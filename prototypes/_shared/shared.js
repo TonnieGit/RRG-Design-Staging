@@ -116,17 +116,20 @@ function revealResults(resultsId) {
 // — a prefilled demo postcode read as real customer data it isn't). The "Update" button is a
 // light demo re-trigger against the same static data (no real geocoding), which swaps the
 // copy on the Click & Collect view-all line between the two states below, AND — since
-// showing named stores with no postcode entered implied a real nearby-store match that
-// wasn't real — hides the Click & Collect results entirely until a postcode is actually
-// typed in. The "In stock and on display in N stores — View all stores" line stays visible
-// either way; only the named store rows are gated. Delivery's results (flat freight rates,
-// not location-matched) are unaffected.
+// showing named stores or delivery rates with no postcode entered implied a real match that
+// wasn't real — hides BOTH panels' results entirely until a postcode is actually typed in
+// (corrected 2026-09-10, second follow-up: Delivery was originally left showing regardless,
+// same bug the Collect tab had already been fixed for). The "In stock and on display in N
+// stores — View all stores" line stays visible either way; only the named store rows are
+// gated. Delivery's `.dc-postcode-prompt` swaps places with its results the same way.
 function initDcPostcode(root = document) {
   root.querySelectorAll('.dc-widget').forEach(widget => {
     const input = widget.querySelector('#dcPostcode, [data-dc-postcode]');
     const btn = widget.querySelector('[data-dc-update]');
     const line = widget.querySelector('.dc-viewall-line');
     const collectResults = widget.querySelector('[data-dc-panel="collect"] .dc-results');
+    const deliveryResults = widget.querySelector('[data-dc-panel="delivery"] .dc-results');
+    const deliveryPrompt = widget.querySelector('[data-dc-panel="delivery"] .dc-postcode-prompt');
     if (!input || !btn) return;
     const update = () => {
       const val = input.value.trim();
@@ -136,6 +139,8 @@ function initDcPostcode(root = document) {
           : `In stock and on display in ${rrgStoreCount()} stores — `;
       }
       if (collectResults) collectResults.hidden = !val;
+      if (deliveryResults) deliveryResults.hidden = !val;
+      if (deliveryPrompt) deliveryPrompt.hidden = !!val;
     };
     btn.addEventListener('click', update);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); update(); } });

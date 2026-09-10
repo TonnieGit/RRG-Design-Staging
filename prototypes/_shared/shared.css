@@ -475,6 +475,11 @@ button{font-family:inherit;cursor:pointer;}
 .dc-viewall{color:#1A56DB;font-weight:700;text-decoration:underline;cursor:pointer;}
 .dc-viewall:hover{color:#123f9e;}
 
+/* Delivery panel's placeholder before a postcode is entered — mirrors the Collect panel
+   gating results the same way (2026-09-10, second follow-up: Delivery was left showing
+   flat rates regardless of postcode, same bug already fixed on Collect). */
+.dc-postcode-prompt{font-size:13.5px;color:#767676;padding:4px 0;}
+
 /* Store slide-out — right-edge drawer, "View all stores" from the Click & Collect and
    Showroom Finder widgets. Real store network (RRG_STORE_NETWORK in shared.js), grouped by
    state to match the live site's own Store Inventory slide-out. Reuses .dc-store/.stock-chip

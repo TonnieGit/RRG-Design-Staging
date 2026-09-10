@@ -484,6 +484,12 @@ Client reviewed the map on Vehicle-Specific and liked it — two changes followe
 
 **Verified this session** (Playwright, all 5 templates): map renders with real OpenStreetMap tiles and pins on Simple and Grouped-Bundle (spot-checked visually), config-variant and sibling-color confirmed via console (zero errors on all 5); "View all stores" now has two working triggers per page (Click & Collect card + Showroom Finder widget) both opening the same slide-out — confirmed by clicking the Showroom Finder's trigger specifically on Simple; computed link colour confirmed white inside `.showroom-widget` and unchanged blue inside the Click & Collect card on the same page.
 
+### Delivery panel — same postcode-gating bug the Collect tab already had fixed (2026-09-10, same day)
+
+Caught on a later pass: the Delivery tab's Standard/Express freight rates were still showing unconditionally regardless of postcode — the postcode-gating fix from the "second correction round" above only ever covered `#collectResults`, not `#deliveryResults`, so Delivery was left exactly where Collect had been before that fix. `initDcPostcode()`'s `update()` now hides `#deliveryResults` the same way (`hidden = !val`), and a new `.dc-postcode-prompt` ("Enter your postcode above to see delivery options.") fills the gap while it's hidden, mirroring the Collect panel always having its "In stock and on display in N stores" line visible — an empty panel with nothing in it would have read as broken. Markup change (`.dc-postcode-prompt` div added to the Delivery panel) applied identically across all 5 templates; the gating logic itself lives once in shared.js, so no other JS changes were needed.
+
+**Verified this session** (Playwright): Delivery tab shows only the prompt with no postcode entered (screenshotted on Vehicle-Specific); entering a postcode and clicking Update hides the prompt and reveals the Standard/Express rates; spot-checked the same hidden-by-default behavior on Grouped-Bundle. No console errors on either.
+
 ### Next steps (in order)
 
 **Superseded:** the old "7 confirmed build items, all done 2026-09-10" list above was from the Scott Childs/Jake meeting only. The same-day Graham Sowerby meeting reopened three of those items and added a longer list of its own — see that meeting's write-up above for full detail. The list below is the current combined backlog, in priority order, picking up where that write-up left off.
