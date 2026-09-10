@@ -342,8 +342,8 @@ button{font-family:inherit;cursor:pointer;}
    margin-left:auto), shown/hidden by the same "on sale" admin flag as the price
    (syncSaleTag() in shared.js finds it via the price-row's containing .decision-panel,
    so it works regardless of where inside the row it sits). */
-.price-row .sale-tag{margin-left:auto;align-self:center;width:58px;height:auto;flex:0 0 auto;pointer-events:none;}
-@media (max-width:640px){.price-row .sale-tag{width:46px;}}
+.price-row .sale-tag{margin-left:auto;align-self:center;width:86px;height:auto;flex:0 0 auto;pointer-events:none;}
+@media (max-width:640px){.price-row .sale-tag{width:64px;}}
 
 /* Package contents (vehicle-specific kits) — each included item with its own SKU + copy
    button, so instore staff can copy individual part numbers without hunting through specs */

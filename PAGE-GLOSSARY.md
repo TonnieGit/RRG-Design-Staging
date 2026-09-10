@@ -32,7 +32,7 @@ Top-to-bottom structural blocks. Not every section appears on every template —
 | **Hero** | The main above-the-fold row: Main Product Gallery on the left, Decision Panel on the right — `section.hero` |
 | **Decision Panel** | The right-hand sidebar column in the Hero: brand logo, SKU, price, fitment status, variant/colour picker, Add to Cart, payment badges, Delivery/Click & Collect widget — `.decision-panel` |
 | **Trust Row** | 4-column strip of trust points (Trusted Since 1989, Trained Professionals, etc.) below the hero — `.trust-row` |
-| **Showroom Finder section** | Full-width black CTA block ("See It In Person — On Display At N Stores") — its own section below the hero, not inside the Decision Panel. See Widgets below. |
+| **Showroom Finder section** | Full-width black CTA block ("See It In Person — On Display At N Stores") — its own section below the hero, not inside the Decision Panel. **Now on all 5 templates** (client ask, 2026-09-10; previously Vehicle-Specific only), toggleable per-SKU via the Demo State Panel. See Widgets below. |
 | **Fitted Photos Gallery section** | "See it fitted to a [vehicle] just like yours" — grid of real installation photos. **Vehicle-Specific only.** See naming clash above. |
 | **Short Description** | One paragraph of product copy, sits between the Hero/Trust Row and the Tabs. Used on lower-complexity templates (Simple, Sibling-Color). |
 | **Body Tabs section** | Full-width area containing the Tabs widget (Details/Specifications/Gold Guarantee/Shipping/Fitting Instructions) — `.body-cols` |
@@ -56,7 +56,7 @@ Interactive or reusable components that live inside the sections above.
 | **Fitment Status widget** | The "fits your vehicle / doesn't fit / no vehicle set" box, white card with a coloured left accent — appears in the Decision Panel, the Sticky Mobile Bar, and the Persistent Bar — `.fitment` |
 | **Payment-Plan Badges** | Afterpay / PayPal / Zip instalment amounts, shown under Add to Cart — `.payment-badges` |
 | **Delivery / Click & Collect widget** | Tabbed widget (Delivery | Click & Collect) with postcode entry and live results, sits directly under Add to Cart in the Decision Panel — `.dc-widget` |
-| **Showroom Finder widget** | High-contrast black CTA block, "on display at N stores," postcode search — sits in its own full-width section below the hero (not the Decision Panel) — `.showroom-widget` |
+| **Showroom Finder widget** | High-contrast black CTA block, "on display at N stores," postcode search — sits in its own full-width section below the hero (not the Decision Panel). **All 5 templates**, with a Demo State Panel toggle ("On display in-store") to preview a SKU that isn't on display anywhere — `.showroom-widget` / `#showroom` / `applyShowroomFlag()` |
 | **Package Contents / "What's Included"** | List of individual kit components with their own SKUs and copy buttons — **Vehicle-Specific & Grouped-Bundle only** — `.package-items` |
 | **Get It Installed CTA** | Installer photo + REVIEWS.io badge + "More Information + Bookings" button, paired with the product video under the gallery — **Config-Variant & Vehicle-Specific only** — `.install-media-row` / `.install-cta-panel` |
 | **Product Video** | Embedded product video or placeholder, appears under the Main Product Gallery — `.video-wrap` / `.video-placeholder` |
@@ -68,7 +68,7 @@ Interactive or reusable components that live inside the sections above.
 | **Tabs widget** | Accordion/tab-bar of Details, Specifications, Gold Guarantee, Shipping Info, Fitting Instructions — `.tabs` |
 | **Related Products carousel** | Grid of cross-sell product cards below the main content — `.product-card` |
 | **Copy-to-clipboard buttons** | Small "⧉ Copy" buttons next to SKUs (main SKU row and each Package Contents item) — `.copy-btn` |
-| **Demo State Panel** | Floating "Demo State" button (bottom-right) that expands into a reviewer-only control panel for previewing product states (video/sale/stock/shipping/collect/special order/ex-demo/fitted option/gallery placement/session vehicle). Not part of the shipped design. — `.admin-fab` / `.admin-panel` |
+| **Demo State Panel** | Floating "Demo State" button (bottom-right) that expands into a reviewer-only control panel for previewing product states (video/sale/stock/shipping/collect/special order/ex-demo/showroom/fitted option/gallery placement/session vehicle). Not part of the shipped design. — `.admin-fab` / `.admin-panel` |
 
 ---
 

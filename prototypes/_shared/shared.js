@@ -208,6 +208,15 @@ function detectInitialCollectState() {
   return !tab || !tab.hidden;
 }
 
+// Showroom Finder is now standard on every template (client ask, 2026-09-10) — the
+// Demo State Panel toggle previews the case where a given SKU isn't on display anywhere,
+// rather than gating whether the section exists at all.
+function applyShowroomFlag(on) {
+  adminState.showroom = on;
+  const section = document.getElementById('showroom');
+  if (section) section.hidden = !on;
+}
+
 function applyVideoFlag(on) {
   adminState.video = on;
   document.querySelectorAll('.install-media-row').forEach(row => row.classList.toggle('no-video', !on));
@@ -663,11 +672,12 @@ function buildAdminPanel() {
   const needsVehicleDemo = !!document.querySelector('[data-fitment-slot]');
   const hasVariantPicker = !!document.querySelector('.variant-picker');
   const hasFitGalleryPlacementToggle = !!document.getElementById('fitGallerySection') && !!document.getElementById('fitGalleryNestedSlot');
+  const hasShowroom = !!document.getElementById('showroom');
   const initialVideo = detectInitialVideoState();
   const initialSale = detectInitialSaleState();
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true });
 
   const fab = document.createElement('button');
   fab.type = 'button';
@@ -706,6 +716,7 @@ function buildAdminPanel() {
         <label class="admin-toggle"><span>Click &amp; Collect available</span><input type="checkbox" data-admin-flag="collect" ${initialCollect ? 'checked' : ''}></label>
         <label class="admin-toggle"><span>Special order item</span><input type="checkbox" data-admin-flag="specialOrder"></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
+        ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
       </div>
       ${hasVariantPicker ? `
       <div class="admin-section">
@@ -749,6 +760,7 @@ function buildAdminPanel() {
           break;
         case 'specialOrder': applySpecialOrderFlag(on); break;
         case 'exdemo': applyExdemoFlag(on); break;
+        case 'showroom': applyShowroomFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;
         case 'fitGalleryRed': applyFitGalleryRedFlag(on); break;
       }
