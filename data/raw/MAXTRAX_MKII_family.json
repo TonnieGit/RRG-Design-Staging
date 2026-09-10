@@ -1,0 +1,172 @@
+{
+  "product_family_id": "maxtrax-mkii",
+  "product_type": "sibling-color",
+  "brand": "MAXTRAX",
+  "title_base": "MAXTRAX MKII",
+  "breadcrumbs": ["Home", "MAXTRAX MKII"],
+  "short_description": "MAXTRAX is the lightweight, easy-to-use vehicle recovery and extraction device that's easily carried by almost anything with four-wheels ensuring an easy way out if your vehicle becomes stuck.",
+  "long_description": "MAXTRAX takes the drama out of getting stuck. The aggressive large cleats on MAXTRAX sink their teeth into the tyre tread and the terrain under your 4WD vehicle to prevent it from slipping back into mud, snow, or sand and make vehicle recovery quick and easy. MAXTRAX is the perfect fit for every outing. Measuring just 1150mm long X 330mm wide x 85mm tall (45 inches long X 13 inches wide), each set of MAXTRAX stacks together at a height of just 85mm (3.5 inches). MAXTRAX stows easily with the rest of your car camping, overlanding, or four-wheel drive touring gear. Made of UV-stabilized, flexible, super tough engineering-grade reinforced nylon, MAXTRAX provides traction and a firm base to get your vehicle quickly back on track. They have been tested at the University of Queensland to wrap completely around a 33-inch tire without breaking. Each MAXTRAX weighs just 3.4 kilograms (7.5 pounds). MAXTRAX is easy to carry and thanks to it's signature double-edged design, it's easy and quick to manoeuvre under your tires. MAXTRAX have six comfortable built-in handles and a shovel at either end for removing excess earth to help get you unstuck quicker. They also have exclusive keyhole accessory points to allow you to securely mount your MAXTRAX.",
+  "specifications_shared": {
+    "Sport / Activity": "4X4",
+    "Brand": "MAXTRAX",
+    "Dimensions": "1150mm long x 330mm wide x 85mm tall (stacked pair)",
+    "Weight": "3.4kg each"
+  },
+  "gold_guarantee_content": "Standard Rack Guarantee — free with every purchase, ensures fit and performance. Gold Rack Guarantee (when professionally fitted): Professional Installation, Rack Check (annual health checks Year 2 & 3), Key Cover 3 years, Free Basic Accessory Fitting, 90-Day Exchanges and hassle-free returns.",
+  "shipping_info_content": "Australia's only nationwide roof rack specialist, 30+ stores, Distribution Centres in QLD/WA/VIC/NSW/SA/ACT. Metro QLD/NSW/VIC/SA/WA: Next Business Day–3 Business Days. Regional QLD/NSW/VIC/WA & all TAS: 3–5 Business Days. NT: 5–7 Business Days.",
+  "trust_icons": [
+    {"label": "Trusted Since 1989", "sub": "Now with over 30 locations Australia wide"},
+    {"label": "Trained Professionals", "sub": "Over 200,000 roof racks fitted"},
+    {"label": "Australia's Largest", "sub": "We're the only nationwide roof rack specialists"},
+    {"label": "Need Help", "sub": "Contact us on: 1300 071 264"}
+  ],
+  "colors": [
+    {
+      "label": "Black",
+      "sku": "MTX02BK",
+      "swatch_hex": "#000000",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-black-mtx02bk",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": [
+        "https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk.jpg",
+        "https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk-view-1.jpg",
+        "https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk-view-2.jpg"
+      ],
+      "description_override": "Perfect for maintaining an inconspicuous profile, black MAXTRAX are nearly invisible when mounted to your vehicle's roof rack. This is the choice of colour for those in stealth mode."
+    },
+    {
+      "label": "Maroon (People's Choice)",
+      "sku": "MTX02MA",
+      "swatch_hex": "#5c1a24",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-maroon-people-s-choice-board-mtx02ma",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "limited",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-recovery-board-mk2-maroon-MTX02MA_2QSBVN_1.jpg"]
+    },
+    {
+      "label": "Gunmetal Grey",
+      "sku": "MTX02GG",
+      "swatch_hex": "#4a4e52",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-gunmetal-grey",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-gunmetal-grey-mtx02gg.jpg"]
+    },
+    {
+      "label": "FJ Blue",
+      "sku": "MTX02FJB",
+      "swatch_hex": "#1f4e8c",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-fj-blue",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-fj-blue-mtx02fjb.jpg"]
+    },
+    {
+      "label": "Lime Green",
+      "sku": "MTX02LG",
+      "swatch_hex": "#8bc53f",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-lime-green-mtx02lg",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-lime-green-mtx02lg.jpg"]
+    },
+    {
+      "label": "Blaze Yellow",
+      "sku": "MTX02BY",
+      "swatch_hex": "#f5d020",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-blaze-yellow-mtx02by",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-blaze-yellow-mtx02by.jpg"]
+    },
+    {
+      "label": "Pink",
+      "sku": "MTX02PK",
+      "swatch_hex": "#e85a9c",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-pink-mtx02pk",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-pink-mtx02pk.jpg"]
+    },
+    {
+      "label": "FJ Red",
+      "sku": "MTX02FJR",
+      "swatch_hex": "#a8222f",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-fj-red",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-fj-red-mtx02fjr.jpg"]
+    },
+    {
+      "label": "Titanium Grey",
+      "sku": "MTX02TG",
+      "swatch_hex": "#8a8d90",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-titanium-grey",
+      "price_was": 319.00,
+      "price_now": 319.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-titanium-grey-mtx02tg.jpg"],
+      "data_flags": ["No discount detected on scrape (was=now=$319) — differs from all other colors at $319→$299; verify with client whether this is a genuine pricing difference or a stale/missed sale flag."]
+    },
+    {
+      "label": "Desert Tan",
+      "sku": "MTX02DT",
+      "swatch_hex": "#c9a876",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-desert-tan-mtx02dt",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-desert-tan-mtx02dt.jpg"]
+    },
+    {
+      "label": "Turquoise",
+      "sku": "MTX02TQ",
+      "swatch_hex": "#2fa3a3",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-turquoise-mtx02tq",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-turquoise-mtx02tq.jpg"]
+    },
+    {
+      "label": "Olive Drab",
+      "sku": "MTX02OD",
+      "swatch_hex": "#4b5320",
+      "url": "https://www.roofracksgalore.com.au/maxtrax-mkii-olive-drab-mtx02od",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-olive-drab-mtx02od.jpg"]
+    },
+    {
+      "label": "Safety Orange",
+      "sku": "MTX02SO",
+      "swatch_hex": "#ff6a13",
+      "url": "https://www.roofracksgalore.com.au/safety-orange-maxtrax",
+      "price_was": 319.00,
+      "price_now": 299.00,
+      "stock_status": "in_stock",
+      "images": ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-safety-orange-mtx02so.jpg"]
+    }
+  ],
+  "related_products": [
+    {"name": "Kaon Raised Folding Maxtrax & TRED Mounts to suit Platform Racks", "sku": "KS0329"},
+    {"name": "MAXTRAX Roof Rack Mount Kit", "sku": "MTXRRM"},
+    {"name": "Maxtrax MaxLox 30mm Dual Pack", "sku": "MTXML30D"},
+    {"name": "Maxtrax MaxLox 30mm Single", "sku": "MTXML30"},
+    {"name": "MAXTRAX Black Carry Bag", "sku": "MTXCB"},
+    {"name": "MAXTRAX Mini and Jaxbase Combo Orange", "sku": "MTXMJB"}
+  ],
+  "data_flags": [
+    "This family record was scraped fresh (previously only MTX02BK/Black existed as a data point per spec Section 7) — closes the sibling/color known data gap. Swatch hex values are approximate (assigned by name, not colorimetrically sampled) — replace with brand-accurate swatch colors before production."
+  ]
+}

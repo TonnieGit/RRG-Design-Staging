@@ -1,0 +1,498 @@
+/* Roof Racks Galore — shared design tokens & component library, used across all four PDP templates */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&family=Lato:wght@400;700;900&display=swap');
+
+:root{
+  --rrg-black:#000;
+  --rrg-red:#BB0220;
+  --rrg-red-dark:#8f0119;
+  --rrg-gold:#BEA98A;
+  --rrg-gold-bg:#FFF9E8;
+  --rrg-line:#D8D8D8;
+  --rrg-bg:#F5F5F5;
+  --rrg-fits:#1E7A34;
+  --rrg-fits-bg:#EAF7EE;
+  --rrg-unknown:#B36B00;
+  --rrg-unknown-bg:#FFF4E5;
+  --rrg-nofit:#A6192E;
+  --rrg-nofit-bg:#FDEAEC;
+  --radius:12px;
+  --shadow:0 8px 22px rgba(0,0,0,.06);
+  --maxw:1280px;
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none!important;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:'Lato',Arial,Helvetica,sans-serif;
+  color:#232323;
+  background:#fff;
+  line-height:1.45;
+}
+h1,h2,h3,h4{
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  margin:0 0 .4em;
+  color:var(--rrg-black);
+}
+p{margin:0 0 1em;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+/* top strip (legacy — superseded by .rrg-utility-bar/.rrg-main-header below, kept in case any page still references it) */
+.rrg-topbar{background:var(--rrg-black);color:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;text-align:center;padding:7px 12px;}
+.rrg-header{border-bottom:1px solid var(--rrg-line);padding:14px 0;}
+.rrg-header .wrap{display:flex;align-items:center;justify-content:space-between;}
+.rrg-logo{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:.02em;}
+.rrg-logo b{color:var(--rrg-red);}
+
+/* Site header — matches "Navbar - Logged In - Final.png" */
+.rrg-utility-bar{background:var(--rrg-red);color:#fff;font-size:12.5px;}
+.rrg-utility-inner{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;gap:20px;flex-wrap:wrap;}
+.rrg-utility-left,.rrg-utility-right{display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
+.u-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.u-item svg{flex:0 0 auto;width:14px;height:14px;}
+.u-item a{color:#fff;text-decoration:underline;font-weight:700;}
+.u-item .flag-emoji{font-size:14px;line-height:1;}
+
+.rrg-main-header{background:#fff;border-bottom:1px solid var(--rrg-line);padding:16px 0;}
+.rrg-main-inner{display:flex;align-items:center;gap:32px;padding:0 24px;flex-wrap:wrap;}
+.rrg-main-inner .rrg-logo{flex:0 0 auto;}
+.rrg-logo img{height:34px;width:auto;display:block;}
+.rrg-nav{display:flex;align-items:center;gap:22px;font-size:14.5px;font-weight:700;flex:0 0 auto;}
+.rrg-nav a{color:var(--rrg-black);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.rrg-nav a:hover{color:var(--rrg-red);}
+.rrg-nav .sep{color:var(--rrg-line);}
+.rrg-search{flex:1 1 260px;max-width:420px;display:flex;border:1.5px solid var(--rrg-line);border-radius:8px;overflow:hidden;margin-left:auto;}
+.rrg-search input{flex:1;border:none;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;min-width:0;}
+.rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.rrg-search-btn svg{width:16px;height:16px;flex:0 0 auto;}
+.rrg-cart{position:relative;flex:0 0 auto;color:var(--rrg-black);cursor:pointer;}
+.rrg-cart svg{width:24px;height:24px;}
+.cart-badge{position:absolute;top:-6px;right:-8px;background:var(--rrg-red);color:#fff;font-size:10px;font-weight:900;border-radius:999px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;}
+@media (max-width:900px){
+  .rrg-nav{display:none;}
+  .rrg-search{margin-left:0;}
+}
+@media (max-width:640px){
+  .rrg-utility-inner{justify-content:center;text-align:center;}
+  .rrg-utility-left,.rrg-utility-right{justify-content:center;}
+}
+.rrg-crumbs{font-size:12px;color:#767676;padding:14px 0;}
+.rrg-crumbs a{color:#767676;text-decoration:none;}
+.rrg-crumbs a:hover{text-decoration:underline;}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:999px;padding:15px 28px;font-weight:900;font-size:15px;text-transform:uppercase;letter-spacing:.03em;text-decoration:none;text-align:center;transition:transform .12s, box-shadow .12s;}
+.btn-primary{background:var(--rrg-red);color:#fff;}
+.btn-primary:hover{background:var(--rrg-red-dark);}
+.btn-primary:active{transform:scale(.98);}
+.btn-block{width:100%;}
+.btn-lg{padding:18px 28px;font-size:16px;}
+.btn-outline{background:#fff;border:1.5px solid var(--rrg-black);color:var(--rrg-black);}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:5px 12px;border-radius:999px;}
+.badge-save{background:var(--rrg-red);color:#fff;}
+
+/* fitment states — softened 2026-09-10 per client feedback: was a full solid-tinted
+   box (heavy fill + full-strength border all round); now a near-white card with a
+   colored left accent only, so it stays structurally boxed/scannable without
+   competing visually with price/Add to Cart. Label + dot keep the state color for
+   quick scanning; body copy is neutral gray, not tinted. */
+.fitment{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:14px 16px;font-size:14px;color:#4a4a4a;}
+.fitment .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;margin-top:4px;}
+.fitment strong{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:15px;letter-spacing:.02em;margin-bottom:2px;}
+.fitment.fits{border-left:3px solid var(--rrg-fits);}
+.fitment.fits strong{color:var(--rrg-fits);}
+.fitment.fits .dot{background:var(--rrg-fits);}
+.fitment.unknown{border-left:3px solid var(--rrg-unknown);}
+.fitment.unknown strong{color:var(--rrg-unknown);}
+.fitment.unknown .dot{background:var(--rrg-unknown);}
+.fitment.no_fit{border-left:3px solid var(--rrg-nofit);}
+.fitment.no_fit strong{color:var(--rrg-nofit);}
+.fitment.no_fit .dot{background:var(--rrg-nofit);}
+.fitment .actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;}
+.fitment .actions button{background:#fff;border:1px solid var(--rrg-line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:#333;}
+
+/* reviews strip */
+.reviews-strip{display:flex;align-items:center;gap:8px;font-size:13px;color:#232323;}
+.stars{color:#E8A83C;letter-spacing:1px;font-size:15px;}
+.reviews-strip a{font-weight:700;text-decoration:underline;color:var(--rrg-black);}
+
+/* price block */
+.price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.price-now{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;color:var(--rrg-black);}
+.price-was{font-size:16px;color:#8a8a8a;text-decoration:line-through;}
+
+/* Stock status line — replaces the old generic "estimate shipping" copy with the
+   product's actual stock state (mirrors the fitment-state colour language: green/amber/
+   red). Driven by the demo admin panel's 3-way "Stock status" control, see
+   applyStockStatus() in shared.js — defaults to whatever's in the static markup below. */
+.stock-status-line{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:4px;}
+.stock-status-line.in-stock{color:var(--rrg-fits);}
+.stock-status-line.low-stock{color:var(--rrg-unknown);}
+.stock-status-line.not-in-stock{color:var(--rrg-nofit);}
+
+/* Payment-plan badges — sits directly under Add to Cart, inside .cta-col, centered to
+   match the button above. Real brand wordmarks (official SVGs), amount text computed
+   live from the current price via syncPaymentBadges() in shared.js so it tracks sale/
+   variant/colour switches automatically (called from reapplySaleFlag()). */
+.payment-badges{display:flex;align-items:stretch;justify-content:center;margin-top:12px;}
+.payment-badge{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;flex:1;min-width:0;padding:0 14px;text-align:center;}
+.payment-badge:not(:first-child){border-left:1px solid var(--rrg-line);}
+.pb-logo{height:15px;width:auto;display:block;}
+.payment-badge.pb-zip .pb-logo{height:13px;}
+.pb-text{font-size:11.5px;color:#666;line-height:1.3;white-space:nowrap;}
+
+/* trust icons */
+.trust-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);margin:32px 0;}
+.trust-row .item{padding:20px 18px;border-left:1px solid var(--rrg-line);}
+.trust-row .item:first-child{border-left:0;}
+.trust-icon{width:26px;height:26px;color:var(--rrg-red);margin-bottom:10px;display:block;}
+.trust-row h4{font-size:15px;margin-bottom:4px;}
+.trust-row p{font-size:12.5px;color:#666;margin:0;}
+
+/* tabs (accordion, mirrors live-site pattern) */
+.tabs input{display:none;}
+.tabs label{display:block;padding:16px 4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;text-transform:uppercase;border-bottom:1px solid var(--rrg-line);cursor:pointer;position:relative;}
+.tabs label::after{content:'+';position:absolute;right:4px;font-size:20px;}
+.tabs input:checked + label::after{content:'\2212';}
+.tabs .content{max-height:0;overflow:hidden;font-size:14.5px;color:#404247;transition:max-height .25s ease;}
+.tabs input:checked + label + .content{max-height:2000px;padding:16px 4px 24px;}
+
+/* Desktop: same DOM/inputs, laid out as a horizontal tab bar with one panel below
+   instead of a vertical accordion. Flexbox `order` (not CSS Grid track spanning —
+   that undersizes to the labels' combined width, not the full container) regroups
+   all labels onto one line, then all .content panels onto the next; each content
+   forces its own line via flex-basis:100%, and only the :checked one has height,
+   so only one panel is ever visible. Mobile is untouched. */
+@media (min-width:901px){
+  .tabs{display:flex;flex-wrap:wrap;column-gap:8px;border-bottom:1px solid var(--rrg-line);}
+  .tabs label{order:1;flex:0 0 auto;padding:14px 18px;border-bottom:3px solid transparent;margin-bottom:-1px;}
+  .tabs label::after{display:none;}
+  .tabs input:checked + label{color:var(--rrg-red);border-bottom-color:var(--rrg-red);}
+  .tabs .content{order:2;flex:0 0 100%;padding:0;}
+  .tabs input:checked + label + .content{padding:24px 4px 8px;max-height:none;}
+}
+
+/* Sticky left column (desktop only): when the decision-panel column ends up taller than
+   the gallery/video/install column (variant pickers, showroom finder, package contents
+   etc. push its height up), pin the shorter gallery column in place while the taller one
+   keeps scrolling, instead of leaving blank space under it once it runs out of content.
+   Relies on .hero's existing align-items:start (defined per-page) to leave room in the
+   grid row to stick into — a no-op if the gallery column happens to be the taller side,
+   so it's safe to apply unconditionally. Scoped to a direct .hero child so it has no
+   effect once the gallery-placement demo toggle moves this column out of .hero. */
+@media (min-width:901px){
+  .hero > .gallery-col{position:sticky;top:20px;}
+}
+
+/* gallery */
+.gallery-main{position:relative;border-radius:var(--radius);overflow:hidden;background:#f0f0f0;aspect-ratio:3/2;}
+.gallery-main img{width:100%;height:100%;object-fit:cover;}
+
+/* Thumbnails scroll as a single-row carousel instead of wrapping to a second row — keeps
+   the gallery column's height from ballooning past the decision panel beside it once the
+   video / Get It Installed row is added below. Sized so exactly 4 fit per view, matching
+   the old 4-column grid look when there are <=4 images; 5+ scroll. */
+.gallery-thumbs-wrap{position:relative;}
+.gallery-thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch;}
+.gallery-thumbs img{flex:0 0 calc((100% - 24px)/4);width:calc((100% - 24px)/4);aspect-ratio:1/1;object-fit:cover;border-radius:8px;border:1px solid var(--rrg-line);cursor:pointer;scroll-snap-align:start;}
+.gallery-thumbs img.active{border-color:var(--rrg-red);border-width:2px;}
+.thumb-nav{display:none;position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid var(--rrg-line);box-shadow:0 2px 6px rgba(0,0,0,.15);align-items:center;justify-content:center;color:var(--rrg-black);padding:0;z-index:2;}
+.thumb-nav svg{width:16px;height:16px;}
+.thumb-nav.prev{left:-4px;}
+.thumb-nav.next{right:-4px;}
+.thumb-nav:disabled{opacity:.3;cursor:default;}
+.gallery-thumbs-wrap.has-overflow .thumb-nav{display:flex;}
+@media (max-width:640px){
+  .thumb-nav{display:none!important;} /* touch swipe carries the interaction on mobile */
+}
+
+/* Product video — appears under the gallery, paired with the Get It Installed CTA where
+   both exist. Prototype stage doesn't embed real video playback anywhere; .video-placeholder
+   is a static thumbnail image (video-thumbnail.png) standing in on every product so the
+   layout can be previewed/reviewed, not a real per-product video. Shown/hidden purely by
+   the demo admin panel's "Product has video" toggle. */
+.video-placeholder{display:block;width:100%;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;object-fit:cover;}
+
+/* Get It Installed — image + text CTA (was a plain sidebar button). .install-media-row
+   pairs it with the product video, side by side, under the gallery images. The .no-video
+   modifier (toggled by the demo admin panel, or present by default on products with no
+   video at all) drops it to a single full-width column instead. */
+.install-media-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.install-media-row.no-video{grid-template-columns:1fr;}
+.install-media-row.no-video .video-placeholder{display:none!important;}
+.install-cta-panel{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:#111;}
+.install-cta-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:65% 35%;}
+.install-cta-panel .install-overlay{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:22px 24px;background:linear-gradient(90deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.1) 100%);color:#fff;}
+.install-cta-panel h3{color:#fff;font-size:19px;margin:0;}
+.install-cta-panel .install-tag{font-size:12.5px;color:#ddd;line-height:1.35;max-width:230px;margin:0;}
+.install-cta-reviews{display:flex;align-items:center;gap:10px;}
+.install-cta-reviews .stars{color:#E8A83C;font-size:14px;}
+.reviews-io-badge{display:inline-flex;align-items:center;gap:2px;background:#fff;color:#232323;font-weight:900;font-size:10.5px;padding:4px 8px;border-radius:4px;letter-spacing:.02em;}
+.install-cta-panel .btn{background:var(--rrg-gold);color:#232323;align-self:flex-start;padding:12px 20px;font-size:13px;border-radius:8px;line-height:1.25;}
+.install-cta-panel .btn:hover{background:#a8916f;}
+.install-media-row.no-video .install-cta-panel{aspect-ratio:auto;min-height:220px;}
+.install-media-row.no-video .install-cta-panel .install-overlay{max-width:520px;}
+@media (max-width:900px){
+  .install-media-row{grid-template-columns:1fr;}
+  .install-cta-panel{aspect-ratio:16/9;}
+}
+
+/* Standalone product-video slot for templates with no Get It Installed panel (Simple,
+   Sibling-color) — shown/hidden purely by the demo admin panel's "has video" toggle. */
+[data-admin-video]{margin-top:10px;}
+
+/* Fitted Photos Gallery — "Gallery" panel widget (2026-09-10, matched to a live-site
+   Figma reference). Vehicle-specific only. Colours are driven entirely by --fg-* custom
+   properties on .fit-gallery-panel so the red/non-red admin toggle (.red modifier) and
+   both placements (default = full width above tabs; .fit-gallery-section.nested = inside
+   the gallery column, see applyFitGalleryPlacement() in shared.js) share one set of rules. */
+.fit-gallery-panel{
+  --fg-bg:#fff; --fg-fg:var(--rrg-black); --fg-link:var(--rrg-red);
+  --fg-btn-bg:var(--rrg-black); --fg-btn-fg:#fff;
+  --fg-dot:rgba(0,0,0,.18); --fg-dot-active:var(--rrg-black);
+  --fg-nav-bg:rgba(255,255,255,.9); --fg-nav-fg:var(--rrg-black); --fg-nav-border:var(--rrg-line);
+  background:var(--fg-bg);color:var(--fg-fg);border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px 24px 24px;
+}
+.fit-gallery-panel.red{
+  --fg-bg:var(--rrg-red); --fg-fg:#fff; --fg-link:#fff;
+  --fg-btn-bg:#fff; --fg-btn-fg:var(--rrg-black);
+  --fg-dot:rgba(255,255,255,.35); --fg-dot-active:#fff;
+  --fg-nav-bg:rgba(0,0,0,.35); --fg-nav-fg:#fff; --fg-nav-border:transparent;
+  border-color:transparent;
+}
+.fit-gallery-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.fit-gallery-title{display:flex;align-items:center;gap:10px;}
+.fit-gallery-badge{width:26px;height:26px;flex:0 0 auto;border-radius:6px;background:var(--rrg-gold);color:#fff;display:flex;align-items:center;justify-content:center;}
+.fit-gallery-badge svg{width:15px;height:15px;}
+.fit-gallery-title h2{margin:0;line-height:1;color:var(--fg-fg);}
+.fit-gallery-viewall{margin-left:auto;color:var(--fg-link);font-weight:700;font-size:13px;text-decoration:underline;white-space:nowrap;}
+.fit-gallery-carousel{position:relative;}
+.fit-gallery-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.fit-gallery-track::-webkit-scrollbar{display:none;}
+.fit-gallery-track img{flex:0 0 calc((100% - 60px)/7);aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#eee;scroll-snap-align:start;}
+.fit-gallery-section.nested .fit-gallery-track img{flex:0 0 calc((100% - 30px)/4);}
+.fit-gallery-nav{display:none;position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--fg-nav-bg);color:var(--fg-nav-fg);border:1px solid var(--fg-nav-border);align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;z-index:2;}
+.fit-gallery-nav:disabled{opacity:.3;cursor:default;}
+.fit-gallery-nav.prev{left:-4px;}
+.fit-gallery-nav.next{right:-4px;}
+.fit-gallery-carousel.has-overflow .fit-gallery-nav{display:flex;}
+@media (max-width:640px){
+  .fit-gallery-nav{display:none!important;} /* touch swipe carries the interaction on mobile */
+}
+.fit-gallery-dots{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;}
+.fit-gallery-dot{width:7px;height:7px;padding:0;border:none;border-radius:999px;background:var(--fg-dot);cursor:pointer;}
+.fit-gallery-dot.active{width:20px;background:var(--fg-dot-active);}
+
+/* Demo state panel (reviewer-only, not part of the shipped design) — a floating button
+   that expands into a panel for toggling simulated product states (video, sale, stock,
+   shipping/click&collect availability) and, on vehicle-specific, the session vehicle used
+   for fitment. Replaces the old fixed top "REVIEWER DEMO" bar. */
+.admin-fab{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;align-items:center;gap:8px;background:var(--rrg-black);color:#fff;border:none;border-radius:999px;padding:13px 18px 13px 14px;font-weight:900;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;box-shadow:0 8px 20px rgba(0,0,0,.25);cursor:pointer;}
+.admin-fab svg{width:18px;height:18px;flex:0 0 auto;}
+.admin-panel{position:fixed;right:20px;bottom:20px;z-index:61;width:300px;max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px) scale(.98);opacity:0;pointer-events:none;transition:transform .15s ease, opacity .15s ease;}
+.admin-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto;}
+.admin-panel-head{display:flex;align-items:center;justify-content:space-between;background:var(--rrg-black);color:#fff;padding:14px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.02em;}
+.admin-panel-head button{background:none;border:none;color:#fff;font-size:18px;line-height:1;padding:2px;opacity:.7;}
+.admin-panel-head button:hover{opacity:1;}
+.admin-panel-body{padding:16px;overflow-y:auto;}
+.admin-section{margin-bottom:18px;}
+.admin-section:last-child{margin-bottom:0;}
+.admin-section h5{font-size:11.5px;color:#767676;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;}
+.admin-vehicle-row{display:flex;flex-direction:column;gap:6px;}
+.admin-vehicle-row button{background:#f2f2f2;border:1px solid var(--rrg-line);border-radius:8px;padding:9px 12px;font-size:12.5px;font-weight:700;text-align:left;color:var(--rrg-black);}
+.admin-vehicle-row button.active{background:var(--rrg-red);border-color:var(--rrg-red);color:#fff;}
+.admin-toggle-label{padding:9px 0 0;font-size:13px;color:#232323;}
+.admin-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;font-size:13px;color:#232323;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.admin-toggle:last-child{border-bottom:none;}
+.admin-toggle input{appearance:none;-webkit-appearance:none;width:36px;height:21px;border-radius:999px;background:#d8d8d8;position:relative;flex:0 0 auto;cursor:pointer;transition:background .15s ease;}
+.admin-toggle input::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s ease;}
+.admin-toggle input:checked{background:var(--rrg-fits);}
+.admin-toggle input:checked::after{left:17px;}
+@media (max-width:640px){
+  .admin-fab,.admin-panel{bottom:84px;}
+}
+
+/* Out-of-stock banner, inserted above the Add to Cart column by the demo admin panel */
+.stock-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-nofit);background:var(--rrg-nofit-bg);border:1px solid var(--rrg-nofit);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+
+/* Shown in place of the Delivery/Click & Collect widget when the demo admin panel has
+   both availability toggles switched off */
+.dc-unavailable-note{font-size:12.5px;color:#767676;padding:12px 14px;border:1px dashed var(--rrg-line);border-radius:8px;}
+
+/* Special order banner — sits above Add to Cart, demo admin panel "Special order" toggle */
+.special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-unknown);background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+
+/* Brand logo — required on every product page, sits at the top of the decision panel */
+.brand-logo{height:26px;width:auto;object-fit:contain;display:block;margin-bottom:12px;}
+/* Text fallback for brands with no supplied logo file yet (see grouped-bundle template,
+   which introduces Yakima — no real logo asset on hand, unlike the other three brands). */
+.brand-logo-text{height:26px;line-height:26px;font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:19px;letter-spacing:.01em;color:#111;text-transform:uppercase;margin-bottom:12px;}
+
+/* Sale tag — sits inline next to the price inside .price-row (right-aligned via
+   margin-left:auto), shown/hidden by the same "on sale" admin flag as the price
+   (syncSaleTag() in shared.js finds it via the price-row's containing .decision-panel,
+   so it works regardless of where inside the row it sits). */
+.price-row .sale-tag{margin-left:auto;align-self:center;width:58px;height:auto;flex:0 0 auto;pointer-events:none;}
+@media (max-width:640px){.price-row .sale-tag{width:46px;}}
+
+/* Package contents (vehicle-specific kits) — each included item with its own SKU + copy
+   button, so instore staff can copy individual part numbers without hunting through specs */
+.package-items{margin:16px 0;border:1px solid var(--rrg-line);border-radius:10px;overflow:hidden;}
+.package-items h5{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#767676;padding:10px 12px;margin:0;background:#f7f7f7;border-bottom:1px solid var(--rrg-line);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
+.package-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:12.5px;border-top:1px solid var(--rrg-line);}
+.package-item:first-of-type{border-top:none;}
+.package-item .pi-name{flex:1;color:#333;}
+.package-item .pi-sku{display:flex;align-items:center;gap:6px;color:#767676;white-space:nowrap;}
+
+/* Generic copy-to-clipboard button, used by the main SKU row and package-item rows */
+.copy-btn{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:11.5px;padding:2px 4px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;}
+.copy-btn.copied{color:var(--rrg-fits);}
+
+/* Ex-Demo / Factory Seconds CTA + modal — demo admin panel "B-Stock" toggle */
+.exdemo-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px dashed var(--rrg-gold);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:12.5px;font-weight:700;color:#6b5a3e;cursor:pointer;text-align:left;width:100%;font-family:inherit;}
+.exdemo-cta:hover{background:var(--rrg-gold-bg);}
+.exdemo-cta .ex-label{display:flex;align-items:center;gap:8px;}
+.exdemo-cta .ex-arrow{font-weight:900;font-size:15px;}
+
+/* Paid "Fitted" option — demo-preview only (2026-09-10 client meeting), not wired to
+   real cart/checkout. Mode 1 injects this as a third card into .variant-picker (higher
+   specificity than each page's own .variant-option rule, so it overrides regardless of
+   stylesheet load order); Mode 2 uses the plain upsell-checkbox styling below instead. */
+.variant-option.fitted-option{grid-column:1/-1;background:var(--rrg-gold-bg);border-color:var(--rrg-gold);}
+.variant-option.fitted-option.selected{border-color:var(--rrg-gold);box-shadow:0 0 0 1px var(--rrg-gold);}
+.fitted-upsell-checkbox{display:flex;align-items:flex-start;gap:10px;background:var(--rrg-gold-bg);border:1px solid var(--rrg-gold);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5c4d34;cursor:pointer;margin-bottom:2px;}
+.fitted-upsell-checkbox input{margin-top:2px;flex:0 0 auto;}
+.fitted-upsell-checkbox .fitted-sub{display:block;color:#8a7a5c;font-size:11px;margin-top:2px;}
+
+.admin-section h5 .admin-note{text-transform:none;font-weight:400;color:#aaa;letter-spacing:0;}
+.admin-radio-row{display:flex;flex-direction:column;gap:6px;margin:8px 0 0;padding-top:8px;border-top:1px dashed #eee;}
+.admin-radio-row label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#333;cursor:pointer;}
+
+/* Fitted Photos Gallery — nested layout (2026-09-10 client ask): when #fitGallerySection
+   sits inside the gallery column (under the main gallery/thumbs/install row) instead of its
+   default full-width position above the tabs. Photo-count/track sizing lives with the rest
+   of the .fit-gallery-panel rules above; this is just outer spacing. */
+.fit-gallery-section.nested{margin:16px 0 0;}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .15s ease;}
+.modal-backdrop.open{opacity:1;pointer-events:auto;}
+.modal-card{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 4px;}
+.modal-head h3{font-size:19px;margin:0 0 4px;}
+.modal-head p{font-size:12.5px;color:#666;margin:0;}
+.modal-close{background:#f2f2f2;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;flex:0 0 auto;color:#333;}
+.modal-body{padding:14px 22px 22px;display:flex;flex-direction:column;gap:12px;}
+.exdemo-option{border:1px solid var(--rrg-line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.exdemo-option .eo-img{width:64px;height:64px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:6px;flex:0 0 auto;}
+.exdemo-option .eo-info{flex:1;min-width:0;}
+.exdemo-option .eo-tag{display:inline-block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
+.exdemo-option .eo-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
+.exdemo-option .eo-was{font-size:12px;color:#8a8a8a;text-decoration:line-through;margin-left:6px;}
+.exdemo-option .eo-note{font-size:12px;color:#666;margin-top:2px;}
+.exdemo-option .btn{padding:10px 16px;font-size:12px;flex:0 0 auto;}
+@media (max-width:520px){
+  .exdemo-option{flex-wrap:wrap;}
+  .exdemo-option .btn{flex:1 0 100%;}
+}
+
+/* rationale panel */
+.rationale{background:var(--rrg-bg);border-top:4px solid var(--rrg-red);margin-top:56px;padding:40px 0 64px;}
+.rationale h2{font-size:28px;}
+.rationale .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:20px;}
+.rationale .card{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:20px;}
+.rationale .card h4{font-size:13px;letter-spacing:.04em;color:var(--rrg-red);margin-bottom:8px;}
+.rationale .card p{font-size:14px;color:#333;margin:0;}
+.rationale .tradeoff{border-left:3px solid var(--rrg-unknown);}
+.rationale .cite{font-size:12px;color:#767676;font-style:italic;margin-top:6px;}
+
+/* Delivery / Click & Collect widget — full-width, two tabs */
+.dc-widget{border:1px solid var(--rrg-line);border-radius:var(--radius);overflow:hidden;background:#fff;}
+.dc-tabs{display:flex;border-bottom:1px solid var(--rrg-line);}
+.dc-tab{flex:1;background:#f7f7f7;border:none;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.02em;color:#767676;border-bottom:2px solid transparent;}
+.dc-tab.active{background:#fff;color:var(--rrg-black);border-bottom-color:var(--rrg-red);}
+.dc-panel{padding:16px 18px;}
+.dc-row{display:flex;gap:10px;flex-wrap:wrap;}
+.dc-input{flex:1 1 220px;border:1px solid var(--rrg-line);border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;}
+.dc-results{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
+.dc-option,.dc-store{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--rrg-line);border-radius:8px;padding:12px 14px;font-size:13.5px;}
+.dc-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;}
+.muted{color:#767676;font-size:12.5px;}
+.stock-chip{display:inline-block;font-size:11px;font-weight:900;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-left:6px;}
+.stock-chip.in{background:var(--rrg-fits-bg);color:var(--rrg-fits);border:1px solid var(--rrg-fits);}
+.stock-chip.order{background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);}
+
+/* Showroom Finder — prominent trust CTA, not a plain widget */
+.showroom-widget{background:var(--rrg-black);color:#fff;border-radius:var(--radius);padding:26px 28px;margin-top:20px;}
+.showroom-widget h3{color:#fff;margin-bottom:8px;}
+.showroom-widget p{color:#ccc;font-size:14px;max-width:640px;}
+.showroom-widget .dc-input{background:#fff;}
+.showroom-widget .dc-results{margin-top:18px;}
+.showroom-widget .dc-store{background:#1c1c1c;border-color:#3a3a3a;color:#fff;}
+.showroom-widget .muted{color:#aaa;}
+.showroom-widget .stock-chip.in{background:#1E7A34;color:#fff;border-color:#1E7A34;}
+
+/* Sticky mobile Add-to-Cart bar — hidden by default, shown only on narrow viewports */
+.sticky-cta-mobile{display:none;}
+@media (max-width:640px){
+  .sticky-cta-mobile{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--rrg-line);padding:10px 16px;gap:10px;align-items:center;z-index:40;box-shadow:0 -6px 16px rgba(0,0,0,.08);}
+  body{padding-bottom:74px;}
+}
+
+/* Persistent decision bar — appears once the primary decision panel scrolls out of view */
+.persistent-bar{position:fixed;left:0;right:0;background:#fff;border-bottom:1px solid var(--rrg-line);box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:35;transform:translateY(-120%);transition:transform .25s ease;}
+.persistent-bar .persistent-inner{display:flex;align-items:center;gap:20px;padding:10px 24px;}
+.persistent-bar.visible{transform:translateY(0);}
+.persistent-bar .fitment{margin:0;flex:1 1 260px;padding:8px 12px;font-size:12px;}
+.persistent-bar .fitment strong{font-size:12.5px;}
+.persistent-bar .price-now{font-size:20px;}
+.persistent-bar .price-was{font-size:12px;}
+.persistent-bar .btn{padding:12px 20px;font-size:13px;flex:0 0 auto;}
+@media (max-width:640px){.persistent-bar{display:none;}}
+
+/* Related / cross-sell product carousel */
+.related-heading{margin-bottom:16px;}
+
+/* Section heading style — shared by every top-level section label (Related Products,
+   Showroom Finder's "See It In Person...", the Fitment Gallery panel) so they all read as
+   one consistent typographic level, per client request 2026-09-10. */
+.related-heading,
+.showroom-widget h3,
+.fit-gallery-title h2{
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-weight:700;
+  font-style:italic;
+  text-transform:uppercase;
+  font-size:37px;
+  letter-spacing:.01em;
+}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+.product-card{border:1px solid var(--rrg-line);border-radius:var(--radius);overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.product-card img{aspect-ratio:1/1;object-fit:contain;background:#f7f7f7;padding:12px;}
+.product-card .body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;}
+.product-card h5{font-family:'Lato',sans-serif;text-transform:none;font-weight:700;font-size:13.5px;margin:0 0 6px;flex:1;letter-spacing:0;}
+.product-card .price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-bottom:8px;}
+.product-card .btn{padding:9px 12px;font-size:12px;}
+
+/* Short description block (Simple/lower-complexity templates) */
+.short-desc{font-size:15px;color:#333;max-width:760px;margin:24px 0;}
+
+.nav-strip{background:#fff;border-bottom:1px solid var(--rrg-line);padding:12px 0;font-size:13px;}
+.nav-strip .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+.nav-strip a.tag{padding:6px 14px;border-radius:999px;border:1px solid var(--rrg-line);text-decoration:none;font-weight:700;}
+.nav-strip a.tag.current{background:var(--rrg-black);color:#fff;border-color:var(--rrg-black);}
+
+@media (max-width: 900px){
+  .trust-row{grid-template-columns:repeat(2,1fr);}
+  .trust-row .item:nth-child(2n+1){border-left:0;}
+  .trust-row .item:nth-child(n+3){border-top:1px solid var(--rrg-line);}
+}

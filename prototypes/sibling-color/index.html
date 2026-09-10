@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sibling/Color PDP — MAXTRAX MKII</title>
+<link rel="stylesheet" href="../_shared/shared.css">
+<style>
+  .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:28px 0 8px;align-items:start;}
+  .decision-panel{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+  .decision-panel h1{font-size:25px;line-height:1.08;margin-bottom:6px;}
+  .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
+  .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
+  .sku-row button{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:12px;padding:0;}
+  .decision-panel .reviews-strip{margin-bottom:16px;}
+
+  /* Swatch picker — fast, satisfying color browsing */
+  .swatch-label-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+  .swatch-label-row h4{font-size:13px;color:#767676;text-transform:uppercase;letter-spacing:.03em;margin:0;}
+  .swatch-current{font-size:13px;font-weight:700;color:var(--rrg-black);}
+  .swatch-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+  .swatch{width:40px;height:40px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--rrg-line);cursor:pointer;position:relative;flex:0 0 auto;transition:box-shadow .12s, transform .12s;}
+  .swatch:hover{transform:scale(1.08);}
+  .swatch.selected{box-shadow:0 0 0 2.5px var(--rrg-red);}
+  .swatch.limited::after{content:'';position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:var(--rrg-unknown);border:2px solid #fff;}
+  .swatch-note{font-size:11.5px;color:#999;margin-bottom:16px;}
+
+  .price-block{border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);padding:16px 0;margin-bottom:16px;}
+  .cta-col{display:flex;flex-direction:column;gap:10px;}
+  .body-cols{margin:40px 0;}
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;}
+  }
+  @media (max-width:640px){
+    .swatch{width:44px;height:44px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="rrg-utility-bar">
+  <div class="wrap rrg-utility-inner">
+    <div class="rrg-utility-left">
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> Your Nearest Store: <a href="#">North Lakes</a></span>
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> Your Vehicle: <a href="#">Toyota Hilux</a></span>
+    </div>
+    <div class="rrg-utility-right">
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg> Call Us</span>
+      <span class="u-item"><span class="flag-emoji">🇦🇺</span> Australia <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M6 9l6 6 6-6"/></svg></span>
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7v1H4v-1z"/></svg> <a href="#">Graham</a></span>
+    </div>
+  </div>
+</div>
+<header class="rrg-main-header">
+  <div class="wrap rrg-main-inner">
+    <div class="rrg-logo"><img src="../_shared/headerlogo.png" alt="Roof Racks Galore"></div>
+    <nav class="rrg-nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:16px;height:16px;"><path d="M4 7h16M4 12h16M4 17h16"/></svg> Products</a>
+      <span class="sep">|</span>
+      <a href="#">Store Finder</a>
+      <a href="#">Fit My Vehicle</a>
+      <a href="#">Catalogue</a>
+      <a href="#">Services</a>
+    </nav>
+    <div class="rrg-search">
+      <input type="text" placeholder="Search Roof Racks or Accessories">
+      <button class="rrg-search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
+    </div>
+    <div class="rrg-cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg>
+      <span class="cart-badge">0</span>
+    </div>
+  </div>
+</header>
+
+<div class="rrg-crumbs wrap">
+  <a href="#">Home</a> &gt; <a href="#">Camping &amp; Offroad</a> &gt; MAXTRAX MKII
+</div>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="gallery-col">
+      <div class="gallery-main">
+        <img id="mainImg" alt="MAXTRAX MKII recovery boards">
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+      <img class="video-placeholder" src="../_shared/video-thumbnail.png" alt="Product video (preview placeholder)" data-admin-video hidden>
+    </div>
+
+    <div class="decision-panel">
+      <img class="brand-logo" src="../_shared/brand-maxtrax.webp" alt="MAXTRAX">
+      <div class="sku-row">SKU: <span id="skuValue"></span> <button data-copy-source="#skuValue">⧉ Copy</button></div>
+      <h1>MAXTRAX MKII Recovery Boards</h1>
+      <div class="value-prop">Get unstuck fast — aggressive cleats grip mud, sand or snow. 13 colours, same board.</div>
+      <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
+
+      <div class="swatch-label-row">
+        <h4>Colour</h4>
+        <span class="swatch-current" id="swatchCurrent"></span>
+      </div>
+      <div class="swatch-grid" id="swatchGrid"></div>
+      <div class="swatch-note">Orange dot = limited stock</div>
+
+      <div class="price-block">
+        <div class="price-row">
+          <span class="price-now" id="priceNow"></span>
+          <span class="price-was" id="priceWas"></span>
+          <span class="badge badge-save" id="saveBadge"></span>
+          <img class="sale-tag" src="../_shared/sale-tag.png" alt="On Sale">
+        </div>
+        <div class="stock-status-line in-stock" id="stockLine">✓ In Stock</div>
+      </div>
+
+      <div class="cta-col">
+        <button class="btn btn-primary btn-lg btn-block" data-cta-label>Add To Cart</button>
+        <div class="payment-badges">
+          <div class="payment-badge pb-afterpay">
+            <img class="pb-logo" src="../_shared/payment-logos/afterpay.svg" alt="Afterpay">
+            <span class="pb-text" data-pb-amount="afterpay"></span>
+          </div>
+          <div class="payment-badge pb-paypal">
+            <img class="pb-logo" src="../_shared/payment-logos/paypal.svg" alt="PayPal">
+            <span class="pb-text" data-pb-amount="paypal"></span>
+          </div>
+          <div class="payment-badge pb-zip">
+            <img class="pb-logo" src="../_shared/payment-logos/zip.svg" alt="Zip">
+            <span class="pb-text" data-pb-amount="zip"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc-widget" style="margin-top:18px;">
+        <div class="dc-tabs">
+          <button class="dc-tab active" data-dc-tab="delivery">Delivery</button>
+          <button class="dc-tab" data-dc-tab="collect">Click &amp; Collect</button>
+        </div>
+        <div class="dc-panel" data-dc-panel="delivery">
+          <div class="dc-row">
+            <input type="text" class="dc-input" placeholder="Enter your postcode" id="deliveryPostcode">
+            <button class="btn btn-outline" onclick="revealResults('deliveryResults')">Check Delivery Cost</button>
+          </div>
+          <div class="dc-results" id="deliveryResults" hidden>
+            <div class="dc-option">
+              <div><strong>Standard Freight</strong><br><span class="muted">2–4 business days to your postcode</span></div>
+              <div class="dc-price">$19.00</div>
+            </div>
+            <div class="dc-option">
+              <div><strong>Express Freight</strong><br><span class="muted">1–2 business days to your postcode</span></div>
+              <div class="dc-price">$34.00</div>
+            </div>
+          </div>
+        </div>
+        <div class="dc-panel" data-dc-panel="collect" hidden>
+          <div class="dc-row">
+            <input type="text" class="dc-input" placeholder="Enter your postcode" id="collectPostcode">
+            <button class="btn btn-outline" onclick="revealResults('collectResults')">Find Nearest Store</button>
+          </div>
+          <div class="dc-results" id="collectResults" hidden>
+            <div class="dc-store">
+              <div><strong>Moorebank, NSW</strong><span class="stock-chip in">In Stock</span><br><span class="muted">12 Centenary Ave · 4.2km away · Free pickup</span></div>
+              <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+            </div>
+            <div class="dc-store">
+              <div><strong>Miranda, NSW</strong><span class="stock-chip in">In Stock</span><br><span class="muted">132 Wyralla Rd · 9.4km away · Free pickup</span></div>
+              <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust-row">
+    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
+    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg><h4>Trained Professionals</h4><p>Over 200,000 roof racks fitted</p></div>
+    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><h4>Australia's Largest</h4><p>We're the only nationwide roof rack specialists</p></div>
+    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: 1300 071 264</p></div>
+  </div>
+
+  <p class="short-desc">MAXTRAX is the lightweight, easy-to-use vehicle recovery and extraction device that's easily carried by almost anything with four wheels. Aggressive large cleats sink their teeth into tyre tread and terrain to prevent slipping in mud, snow or sand — vehicle recovery, quick and easy.</p>
+
+  <section class="body-cols">
+    <div>
+      <div class="tabs">
+        <input type="radio" name="tabs" id="t1" checked><label for="t1">Details</label>
+        <div class="content">
+          <ul>
+            <li>Measures 1150mm long x 330mm wide x 85mm tall (stacked pair)</li>
+            <li>UV-stabilised, flexible, engineering-grade reinforced nylon</li>
+            <li>Tested at the University of Queensland to wrap fully around a 33-inch tyre without breaking</li>
+            <li>3.4kg each — light enough to carry, tough enough to drive over</li>
+            <li>Six built-in handles plus a shovel edge at either end</li>
+            <li>Exclusive keyhole accessory points for secure mounting</li>
+          </ul>
+        </div>
+        <input type="radio" name="tabs" id="t2"><label for="t2">Specifications</label>
+        <div class="content">
+          <ul id="specsList"></ul>
+        </div>
+        <input type="radio" name="tabs" id="t3"><label for="t3">Gold Guarantee</label>
+        <div class="content">
+          <p>Standard Rack Guarantee is free with every purchase. Book professional fitting and you're covered by the Gold Rack Guarantee: expert installation, annual Rack Health Checks (Year 2 &amp; 3), 3-year Key Cover, free basic accessory fitting, and 90-day exchanges.</p>
+        </div>
+        <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
+        <div class="content">
+          <p>Metro QLD/NSW/VIC/SA/WA: next business day–3 business days. Regional &amp; TAS: 3–5 business days. NT: 5–7 business days. Free Click &amp; Collect at 30+ stores.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin:48px 0;">
+    <h3 class="related-heading">Related Products</h3>
+    <div class="related-grid">
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/K/a/Kaon-KS0329-Platforms--Trays---Accessories._1_1.jpg" alt="Kaon Raised Folding Maxtrax &amp; TRED Mounts">
+        <div class="body"><h5>Kaon Raised Folding Maxtrax &amp; TRED Mounts</h5><div class="price">$195.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/M/A/MAXTRAX-MTXRRM-Platforms--Trays---Accessories._1_1.jpg" alt="MAXTRAX Roof Rack Mount Kit">
+        <div class="body"><h5>MAXTRAX Roof Rack Mount Kit</h5><div class="price">$219.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/M/A/MAXTRAX-MTXML30D-Locking-Cables--Padlocks._1_1.jpg" alt="Maxtrax MaxLox 30mm Dual Pack">
+        <div class="body"><h5>Maxtrax MaxLox 30mm Dual Pack</h5><div class="price">$45.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/M/A/MAXTRAX-MTXCB-Recovery-Gear._1_1.jpg" alt="MAXTRAX Black Carry Bag">
+        <div class="body"><h5>MAXTRAX Black Carry Bag</h5><div class="price">$25.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="sticky-cta-mobile">
+  <div class="info" style="flex:1;font-size:12px;">
+    <span id="mobilePrice" style="font-weight:700;"></span>
+  </div>
+  <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
+</div>
+
+<section class="rationale">
+  <div class="wrap">
+    <h2>Design Rationale — Sibling/Color Template</h2>
+    <div class="grid">
+      <div class="card">
+        <h4>Decisions</h4>
+        <p>All 13 real MAXTRAX MKII colours are on-page as one large, thumb-friendly swatch grid (40px circles, 44px on mobile) rather than a dropdown — clicking any swatch instantly swaps gallery images, price, stock status, SKU and the Colour spec field, with the selected colour name always shown as text next to the grid (not color-only, for accessibility and at-a-glance confirmation). A small orange dot flags limited-stock colours directly on the swatch itself.</p>
+      </div>
+      <div class="card">
+        <h4>Grounded in</h4>
+        <p>Section 1 table (sibling/color's stated challenge: "visual browsing/selection — swatches need to be fast and satisfying to click through"); Section 0.1.6 (thumb-friendly sizing on mobile, explicitly called out for swatch pickers); product-page-requirements.md Section 1.3/2.11 (this is a deliberate structural departure from the live site, which has no swatch picker at all today — each color is a separate URL).</p>
+        <p class="cite">Spec Section 1 taxonomy table; product-page-requirements.md Sections 1.3 &amp; 2.11.</p>
+      </div>
+      <div class="card tradeoff">
+        <h4>Trade-off / open item</h4>
+        <p>Titanium Grey is the one colour with no scraped discount ($319 flat, vs. $319→$299 on all 12 others) — shown here as real/unmerged data per spec Section 3 step 4, not silently corrected. Needs a client check: genuine pricing difference, or a missed sale flag on that one listing? One more data-fidelity note: Black's two extra thumbnail images are real scraped URLs (filenamed per-SKU) but show generic lifestyle/action photography of an orange board in the field — the live site appears to reuse the same action shots across colour listings regardless of filename. Worth flagging to the client rather than silently swapping in a "cleaner" placeholder.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../_shared/shared.js"></script>
+<script>
+const MAXTRAX_FAMILY = {
+  title_base: "MAXTRAX MKII",
+  specifications_shared: {
+    "Sport / Activity": "4X4",
+    "Brand": "MAXTRAX"
+  },
+  colors: [
+    { label: "Black", sku: "MTX02BK", hex: "#000000", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk.jpg","https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk-view-1.jpg","https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-black-mtx02bk-view-2.jpg"] },
+    { label: "Maroon", sku: "MTX02MA", hex: "#5c1a24", price_was: 319.00, price_now: 299.00, stock_status: "limited",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-recovery-board-mk2-maroon-MTX02MA_2QSBVN_1.jpg"] },
+    { label: "Gunmetal Grey", sku: "MTX02GG", hex: "#4a4e52", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-gunmetal-grey-mtx02gg.jpg"] },
+    { label: "FJ Blue", sku: "MTX02FJB", hex: "#1f4e8c", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-fj-blue-mtx02fjb.jpg"] },
+    { label: "Lime Green", sku: "MTX02LG", hex: "#8bc53f", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-lime-green-mtx02lg.jpg"] },
+    { label: "Blaze Yellow", sku: "MTX02BY", hex: "#f5d020", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-blaze-yellow-mtx02by.jpg"] },
+    { label: "Pink", sku: "MTX02PK", hex: "#e85a9c", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-pink-mtx02pk.jpg"] },
+    { label: "FJ Red", sku: "MTX02FJR", hex: "#a8222f", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-fj-red-mtx02fjr.jpg"] },
+    { label: "Titanium Grey", sku: "MTX02TG", hex: "#8a8d90", price_was: 319.00, price_now: 319.00, stock_status: "in_stock", data_flag: true,
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-titanium-grey-mtx02tg.jpg"] },
+    { label: "Desert Tan", sku: "MTX02DT", hex: "#c9a876", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-desert-tan-mtx02dt.jpg"] },
+    { label: "Turquoise", sku: "MTX02TQ", hex: "#2fa3a3", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-turquoise-mtx02tq.jpg"] },
+    { label: "Olive Drab", sku: "MTX02OD", hex: "#4b5320", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-olive-drab-mtx02od.jpg"] },
+    { label: "Safety Orange", sku: "MTX02SO", hex: "#ff6a13", price_was: 319.00, price_now: 299.00, stock_status: "in_stock",
+      images: ["https://www.roofracksgalore.com.au/pub/media/catalog/product/m/a/maxtrax-mkii-safety-orange-mtx02so.jpg"] }
+  ]
+};
+
+let selectedColorIndex = 0;
+
+function fmtMoney(n) { return '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function renderSwatches() {
+  const grid = document.getElementById('swatchGrid');
+  grid.innerHTML = MAXTRAX_FAMILY.colors.map((c, i) => `
+    <div class="swatch ${i===selectedColorIndex?'selected':''} ${c.stock_status==='limited'?'limited':''}"
+         style="background:${c.hex};" data-color-index="${i}" title="${c.label}"></div>
+  `).join('');
+  grid.querySelectorAll('.swatch').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedColorIndex = Number(el.dataset.colorIndex);
+      renderAll();
+    });
+  });
+}
+
+function renderGallery(color) {
+  const mainImg = document.getElementById('mainImg');
+  mainImg.src = color.images[0];
+  const thumbs = document.getElementById('galleryThumbs');
+  thumbs.innerHTML = color.images.map((src, i) => `<img class="${i===0?'active':''}" src="${src}" onclick="document.getElementById('mainImg').src=this.src; document.querySelectorAll('#galleryThumbs img').forEach(im=>im.classList.remove('active')); this.classList.add('active');">`).join('');
+}
+
+function renderPrice(color) {
+  document.getElementById('priceNow').textContent = fmtMoney(color.price_now);
+  const discount = Math.round((1 - color.price_now/color.price_was) * 100);
+  const saveBadge = document.getElementById('saveBadge');
+  const priceWas = document.getElementById('priceWas');
+  if (color.price_now < color.price_was) {
+    priceWas.textContent = fmtMoney(color.price_was);
+    priceWas.hidden = false;
+    saveBadge.textContent = `Save ${discount}%`;
+    saveBadge.hidden = false;
+  } else {
+    priceWas.hidden = true;
+    saveBadge.hidden = true;
+  }
+  document.getElementById('mobilePrice').innerHTML = `${fmtMoney(color.price_now)}` + (color.price_now < color.price_was ? ` <span style="color:#8a8a8a;font-weight:400;text-decoration:line-through;font-size:11px;">${fmtMoney(color.price_was)}</span>` : '');
+}
+
+function renderStock(color) {
+  // Skip if the demo admin panel has taken over this line with a simulated stock
+  // status — otherwise every colour swap would clobber that override with this
+  // colour's real data (same class of bug as the price/sale-flag interaction).
+  if (typeof adminState !== 'undefined' && adminState.stockOverride) return;
+  const el = document.getElementById('stockLine');
+  if (color.stock_status === 'limited') {
+    el.textContent = '⚠ Limited stock in this colour — order soon';
+    el.className = 'stock-status-line low-stock';
+  } else {
+    el.textContent = '✓ In Stock';
+    el.className = 'stock-status-line in-stock';
+  }
+}
+
+function renderSpecs(color) {
+  const list = document.getElementById('specsList');
+  list.innerHTML = `
+    <li><strong>SKU:</strong> ${color.sku}</li>
+    <li><strong>Colour:</strong> ${color.label}</li>
+    <li><strong>Sport / Activity:</strong> ${MAXTRAX_FAMILY.specifications_shared['Sport / Activity']}</li>
+    <li><strong>Brand:</strong> ${MAXTRAX_FAMILY.specifications_shared['Brand']}</li>
+  `;
+}
+
+function renderAll() {
+  const color = MAXTRAX_FAMILY.colors[selectedColorIndex];
+  document.getElementById('skuValue').textContent = color.sku;
+  document.getElementById('swatchCurrent').textContent = color.label;
+  renderSwatches();
+  renderGallery(color);
+  renderPrice(color);
+  renderStock(color);
+  renderSpecs(color);
+  if (typeof reapplySaleFlag === 'function') reapplySaleFlag();
+}
+
+document.addEventListener('DOMContentLoaded', renderAll);
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "sku": "RH62112F",
+  "variant_label": "Flat Pack (Unassembled)",
+  "product_type": "config-variant",
+  "url": "https://www.roofracksgalore.com.au/rhino-rack-pioneer-6-platform-900-x-1430-flat-pack-62112f",
+  "brand": "Rhino Rack",
+  "title_base": "Rhino Rack 6 Series Pioneer Platform 900 x 1430mm",
+  "title": "Rhino Rack Pioneer 6 Platform 900 X 1430 Flat Pack - 62112F",
+  "breadcrumbs": ["Home", "Rhino Rack Pioneer 6 Platform 900 X 1430 Flat Pack - 62112F"],
+  "price_was": 979.00,
+  "price_now": 780.00,
+  "discount_pct": 20,
+  "stock_status": "in_stock",
+  "micro_value_props": [
+    "Rhino-Rack's battle tested Pioneer platform has been improved again - Unassembled for easy shipping",
+    "Maximize your roof carrying capabilities, for 4x4, trade or everyday use and upgrade your lifestyle",
+    "With additional East-West channels for even more accessory mounting options",
+    "The widest range of accessories available for every activity from kayaking to off-road adventures",
+    "Improvements include 60% less drag, 20% less weight and 25% more channels",
+    "Enhanced powder coating for diamond-like durability to take more use and abuse"
+  ],
+  "long_description": "The Pioneer 6 Platform is the ultimate roof rack that expands your adventures-not just your vehicle's capabilities. Designed to be the pinnacle of engineering, the Pioneer 6 Platform is a leap ahead of our already impressive predecessors and challenges the boundaries of aerodynamics and durability. Born for the trailblazers, forged without compromise, the Pioneer 6 Platform isn't just an extension of your vehicle-it's an expansion of your potential. Our strongest and most versatile roof rack ever, yet it still boasts up to a 60% reduction in drag, a 20% reduction in weight, and 25% more usable channels-enabling every inch of the platform to be utilised for mounting accessories. Quieter and lighter than ever, our unique alloy components and scuff-resistant coating ensure there's no compromise on quality, allowing you to load more than ever before without sacrificing your gear for adventure. With integrated wiring capabilities, additional east/west mounting channels, and the most comprehensive ecosystem of accessories on the market, the Pioneer 6 Platform makes you the Pioneer of your adventure! Quietest & lightest Rhino-Rack Pioneer Platform... Ever! Up to 60% reduction in drag from its predecessor. Stronger alloys that maintain strength but reduce weight by 20% too. No channel apertures make 100% of the platform usable for mounting accessories. Improved performance with up to 25% more usable channels. Our hardest coating ever, reducing damage and scuffs. East/West mounting channels for more mounting options than ever before. Integrated wiring capabilities within all extrusions. Detachable wind fairing inserts in leading-edge further enhance drag reduction. Most comprehensive ecosystem of accessories for mounting everything from kayaks to fishing rods in seconds.",
+  "specifications": {
+    "SKU": "RH62112F",
+    "Platform Style": "Flat",
+    "Platform Size (L x W x H)": "900 x 1430mm",
+    "Number of Platform Planks": 5,
+    "Platform Plank Direction": "North - South",
+    "Platform Weight": "12.5kg",
+    "Variable Planks": "No",
+    "Platform Material": "Aluminium",
+    "Powder Coated": "Yes",
+    "Colour": "Black",
+    "Brand": "Rhino Rack",
+    "Requires Professional installation": "No"
+  },
+  "video_url": null,
+  "images": [
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Medium-Generic_1_6.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Corner-Detail_1_11.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Measurement-Detail_1_11.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Corner-Detail-Top_1_11.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Corner-Detail-Underside_1_11.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Bolt-Detail_1_11.jpg",
+    "https://www.roofracksgalore.com.au/pub/media/catalog/product/R/h/Rhino-Pioneer-6-Measurement-Detail-Underside_1_11.jpg"
+  ],
+  "fitting_instructions_pdf": "https://assets.rhinorack.com/Instructions/Platforms/Pioneer-6-series/520-RFI-00159%20PIONEER%20SERIES%206%20%28Flat%20Pack%29%20Fitting%20Instruction.pdf",
+  "gold_guarantee_content": "Standard Rack Guarantee — free with every purchase, ensures fit and performance. Gold Rack Guarantee (when professionally fitted): Professional Installation by experienced Fit Technicians at 30+ AU/NZ stores; Rack Check — full safety check at install plus Annual Rack Health Checks Year 2 & 3; Key Cover — 3 years, up to 2 replacement keys/year; Free Basic Accessory Fitting for eligible accessories fitted same-invoice (roof boxes, bike racks, cargo baskets, kayak carriers, rod holders, ski carriers, platform accessories — rooftop tents/awnings/ladder systems excluded); 90-Day Exchanges and hassle-free returns. Fitting charges apply, confirmed in-store.",
+  "shipping_info_content": "Australia's only nationwide roof rack specialist, 30+ stores, Distribution Centres in QLD/WA/VIC/NSW/SA/ACT. Metro QLD/NSW/VIC/SA/WA: Next Business Day–3 Business Days. Regional QLD/NSW/VIC/WA & all TAS: 3–5 Business Days. NT: 5–7 Business Days. Large/Bulky Goods: 5–7 Business Days.",
+  "trust_icons": [
+    {"label": "Trusted Since 1989", "sub": "Now with over 30 locations Australia wide"},
+    {"label": "Trained Professionals", "sub": "Over 200,000 roof racks fitted"},
+    {"label": "Australia's Largest", "sub": "We're the only nationwide roof rack specialists"},
+    {"label": "Need Help", "sub": "Contact us on: 1300 071 264"}
+  ],
+  "data_flags": ["Plank count differs from Assembled variant (5 vs 4) — unconfirmed whether genuine spec difference or site data inconsistency; flagged per spec Section 7."]
+}
