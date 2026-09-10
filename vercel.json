@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "/prototypes/index.html", "permanent": false }
+  ]
+}
