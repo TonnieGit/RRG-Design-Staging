@@ -256,6 +256,11 @@ Components to build (all templates draw from this pool, not all use all of them)
 
 **Last updated: 2026-09-10.** Framework decision made: plain HTML/CSS/JS (not a component framework) — fastest to iterate on visually, no build step.
 
+### Version control
+This project is a git repo pushed to **https://github.com/TonnieGit/RRG-Design-Staging.git** (`main` branch). Commits to this repo are authored as `brenton.cooley@gmail.com` (set as this repo's local `user.email`/`user.name`, not the machine's global git identity — don't change the global config to match).
+
+**Workflow: push once a round of changes has been reviewed and approved, not after every individual edit.** Batch a session's changes into one commit (or a few logically-grouped commits) covering everything just signed off, with a message describing what changed and why, then push to `origin main`. Don't push mid-task or speculatively — only once the user is happy with the current state.
+
 ### Folder structure
 ```
 PAGE-GLOSSARY.md                   — naming reference: every page section + widget by name
