@@ -193,7 +193,12 @@ button{font-family:inherit;cursor:pointer;}
 .payment-badge:not(:first-child){border-left:1px solid var(--rrg-line);}
 .pb-logo{height:15px;width:auto;display:block;}
 .payment-badge.pb-zip .pb-logo{height:13px;}
-.pb-text{font-size:11.5px;color:#666;line-height:1.3;white-space:nowrap;}
+/* white-space:nowrap removed (2026-09-10) — forced the instalment line ("4 payments of
+   $473.27") to stay on one line regardless of available width, which at narrow mobile
+   widths (~390px) couldn't shrink to fit 3 badges side by side and forced the whole page
+   to horizontally scroll. Wrapping to 2 lines when tight fixes it with no visual change
+   at desktop widths, where there's already room for one line. */
+.pb-text{font-size:11.5px;color:#666;line-height:1.3;}
 
 /* trust icons */
 .trust-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);margin:32px 0;}
@@ -225,6 +230,35 @@ button{font-family:inherit;cursor:pointer;}
   .tabs .content{order:2;flex:0 0 100%;padding:0;}
   .tabs input:checked + label + .content{padding:24px 4px 8px;max-height:none;}
 }
+
+/* Specifications as a real 2-column table (2026-09-10, Graham Sowerby meeting) — the
+   underlying data is always attribute/value pairs, never free text, so dot-points were
+   a display choice worth fixing rather than a data constraint. */
+.specs-table{width:100%;border-collapse:collapse;}
+.specs-table tr{border-top:1px solid var(--rrg-line);}
+.specs-table tr:first-child{border-top:none;}
+.specs-table th,.specs-table td{padding:9px 10px 9px 0;text-align:left;font-size:13.5px;font-weight:400;vertical-align:top;}
+.specs-table th{color:#767676;font-weight:600;width:44%;white-space:nowrap;}
+.specs-table td{color:#222;}
+
+/* Gold Guarantee tab condensed to 2 USP lines + a "Learn more" link, rather than the full
+   guarantee copy inline (2026-09-10, Graham Sowerby meeting). No dedicated guarantee page
+   exists yet to link to — href="#" placeholder, same convention as other not-yet-built
+   destinations in this prototype (flag before this leaves prototype stage). */
+.guarantee-usps{margin:0 0 12px;padding-left:20px;}
+.guarantee-usps li{margin-bottom:4px;font-size:14px;color:#333;}
+.guarantee-learn-more{font-size:13px;color:var(--rrg-red);font-weight:700;text-decoration:none;}
+.guarantee-learn-more:hover{text-decoration:underline;}
+
+/* Short description 2-line clamp + "Read more" link (2026-09-10, Graham Sowerby meeting),
+   applied to .value-prop (the short value-prop line under the title, base rules declared
+   per-template — these clamp-specific properties aren't set there so nothing conflicts).
+   "Read more" jumps to the Details tab via initTabJumpLinks() below, since the tabs
+   accordion is pure CSS (radio + label + sibling selector, no JS) and a plain anchor jump
+   wouldn't check the tab's radio input. */
+.value-prop{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.value-prop-readmore{display:inline-block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--rrg-red);text-decoration:none;cursor:pointer;}
+.value-prop-readmore:hover{text-decoration:underline;}
 
 /* Sticky left column (desktop only): when the decision-panel column ends up taller than
    the gallery/video/install column (variant pickers, showroom finder, package contents
@@ -376,8 +410,15 @@ button{font-family:inherit;cursor:pointer;}
 /* Special order banner — sits above Add to Cart, demo admin panel "Special order" toggle */
 .special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-unknown);background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
 
-/* Brand logo — required on every product page, sits at the top of the decision panel */
-.brand-logo{height:26px;width:auto;object-fit:contain;display:block;margin-bottom:12px;}
+/* Brand logo — required on every product page, sits at the top of the decision panel.
+   Fixed height/auto width made MAXTRAX (and Front Runner, same source aspect ratio)
+   render ~40% narrower than Rhino Rack/Yakima, since MAXTRAX's source file is a more
+   square canvas (148x39, ~3.8:1) than the others (~6.3:1) — a fixed height treats a
+   naturally squatter logo as "smaller" even though the artwork itself isn't (2026-09-10,
+   Graham Sowerby meeting). Sized against a bounding box instead (max-width + max-height,
+   width/height auto) so every brand fills a similar visual footprint regardless of its
+   own aspect ratio, without needing better-proportioned source assets. */
+.brand-logo{max-width:160px;max-height:32px;width:auto;height:auto;object-fit:contain;display:block;margin-bottom:12px;}
 /* Text fallback for brands with no supplied logo file yet (see grouped-bundle template,
    which introduces Yakima — no real logo asset on hand, unlike the other three brands). */
 .brand-logo-text{height:26px;line-height:26px;font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:19px;letter-spacing:.01em;color:#111;text-transform:uppercase;margin-bottom:12px;}
@@ -399,11 +440,19 @@ button{font-family:inherit;cursor:pointer;}
 .package-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:12.5px;border-top:1px solid var(--rrg-line);}
 .package-item:first-of-type{border-top:none;}
 .package-item .pi-name{flex:1;color:#333;}
+/* Quantity per row (2026-09-10, Graham Sowerby meeting) — so a customer adding what looks
+   like one product isn't confused when a multi-part kit arrives with no visible reason
+   why. Real per-component quantities aren't confirmed by the client yet — see spec.md §7. */
+.package-item .pi-qty{flex:0 0 auto;color:#999;font-size:11px;font-weight:700;white-space:nowrap;}
 .package-item .pi-sku{display:flex;align-items:center;gap:6px;color:#767676;white-space:nowrap;}
 
 /* Generic copy-to-clipboard button, used by the main SKU row and package-item rows */
-.copy-btn{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:11.5px;padding:2px 4px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;}
-.copy-btn.copied{color:var(--rrg-fits);}
+/* SKU click-to-copy (2026-09-10, Graham Sowerby meeting) — the SKU text itself is the
+   click target now, not a separate copy-icon button (main SKU row + What's Included
+   rows). Dashed underline in the current text colour signals "clickable" without adding
+   a second visual element next to a value that used to look purely static. */
+.sku-copy{cursor:pointer;border-bottom:1px dashed currentColor;}
+.sku-copy.copied{color:var(--rrg-fits);border-bottom-color:var(--rrg-fits);}
 
 /* Ex-Demo / Factory Seconds — demo admin panel "B-Stock" toggle. Appended inline to the
    stock-status line itself (e.g. "In Stock — Ex-Demo/Factory Seconds from $1,495"), not a

@@ -15,7 +15,6 @@
   .decision-panel h1{font-size:25px;line-height:1.08;margin-bottom:6px;}
   .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
-  .sku-row button{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:12px;padding:0;}
   .decision-panel .reviews-strip{margin-bottom:14px;}
   .price-block{border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);padding:16px 0;margin-bottom:14px;}
   .scarcity{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-unknown);background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:8px 12px;margin-bottom:14px;}
@@ -24,7 +23,16 @@
   .details-sub h5{font-size:13px;text-transform:uppercase;color:#767676;margin:14px 0 4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;}
   .details-sub ul{margin:0;padding-left:18px;}
   @media (max-width:900px){
-    .hero{grid-template-columns:1fr;}
+    .hero{grid-template-columns:1fr;gap:0;}
+    /* Decision panel (price/CTA) renders above the video/Get It Installed row on mobile,
+       not below it (2026-09-10, Graham Sowerby meeting). .gallery-col's own children
+       become direct .hero grid items via display:contents so each can be ordered
+       independently: gallery images/thumbs (order 1) → decision panel (order 2) →
+       video/install row (order 3). */
+    .gallery-col{display:contents;}
+    .gallery-col > *{order:1;}
+    .decision-panel{order:2;margin-top:28px;}
+    .install-media-row{order:3;margin-top:22px;}
   }
 </style>
 </head>
@@ -112,9 +120,10 @@
 
     <div class="decision-panel">
       <img class="brand-logo" src="../_shared/brand-front-runner.webp" alt="Front Runner">
-      <div class="sku-row">SKU: FRWTAN063 <button data-copy="FRWTAN063">⧉ Copy</button></div>
+      <div class="sku-row">SKU: <span class="sku-copy" data-copy="FRWTAN063" role="button" title="Click to copy SKU">FRWTAN063</span></div>
       <h1>Front Runner Pro Water Tank With Strap 42L</h1>
       <div class="value-prop">Tank, mounting strap and hardware in one kit — ready to strap to your roof rack or carry to camp.</div>
+      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
       <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
 
       <div class="price-block">
@@ -250,14 +259,18 @@
         </div>
         <input type="radio" name="tabs" id="t2"><label for="t2">Specifications</label>
         <div class="content">
-          <ul>
-            <li>SKU: FRWTAN063</li>
-            <li>Brand: Front Runner</li>
-          </ul>
+          <table class="specs-table">
+            <tr><th scope="row">SKU</th><td>FRWTAN063</td></tr>
+            <tr><th scope="row">Brand</th><td>Front Runner</td></tr>
+          </table>
         </div>
         <input type="radio" name="tabs" id="t3"><label for="t3">Gold Guarantee</label>
         <div class="content">
-          <p>Standard Rack Guarantee is free with every purchase. Book professional fitting and you're covered by the Gold Rack Guarantee: expert installation, annual Rack Health Checks (Year 2 &amp; 3), 3-year Key Cover, free basic accessory fitting, and 90-day exchanges.</p>
+          <ul class="guarantee-usps">
+            <li>90-day hassle-free exchanges and returns</li>
+            <li>Nationwide support — over 30 locations Australia-wide</li>
+          </ul>
+          <a href="#" class="guarantee-learn-more">Learn more about the Gold Guarantee →</a>
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">

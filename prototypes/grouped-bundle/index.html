@@ -15,7 +15,6 @@
   .decision-panel h1{font-size:23px;line-height:1.12;margin-bottom:6px;}
   .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
-  .sku-row button{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:12px;padding:0;}
   .decision-panel .reviews-strip{margin-bottom:14px;}
   .price-block{border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);padding:16px 0;margin-bottom:14px;}
   .cta-col{display:flex;flex-direction:column;gap:10px;}
@@ -23,7 +22,14 @@
   .details-sub h5{font-size:13px;text-transform:uppercase;color:#767676;margin:14px 0 4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;}
   .details-sub ul{margin:0;padding-left:18px;}
   @media (max-width:900px){
-    .hero{grid-template-columns:1fr;}
+    .hero{grid-template-columns:1fr;gap:0;}
+    /* Decision panel (price/CTA) renders above the video/Get It Installed row on mobile,
+       not below it (2026-09-10, Graham Sowerby meeting). See simple/index.html for the
+       full explanation of the display:contents technique used here. */
+    .gallery-col{display:contents;}
+    .gallery-col > *{order:1;}
+    .decision-panel{order:2;margin-top:28px;}
+    .install-media-row{order:3;margin-top:22px;}
   }
 </style>
 </head>
@@ -109,9 +115,10 @@
 
     <div class="decision-panel">
       <img class="brand-logo" src="../_shared/brand-yakima.webp" alt="Yakima">
-      <div class="sku-row">SKU: 8004109PROMO <button data-copy="8004109PROMO">⧉ Copy</button></div>
+      <div class="sku-row">SKU: <span class="sku-copy" data-copy="8004109PROMO" role="button" title="Click to copy SKU">8004109PROMO</span></div>
       <h1>Yakima RoadShower 15L Complete Shower &amp; Hose Bundle</h1>
       <div class="value-prop">Tank, dual On-Off Elbow, 214cm hose and FlexHead shower — one connected system, ready to mount, no extra parts to buy.</div>
+      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
       <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
 
       <div class="price-block">
@@ -182,20 +189,24 @@
       <div class="package-items">
         <h5>What's Included</h5>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Yakima RoadShower SM 15L</span>
-          <span class="pi-sku">8004109 <button type="button" class="copy-btn" data-copy="8004109" aria-label="Copy SKU 8004109">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="8004109" role="button" title="Click to copy SKU">8004109</span>
         </div>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Yakima RoadShower On-Off Elbow</span>
-          <span class="pi-sku">8004103 <button type="button" class="copy-btn" data-copy="8004103" aria-label="Copy SKU 8004103">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="8004103" role="button" title="Click to copy SKU">8004103</span>
         </div>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Yakima RoadShower Extra Long Hose 214cm</span>
-          <span class="pi-sku">8881251 <button type="button" class="copy-btn" data-copy="8881251" aria-label="Copy SKU 8881251">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="8881251" role="button" title="Click to copy SKU">8881251</span>
         </div>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Yakima RoadShower FlexHead Shower LG 76cm</span>
-          <span class="pi-sku">8004106 <button type="button" class="copy-btn" data-copy="8004106" aria-label="Copy SKU 8004106">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="8004106" role="button" title="Click to copy SKU">8004106</span>
         </div>
       </div>
     </div>
@@ -254,20 +265,24 @@
         </div>
         <input type="radio" name="tabs" id="t2"><label for="t2">Specifications</label>
         <div class="content">
-          <ul>
-            <li>Water capacity: 15L</li>
-            <li>Welded aluminium tank construction, powder-coated finish</li>
-            <li>Two water outlet ports — one at each end, dual On-Off Elbow configuration</li>
-            <li>214cm Extra Long Hose · 76cm FlexHead Shower · quick-connect fittings</li>
-            <li>Pressurisation: Schrader valve, max 65psi, built-in relief valve</li>
-            <li>External stick-on thermometer strip</li>
-            <li>Mounting: stainless steel universal hardware, SKS Locks included</li>
-            <li>Empty weight: 9.21kg · full (15L water): approx. 24kg</li>
-          </ul>
+          <table class="specs-table">
+            <tr><th scope="row">Water Capacity</th><td>15L</td></tr>
+            <tr><th scope="row">Construction</th><td>Welded aluminium tank, powder-coated finish</td></tr>
+            <tr><th scope="row">Outlet Ports</th><td>Two — one at each end, dual On-Off Elbow configuration</td></tr>
+            <tr><th scope="row">Included Hose &amp; Shower</th><td>214cm Extra Long Hose, 76cm FlexHead Shower, quick-connect fittings</td></tr>
+            <tr><th scope="row">Pressurisation</th><td>Schrader valve, max 65psi, built-in relief valve</td></tr>
+            <tr><th scope="row">Thermometer</th><td>External stick-on strip</td></tr>
+            <tr><th scope="row">Mounting</th><td>Stainless steel universal hardware, SKS Locks included</td></tr>
+            <tr><th scope="row">Weight</th><td>Empty: 9.21kg · Full (15L water): approx. 24kg</td></tr>
+          </table>
         </div>
         <input type="radio" name="tabs" id="t3"><label for="t3">Gold Guarantee</label>
         <div class="content">
-          <p>Standard Rack Guarantee is free with every purchase. Book professional fitting and you're covered by the Gold Rack Guarantee: expert installation, annual Rack Health Checks (Year 2 &amp; 3), 3-year Key Cover, free basic accessory fitting, and 90-day exchanges.</p>
+          <ul class="guarantee-usps">
+            <li>90-day hassle-free exchanges and returns</li>
+            <li>Nationwide support — over 30 locations Australia-wide</li>
+          </ul>
+          <a href="#" class="guarantee-learn-more">Learn more about the Gold Guarantee →</a>
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">

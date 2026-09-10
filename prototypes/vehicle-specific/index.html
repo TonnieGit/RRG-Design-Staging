@@ -15,7 +15,6 @@
   .decision-panel h1{font-size:26px;line-height:1.05;margin-bottom:6px;}
   .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
-  .sku-row button{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:12px;padding:0;}
   .decision-panel .reviews-strip{margin-bottom:14px;}
   .fitment{margin-bottom:16px;}
 
@@ -44,9 +43,19 @@
   .fit-gallery-section{margin:40px 0;}
   .body-cols{margin:40px 0;}
   @media (max-width:900px){
-    .hero{grid-template-columns:1fr;}
+    .hero{grid-template-columns:1fr;gap:0;}
     .decision-panel{position:static;}
     .variant-picker{grid-template-columns:1fr;}
+    /* Decision panel (price/CTA) renders above the video/Get It Installed row on mobile,
+       not below it (2026-09-10, Graham Sowerby meeting). .gallery-col's own children
+       become direct .hero grid items via display:contents so each can be ordered
+       independently: gallery images/thumbs (order 1) → decision panel (order 2) →
+       video/install row + Fitted Photos Gallery nested slot (order 3). */
+    .gallery-col{display:contents;}
+    .gallery-col > *{order:1;}
+    .decision-panel{order:2;margin-top:28px;}
+    .install-media-row{order:3;margin-top:22px;}
+    #fitGalleryNestedSlot{order:3;}
   }
   .sticky-cta-mobile{display:none;}
   @media (max-width:640px){
@@ -144,9 +153,10 @@
 
     <div class="decision-panel">
       <img class="brand-logo" src="../_shared/brand-rhino-rack.webp" alt="Rhino Rack">
-      <div class="sku-row">SKU: <span id="skuValue">GP01M1TZZ</span> <button data-copy-source="#skuValue">⧉ Copy</button></div>
+      <div class="sku-row">SKU: <span id="skuValue" class="sku-copy" data-copy-source="#skuValue" role="button" title="Click to copy SKU">GP01M1TZZ</span></div>
       <h1>Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</h1>
       <div class="value-prop">Full track-mount kit — platform, Backbone spine &amp; tracks — engineered specifically for your Hilux, not a universal fit.</div>
+      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
       <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
 
       <div class="fitment-wrap">
@@ -237,16 +247,19 @@
       <div class="package-items">
         <h5>What's Included</h5>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Rhino-Rack 6 Series Pioneer Platform</span>
-          <span class="pi-sku">RH62100 <button type="button" class="copy-btn" data-copy="RH62100" aria-label="Copy SKU RH62100">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="RH62100" role="button" title="Click to copy SKU">RH62100</span>
         </div>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Rhino Rack Platform Backbone</span>
-          <span class="pi-sku">RTHB1 <button type="button" class="copy-btn" data-copy="RTHB1" aria-label="Copy SKU RTHB1">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="RTHB1" role="button" title="Click to copy SKU">RTHB1</span>
         </div>
         <div class="package-item">
+          <span class="pi-qty">1x</span>
           <span class="pi-name">Rhino Rack Tracks — Hilux Double Cab</span>
-          <span class="pi-sku">RTS556 <button type="button" class="copy-btn" data-copy="RTS556" aria-label="Copy SKU RTS556">⧉</button></span>
+          <span class="pi-sku sku-copy" data-copy="RTS556" role="button" title="Click to copy SKU">RTS556</span>
         </div>
       </div>
     </div>
@@ -331,11 +344,15 @@
         </div>
         <input type="radio" name="tabs" id="t2"><label for="t2">Specifications</label>
         <div class="content">
-          <ul id="specsList"></ul>
+          <table class="specs-table" id="specsList"></table>
         </div>
         <input type="radio" name="tabs" id="t3"><label for="t3">Gold Guarantee</label>
         <div class="content">
-          <p>Standard Rack Guarantee is free with every purchase. Book professional fitting and you're covered by the Gold Rack Guarantee: expert installation, annual Rack Health Checks (Year 2 &amp; 3), 3-year Key Cover, free basic accessory fitting, and 90-day exchanges.</p>
+          <ul class="guarantee-usps">
+            <li>90-day hassle-free exchanges and returns</li>
+            <li>Nationwide support — over 30 locations Australia-wide</li>
+          </ul>
+          <a href="#" class="guarantee-learn-more">Learn more about the Gold Guarantee →</a>
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">
@@ -504,7 +521,7 @@ function renderVehicleSpecs(variant) {
   const merged = { ...variant.specifications_diff, ...VEHICLE_PRODUCT.shared.specifications_shared };
   const order = ['SKU','Build Option','Platform Size (L x W x H)','Platform Weight','Estimated Fit Time','Material','Vehicle Fit Type','Vehicle','Colour','Requires Professional Installation'];
   const list = document.getElementById('specsList');
-  list.innerHTML = order.filter(k => merged[k] !== undefined).map(k => `<li><strong>${k}:</strong> ${merged[k]}</li>`).join('');
+  list.innerHTML = order.filter(k => merged[k] !== undefined).map(k => `<tr><th scope="row">${k}</th><td>${merged[k]}</td></tr>`).join('');
 }
 
 function renderVehicleAll() {

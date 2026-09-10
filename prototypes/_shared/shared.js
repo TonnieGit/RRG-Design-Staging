@@ -10,10 +10,15 @@ const PRODUCT_FITMENT = {
   roof_type: "Bare Roof"
 };
 
+// body_style/roof_type (2026-09-10, Graham Sowerby meeting) — added so the "doesn't fit"
+// message can name the customer's saved vehicle's full spec, not just its name (two
+// vehicles can share a make/model/generation but differ by roof/rail type). No real
+// per-customer vehicle data source exists at prototype stage, so these are demo values,
+// same caution as the rest of this file's fabricated data.
 const DEMO_VEHICLES = {
   none: null,
-  match: { make: "Toyota", model: "Hilux", generation: "N80", year: 2022 },
-  mismatch: { make: "Ford", model: "Ranger", generation: "P703", year: 2023 }
+  match: { make: "Toyota", model: "Hilux", generation: "N80", year: 2022, body_style: "4dr Ute", roof_type: "Bare Roof" },
+  mismatch: { make: "Ford", model: "Ranger", generation: "P703", year: 2023, body_style: "4dr Ute", roof_type: "Bare Roof" }
 };
 
 function getFitmentStatus(productFitment, sessionVehicle) {
@@ -36,20 +41,24 @@ const FITMENT_COPY = {
   },
   unknown: {
     label: "Confirm your vehicle",
-    detail: `This kit suits ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.vehicle_years}). Set your vehicle to confirm an exact fit before ordering.`,
+    detail: `This product suits ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.vehicle_years}). Set your vehicle to confirm an exact fit before ordering.`,
     cta: "Select Your Vehicle",
     actions: ["Select your vehicle"]
   },
   no_fit: {
     label: "Doesn't fit your vehicle",
-    detail: `This kit is built for ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} — not your selected vehicle.`,
-    cta: "Find The Right Kit",
-    actions: ["Change vehicle", "Find the right kit"]
+    // A function, not a static string (2026-09-10, Graham Sowerby meeting) — needs the
+    // customer's full saved vehicle spec (body style, roof type, year), not just its name,
+    // since two vehicles can share a make/model/generation but differ by roof/rail type.
+    detail: (vehicle) => `This product is built for ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} — not your ${vehicle.make} ${vehicle.model} ${vehicle.generation} (${vehicle.body_style}, ${vehicle.roof_type}, ${vehicle.year}).`,
+    cta: "Find The Right Fit",
+    actions: ["Change vehicle", "Find the right fit"]
   }
 };
 
-function renderFitmentHTML(state) {
+function renderFitmentHTML(state, vehicle) {
   const c = FITMENT_COPY[state];
+  const detail = typeof c.detail === 'function' ? c.detail(vehicle) : c.detail;
   const actions = c.actions.length
     ? `<div class="actions">${c.actions.map(a => `<button type="button">${a}</button>`).join("")}</div>`
     : "";
@@ -57,18 +66,18 @@ function renderFitmentHTML(state) {
     <span class="dot"></span>
     <div>
       <strong>${c.label}</strong>
-      ${c.detail}
+      ${detail}
       ${actions}
     </div>
   `;
 }
 
-function applyFitmentState(state) {
+function applyFitmentState(state, vehicle) {
   const c = FITMENT_COPY[state];
   document.querySelectorAll('[data-fitment-slot]').forEach(el => {
     el.className = el.className.replace(/\b(fits|unknown|no_fit)\b/g, '').trim();
     el.classList.add(state);
-    el.innerHTML = renderFitmentHTML(state);
+    el.innerHTML = renderFitmentHTML(state, vehicle);
     // Rack Fit Guarantee badge (2026-09-10) only makes sense when the vehicle is
     // actually confirmed to fit — hide it for "confirm your vehicle"/"doesn't fit".
     const badge = el.nextElementSibling;
@@ -89,7 +98,7 @@ function initFitmentDemo(defaultKey = 'match') {
   function set(key) {
     const vehicle = DEMO_VEHICLES[key];
     const state = getFitmentStatus(PRODUCT_FITMENT, vehicle);
-    applyFitmentState(state);
+    applyFitmentState(state, vehicle);
     buttons.forEach(b => b.classList.toggle('active', b.dataset.demoVehicle === key));
   }
   buttons.forEach(b => b.addEventListener('click', () => set(b.dataset.demoVehicle)));
@@ -429,7 +438,8 @@ function applyStockStatus(status) {
   } else {
     const activeVehicleBtn = document.querySelector('[data-demo-vehicle].active');
     if (activeVehicleBtn) {
-      applyFitmentState(getFitmentStatus(PRODUCT_FITMENT, DEMO_VEHICLES[activeVehicleBtn.dataset.demoVehicle]));
+      const vehicle = DEMO_VEHICLES[activeVehicleBtn.dataset.demoVehicle];
+      applyFitmentState(getFitmentStatus(PRODUCT_FITMENT, vehicle), vehicle);
     } else {
       document.querySelectorAll('[data-cta-label]').forEach(btn => {
         btn.disabled = false;
@@ -882,24 +892,35 @@ function initFitGalleryCarousel() {
 // Generic copy-to-clipboard for SKU buttons — [data-copy] holds a literal value; on pages
 // where the SKU changes at runtime (variant/colour switch), [data-copy-source] instead
 // names a selector to read the current value from at click time.
+// SKU click-to-copy (2026-09-10, Graham Sowerby meeting) — the clickable element is now
+// the SKU text itself (e.g. .sku-copy), not a separate "⧉ Copy" button, so [data-copy]/
+// [data-copy-source] can point at their own element (self-referencing) as well as another
+// one. The "restore" value is captured fresh at click time rather than cached once at
+// bind time — the old cached-at-bind-time approach broke on pages where the SKU re-renders
+// after a variant/colour switch (a later copy click would revert the text back to
+// whatever was showing on first page load, not the current value).
 function initCopyButtons() {
-  document.querySelectorAll('[data-copy], [data-copy-source]').forEach(btn => {
-    if (btn.dataset.copyBound) return;
-    btn.dataset.copyBound = 'true';
-    btn.addEventListener('click', () => {
-      const text = btn.dataset.copySource
-        ? (document.querySelector(btn.dataset.copySource)?.textContent || '').trim()
-        : btn.dataset.copy;
+  document.querySelectorAll('[data-copy], [data-copy-source]').forEach(el => {
+    if (el.dataset.copyBound) return;
+    el.dataset.copyBound = 'true';
+    if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
+    const activate = () => {
+      const source = el.dataset.copySource ? document.querySelector(el.dataset.copySource) : el;
+      const text = ((source && source.textContent) || el.dataset.copy || '').trim();
       if (!text) return;
       if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).catch(() => {});
-      const original = btn.dataset.originalLabel !== undefined ? btn.dataset.originalLabel : (btn.dataset.originalLabel = btn.innerHTML);
-      btn.innerHTML = '✓ Copied';
-      btn.classList.add('copied');
-      clearTimeout(btn._copyTimer);
-      btn._copyTimer = setTimeout(() => {
-        btn.innerHTML = original;
-        btn.classList.remove('copied');
+      const original = el.textContent;
+      el.textContent = '✓ Copied';
+      el.classList.add('copied');
+      clearTimeout(el._copyTimer);
+      el._copyTimer = setTimeout(() => {
+        el.textContent = original;
+        el.classList.remove('copied');
       }, 1400);
+    };
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
     });
   });
 }
@@ -929,12 +950,30 @@ function initTemplateSwitcher() {
   });
 }
 
+// "Read more" under the clamped short value-prop line jumps to the Details tab
+// (2026-09-10, Graham Sowerby meeting). The tabs accordion is pure CSS (a radio input +
+// label + sibling-selector .content, no JS anywhere) — a plain anchor jump would scroll to
+// the (hidden) radio without checking it, so the tab wouldn't actually switch. This checks
+// the target radio directly, then scrolls its .tabs container into view.
+function initTabJumpLinks() {
+  document.querySelectorAll('[data-jump-tab]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const radio = document.getElementById(link.dataset.jumpTab);
+      if (!radio) return;
+      radio.checked = true;
+      radio.closest('.tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   buildExdemoModal();
   buildStoreSlideout();
   initCopyButtons();
   initFitGalleryCarousel();
   initTemplateSwitcher();
+  initTabJumpLinks();
 });
 
 function buildAdminPanel() {

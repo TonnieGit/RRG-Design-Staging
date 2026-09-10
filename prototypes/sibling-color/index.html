@@ -15,7 +15,6 @@
   .decision-panel h1{font-size:25px;line-height:1.08;margin-bottom:6px;}
   .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
-  .sku-row button{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:12px;padding:0;}
   .decision-panel .reviews-strip{margin-bottom:16px;}
 
   /* Swatch picker — fast, satisfying color browsing */
@@ -33,7 +32,14 @@
   .cta-col{display:flex;flex-direction:column;gap:10px;}
   .body-cols{margin:40px 0;}
   @media (max-width:900px){
-    .hero{grid-template-columns:1fr;}
+    .hero{grid-template-columns:1fr;gap:0;}
+    /* Decision panel (price/CTA) renders above the video/Get It Installed row on mobile,
+       not below it (2026-09-10, Graham Sowerby meeting). See simple/index.html for the
+       full explanation of the display:contents technique used here. */
+    .gallery-col{display:contents;}
+    .gallery-col > *{order:1;}
+    .decision-panel{order:2;margin-top:28px;}
+    .install-media-row{order:3;margin-top:22px;}
   }
   @media (max-width:640px){
     .swatch{width:44px;height:44px;}
@@ -117,9 +123,10 @@
 
     <div class="decision-panel">
       <img class="brand-logo" src="../_shared/brand-maxtrax.webp" alt="MAXTRAX">
-      <div class="sku-row">SKU: <span id="skuValue"></span> <button data-copy-source="#skuValue">⧉ Copy</button></div>
+      <div class="sku-row">SKU: <span id="skuValue" class="sku-copy" data-copy-source="#skuValue" role="button" title="Click to copy SKU"></span></div>
       <h1>MAXTRAX MKII Recovery Boards</h1>
       <div class="value-prop">Get unstuck fast — aggressive cleats grip mud, sand or snow. 13 colours, same board.</div>
+      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
       <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
 
       <div class="swatch-label-row">
@@ -246,11 +253,15 @@
         </div>
         <input type="radio" name="tabs" id="t2"><label for="t2">Specifications</label>
         <div class="content">
-          <ul id="specsList"></ul>
+          <table class="specs-table" id="specsList"></table>
         </div>
         <input type="radio" name="tabs" id="t3"><label for="t3">Gold Guarantee</label>
         <div class="content">
-          <p>Standard Rack Guarantee is free with every purchase. Book professional fitting and you're covered by the Gold Rack Guarantee: expert installation, annual Rack Health Checks (Year 2 &amp; 3), 3-year Key Cover, free basic accessory fitting, and 90-day exchanges.</p>
+          <ul class="guarantee-usps">
+            <li>90-day hassle-free exchanges and returns</li>
+            <li>Nationwide support — over 30 locations Australia-wide</li>
+          </ul>
+          <a href="#" class="guarantee-learn-more">Learn more about the Gold Guarantee →</a>
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">
@@ -419,10 +430,10 @@ function renderStock(color) {
 function renderSpecs(color) {
   const list = document.getElementById('specsList');
   list.innerHTML = `
-    <li><strong>SKU:</strong> ${color.sku}</li>
-    <li><strong>Colour:</strong> ${color.label}</li>
-    <li><strong>Sport / Activity:</strong> ${MAXTRAX_FAMILY.specifications_shared['Sport / Activity']}</li>
-    <li><strong>Brand:</strong> ${MAXTRAX_FAMILY.specifications_shared['Brand']}</li>
+    <tr><th scope="row">SKU</th><td>${color.sku}</td></tr>
+    <tr><th scope="row">Colour</th><td>${color.label}</td></tr>
+    <tr><th scope="row">Sport / Activity</th><td>${MAXTRAX_FAMILY.specifications_shared['Sport / Activity']}</td></tr>
+    <tr><th scope="row">Brand</th><td>${MAXTRAX_FAMILY.specifications_shared['Brand']}</td></tr>
   `;
 }
 
