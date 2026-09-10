@@ -217,6 +217,13 @@ function applyShowroomFlag(on) {
   if (section) section.hidden = !on;
 }
 
+// Add to Cart colour preview (demo ask) — swaps every Add to Cart button on the page
+// (decision panel, sticky mobile bar, persistent bar) to #FFCA48 with black text.
+function applyCtaColorFlag(on) {
+  adminState.ctaGold = on;
+  document.querySelectorAll('[data-cta-label]').forEach(btn => btn.classList.toggle('cta-gold', on));
+}
+
 function applyVideoFlag(on) {
   adminState.video = on;
   document.querySelectorAll('.install-media-row').forEach(row => row.classList.toggle('no-video', !on));
@@ -703,7 +710,7 @@ function buildAdminPanel() {
   const initialSale = detectInitialSaleState();
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, ctaGold: false });
 
   const fab = document.createElement('button');
   fab.type = 'button';
@@ -743,6 +750,7 @@ function buildAdminPanel() {
         <label class="admin-toggle"><span>Special order item</span><input type="checkbox" data-admin-flag="specialOrder"></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
+        <label class="admin-toggle"><span>Gold Add to Cart button <span class="admin-note">(colour preview)</span></span><input type="checkbox" data-admin-flag="ctaGold"></label>
       </div>
       ${hasVariantPicker ? `
       <div class="admin-section">
@@ -787,6 +795,7 @@ function buildAdminPanel() {
         case 'specialOrder': applySpecialOrderFlag(on); break;
         case 'exdemo': applyExdemoFlag(on); break;
         case 'showroom': applyShowroomFlag(on); break;
+        case 'ctaGold': applyCtaColorFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;
         case 'fitGalleryRed': applyFitGalleryRedFlag(on); break;
       }

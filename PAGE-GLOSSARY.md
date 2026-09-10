@@ -68,7 +68,7 @@ Interactive or reusable components that live inside the sections above.
 | **Tabs widget** | Accordion/tab-bar of Details, Specifications, Gold Guarantee, Shipping Info, Fitting Instructions — `.tabs` |
 | **Related Products carousel** | Grid of cross-sell product cards below the main content — `.product-card` |
 | **Copy-to-clipboard buttons** | Small "⧉ Copy" buttons next to SKUs (main SKU row and each Package Contents item) — `.copy-btn` |
-| **Demo State Panel** | Floating "Demo State" button (bottom-right) that expands into a reviewer-only control panel for previewing product states (video/sale/stock/shipping/collect/special order/ex-demo/showroom/fitted option/gallery placement/session vehicle). Not part of the shipped design. — `.admin-fab` / `.admin-panel` |
+| **Demo State Panel** | Floating "Demo State" button (bottom-right) that expands into a reviewer-only control panel for previewing product states (video/sale/stock/shipping/collect/special order/ex-demo/showroom/Add to Cart colour/fitted option/gallery placement/session vehicle). Not part of the shipped design. — `.admin-fab` / `.admin-panel` |
 
 ---
 

@@ -107,6 +107,12 @@ button{font-family:inherit;cursor:pointer;}
 .btn-primary:hover{background:var(--rrg-red-dark);}
 .btn-primary:active{transform:scale(.98);}
 .btn-block{width:100%;}
+
+/* Add to Cart colour preview (Demo State Panel toggle) — applied via [data-cta-label] so it
+   hits every Add to Cart button on the page (decision panel, sticky mobile bar, persistent
+   bar) without needing per-button wiring. */
+[data-cta-label].cta-gold{background:#FFCA48;color:#000;}
+[data-cta-label].cta-gold:hover{background:#e6b53f;}
 .btn-lg{padding:18px 28px;font-size:16px;}
 .btn-outline{background:#fff;border:1.5px solid var(--rrg-black);color:var(--rrg-black);}
 
