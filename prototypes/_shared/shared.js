@@ -111,6 +111,38 @@ function revealResults(resultsId) {
   if (el) el.hidden = false;
 }
 
+// Delivery / Click & Collect widget — the single postcode field shared across both tabs
+// (2026-09-10 rework: was two separate, unsynced inputs), starts empty (2026-09-10 follow-up
+// — a prefilled demo postcode read as real customer data it isn't). The "Update" button is a
+// light demo re-trigger against the same static data (no real geocoding), which swaps the
+// copy on the Click & Collect view-all line between the two states below, AND — since
+// showing named stores with no postcode entered implied a real nearby-store match that
+// wasn't real — hides the Click & Collect results entirely until a postcode is actually
+// typed in. The "In stock and on display in N stores — View all stores" line stays visible
+// either way; only the named store rows are gated. Delivery's results (flat freight rates,
+// not location-matched) are unaffected.
+function initDcPostcode(root = document) {
+  root.querySelectorAll('.dc-widget').forEach(widget => {
+    const input = widget.querySelector('#dcPostcode, [data-dc-postcode]');
+    const btn = widget.querySelector('[data-dc-update]');
+    const line = widget.querySelector('.dc-viewall-line');
+    const collectResults = widget.querySelector('[data-dc-panel="collect"] .dc-results');
+    if (!input || !btn) return;
+    const update = () => {
+      const val = input.value.trim();
+      if (line) {
+        line.firstChild.textContent = val
+          ? `Showing stores within 100km of ${val} — `
+          : `In stock and on display in ${rrgStoreCount()} stores — `;
+      }
+      if (collectResults) collectResults.hidden = !val;
+    };
+    btn.addEventListener('click', update);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); update(); } });
+    update();
+  });
+}
+
 // Persistent decision bar — shows once the given sentinel element scrolls above the viewport.
 function initPersistentBar(sentinelSelector, barSelector) {
   const sentinel = document.querySelector(sentinelSelector);
@@ -125,6 +157,7 @@ function initPersistentBar(sentinelSelector, barSelector) {
 
 document.addEventListener('DOMContentLoaded', () => {
   initDeliveryCollectTabs();
+  initDcPostcode();
 });
 
 // Gallery thumbnail carousel — wraps every .gallery-thumbs row (however its images got
@@ -217,13 +250,6 @@ function applyShowroomFlag(on) {
   if (section) section.hidden = !on;
 }
 
-// Add to Cart colour preview (demo ask) — swaps every Add to Cart button on the page
-// (decision panel, sticky mobile bar, persistent bar) to #FFCA48 with black text.
-function applyCtaColorFlag(on) {
-  adminState.ctaGold = on;
-  document.querySelectorAll('[data-cta-label]').forEach(btn => btn.classList.toggle('cta-gold', on));
-}
-
 function applyVideoFlag(on) {
   adminState.video = on;
   document.querySelectorAll('.install-media-row').forEach(row => row.classList.toggle('no-video', !on));
@@ -306,13 +332,37 @@ const STOCK_STATUS = {
   not_in_stock: { text: '✕ Not in Stock — Contact our team', cls: 'not-in-stock', blocksCta: true }
 };
 
+// Renders a .stock-status-line's base text/class from the current stock state, then
+// appends the B-Stock/Ex-Demo suffix inline when that admin flag is on — e.g.
+// "In Stock — Ex-Demo/Factory Seconds from $1,495" with the price as a clickable link into
+// the existing ex-demo modal. Replaces the old standalone .exdemo-cta button (Graham
+// Sowerby meeting, 2026-09-10: this needed to read as part of the stock line, not its own
+// button-weight element).
+function renderStockLine(line) {
+  const cfg = STOCK_STATUS[adminState.stockStatus] || STOCK_STATUS.in_stock;
+  line.className = 'stock-status-line ' + cfg.cls;
+  line.textContent = cfg.text;
+  if (!adminState.exdemo) return;
+  const block = line.closest('.price-block');
+  const basePrice = block ? currentPagePrice(block) : 0;
+  const from = buildExdemoOptions(basePrice).reduce((min, o) => Math.min(min, o.price), Infinity);
+  const link = document.createElement('a');
+  link.href = '#';
+  link.className = 'exdemo-inline-link';
+  link.textContent = `Ex-Demo/Factory Seconds from ${fmtAud(from)}`;
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const titleEl = document.querySelector('h1');
+    const imgEl = document.querySelector('#mainImg, .gallery-main img');
+    openExdemoModal(basePrice, titleEl ? titleEl.textContent : 'This product', imgEl ? imgEl.src : '');
+  });
+  line.append(' — ', link);
+}
+
 function applyStockStatus(status) {
   adminState.stockStatus = status;
   const cfg = STOCK_STATUS[status] || STOCK_STATUS.in_stock;
-  document.querySelectorAll('.stock-status-line').forEach(line => {
-    line.textContent = cfg.text;
-    line.className = 'stock-status-line ' + cfg.cls;
-  });
+  document.querySelectorAll('.stock-status-line').forEach(renderStockLine);
   document.querySelectorAll('.cta-col').forEach(col => {
     const parent = col.parentNode;
     const banner = parent.querySelector(':scope > .stock-banner');
@@ -482,28 +532,169 @@ function currentPagePrice(block) {
 
 function applyExdemoFlag(on) {
   adminState.exdemo = on;
-  document.querySelectorAll('.price-block').forEach(block => {
-    const parent = block.parentNode;
-    let cta = parent.querySelector(':scope > .exdemo-cta');
-    if (!on) {
-      if (cta) cta.remove();
-      return;
-    }
-    const basePrice = currentPagePrice(block);
-    const from = buildExdemoOptions(basePrice).reduce((min, o) => Math.min(min, o.price), Infinity);
-    if (!cta) {
-      cta = document.createElement('button');
-      cta.type = 'button';
-      cta.className = 'exdemo-cta';
-      cta.addEventListener('click', () => {
-        const titleEl = document.querySelector('h1');
-        const imgEl = document.querySelector('#mainImg, .gallery-main img');
-        openExdemoModal(currentPagePrice(block), titleEl ? titleEl.textContent : 'This product', imgEl ? imgEl.src : '');
-      });
-      block.insertAdjacentElement('afterend', cta);
-    }
-    cta.innerHTML = `<span class="ex-label">🏷 Ex Demo / Factory Seconds — from ${fmtAud(from)}</span><span class="ex-arrow">›</span>`;
-  });
+  document.querySelectorAll('.stock-status-line').forEach(renderStockLine);
+}
+
+// ---- Real store network (scraped 2026-09-10 from the live site's own Store Inventory
+// slide-out, roofracksgalore.com.au — a real product's Click & Collect card, "View all
+// Stock") ----
+// Real names, addresses, phone numbers and Google Maps links for every physical store —
+// store identity doesn't vary by product, so this is one canonical list shared by every
+// template's Click & Collect widget and the store slide-out, grouped by state to match the
+// live site's own presentation. Per-store IN-STOCK/ORDER-IN status and the ON_DISPLAY_STORES
+// set below are still demo/placeholder (no real per-SKU per-store stock feed exists) — same
+// caution as the rest of this widget's data.
+const RRG_STORE_NETWORK = [
+  { state: "New South Wales", stores: [
+    { name: "Moorebank", street: "12 Centenary Ave", city: "Moorebank", postcode: "2170", phone: "(02) 9053 8621", mapLink: "https://maps.app.goo.gl/371QHZWa4pDU4qzA7" },
+    { name: "Smeaton Grange", street: "3/18 Exchange Parade", city: "Smeaton Grange", postcode: "2567", phone: "(02) 8215 7092", mapLink: "https://maps.app.goo.gl/Khp5w9LoxReciEho7" },
+    { name: "Matraville", street: "35 Raymond Avenue", city: "Matraville", postcode: "2036", phone: "(02) 9159 6777", mapLink: "https://maps.app.goo.gl/U7Cfof4Wkkk77KqM8" },
+    { name: "Warriewood", street: "3 Vuko Place", city: "Warriewood", postcode: "2102", phone: "(02) 8007 6177", mapLink: "https://maps.app.goo.gl/paxnS1CPK26xbeC59" },
+    { name: "Silverwater", street: "1/104 Wetherill St N", city: "Silverwater", postcode: "2128", phone: "(02) 8007 6155", mapLink: "https://maps.app.goo.gl/NCofTPDD28BDfZRv5" },
+    { name: "Miranda", street: "132 Wyralla Rd", city: "Miranda", postcode: "2228", phone: "(02) 9526 2777", mapLink: "https://goo.gl/maps/f3wCEmtgtHEGBPcn8" },
+    { name: "Castle Hill", street: "3/8 Anella Avenue", city: "Castle Hill", postcode: "2154", phone: "(02) 9899 3256", mapLink: "https://goo.gl/maps/QebgyjaDAjpKVDw96" }
+  ]},
+  { state: "Victoria", stores: [
+    { name: "Hoppers Crossing", street: "352 Old Geelong Road", city: "Hoppers Crossing", postcode: "3029", phone: "(03) 9015 8615", mapLink: "https://maps.app.goo.gl/HPHsUyA4yfpUVp8V6" },
+    { name: "Frankston", street: "43 New Street", city: "Frankston", postcode: "3199", phone: "(03) 9015 8656", mapLink: "https://maps.app.goo.gl/tjTwH36rzw1oQJso6" },
+    { name: "Preston", street: "3/1 Bell St", city: "Preston", postcode: "3072", phone: "(03) 9484 3447", mapLink: "https://goo.gl/maps/6DDmf3KREjGmqn8z8" },
+    { name: "Geelong", street: "34/8 Lewalan St", city: "Grovedale", postcode: "3216", phone: "(03) 5221 3433", mapLink: "https://maps.app.goo.gl/NGfvQ9yKvYPv3hwq9" },
+    { name: "Moorabbin", street: "6/265 - 269 Wickham Rd", city: "Moorabbin", postcode: "3189", phone: "(03) 9553 2799", mapLink: "https://goo.gl/maps/3bj1XdzQqReSdaJz7" },
+    { name: "Hallam", street: "1/237 Princes Hwy", city: "Hallam", postcode: "3803", phone: "(03) 9703 1295", mapLink: "https://goo.gl/maps/sX8KjK28XqjC5BVMA" },
+    { name: "Mitcham", street: "3/660 Whitehorse Rd", city: "Mitcham", postcode: "3132", phone: "(03) 9874 6261", mapLink: "https://goo.gl/maps/eqRzmAGA7RDZ7Go79" },
+    { name: "Maidstone", street: "3/72 - 80 Hampstead Rd", city: "Maidstone", postcode: "3012", phone: "(03) 9318 5846", mapLink: "https://goo.gl/maps/gocCgS8Jk5tNZfw48" },
+    { name: "Epping", street: "8/168 Jersey Dr", city: "Epping", postcode: "3076", phone: "(03) 7006 5180", mapLink: "https://goo.gl/maps/HGZxbcKqbiZeDjTE6" }
+  ]},
+  { state: "South Australia", stores: [
+    { name: "Pooraka", street: "222 Bridge Road", city: "Pooraka", postcode: "5095", phone: "(08) 7078 4574", mapLink: "https://maps.app.goo.gl/qKNoRaN4etFaXJhd9" },
+    { name: "Adelaide City", street: "37 Gilbert St", city: "Adelaide", postcode: "5000", phone: "(08) 8211 7600", mapLink: "https://goo.gl/maps/9DA31eWAsSPAgcCe9" },
+    { name: "Lonsdale", street: "8/4 Aldenhoven Rd", city: "Lonsdale", postcode: "5160", phone: "(08) 7081 5535", mapLink: "https://goo.gl/maps/a9PHVjoo3PzQbaHj6" },
+    { name: "Edinburgh", street: "1/5b Peachey Rd", city: "Edinburgh North", postcode: "5113", phone: "(08) 7081 5550", mapLink: "https://maps.app.goo.gl/KJxUWzc6gj2B6U1aA" }
+  ]},
+  { state: "Tasmania", stores: [
+    { name: "Hobart", street: "134-136 Main Rd", city: "Moonah", postcode: "7009", phone: "(03) 6273 7555", mapLink: "https://goo.gl/maps/Cyi2N7UE4qvE5ZFb6" }
+  ]},
+  { state: "Queensland", stores: [
+    { name: "Kedron", street: "Unit 1/14 Boothby Street", city: "Kedron", postcode: "4031", phone: "(07) 3350 3711", mapLink: "https://goo.gl/maps/FGRrDi9CrZS2" },
+    { name: "East Brisbane", street: "46 Caswell St", city: "East Brisbane", postcode: "4169", phone: "(07) 3256 3630", mapLink: "https://goo.gl/maps/JAqUCMi5rYmZhZ1T7" },
+    { name: "Sunshine Coast", street: "1/224 Nicklin Way", city: "Warana", postcode: "4575", phone: "(07) 5408 5040", mapLink: "https://goo.gl/maps/twjqFgLGGMXotKtcA" },
+    { name: "Gold Coast", street: "3/10 Kamholtz Court", city: "Molendinar", postcode: "4214", phone: "(07) 5619 5800", mapLink: "https://g.page/roof-racks-galore-gold-coast?share" },
+    { name: "Springwood", street: "3/11 Judds Court", city: "Slacks Creek", postcode: "4127", phone: "(07) 3103 8422", mapLink: "https://goo.gl/maps/GShsfi9yfoK2" },
+    { name: "North Lakes", street: "1/74 Flinders Parade", city: "North Lakes", postcode: "4509", phone: "(07) 3103 8414", mapLink: "https://goo.gl/maps/VaQxwqVsnXw" },
+    { name: "Burleigh Heads", street: "1/11 Hutchinson Street", city: "Burleigh Heads", postcode: "4220", phone: "(07) 5619 5822", mapLink: "https://maps.app.goo.gl/m9cdKVoTojrfBC82A" },
+    { name: "Rocklea", street: "Unit 2/1620 Ipswich Road", city: "Rocklea", postcode: "4106", phone: "(07) 3277 5722", mapLink: "https://goo.gl/maps/HxDPHYUJnYm" }
+  ]},
+  { state: "Australian Capital Territory", stores: [
+    { name: "Canberra", street: "107 Wollongong Street", city: "Fyshwick", postcode: "2609", phone: "(02) 6176 1909", mapLink: "https://goo.gl/maps/6EP4rtQWnJu9hrRBA" }
+  ]},
+  { state: "Western Australia", stores: [
+    { name: "Joondalup", street: "Tenancy 4, 27-29 Sundew Rise", city: "Joondalup", postcode: "6027", phone: "(08) 9513 7225", mapLink: "https://goo.gl/maps/2Tnnk6qAgDCxcSBA9" },
+    { name: "Osborne Park", street: "51 Frobisher Street", city: "Osborne Park", postcode: "6017", phone: "(08) 9444 5061", mapLink: "https://maps.app.goo.gl/zEvXaoWceNKR7TgeA" },
+    { name: "Welshpool", street: "74 Dowd St", city: "Welshpool", postcode: "6106", phone: "(08) 9258 7663", mapLink: "https://maps.app.goo.gl/y6btYejbz9eQ39vD8" },
+    { name: "Malaga", street: "9 Rowe St", city: "Malaga", postcode: "6090", phone: "(08) 6102 6767", mapLink: "https://maps.app.goo.gl/ZFEKHyycGL8YhgoE8" },
+    { name: "Rockingham", street: "6B Leach Crescent", city: "Rockingham", postcode: "6168", phone: "(08) 6102 6722", mapLink: "https://maps.app.goo.gl/fvpWNyA1HTyT2Rwf7" }
+  ]}
+];
+
+// Which stores show the "On Display" pill (this specific product is set up in-showroom
+// there) — demo/placeholder, same two stores the Showroom Finder widget's copy already
+// named before this rework, kept for continuity across the page.
+const ON_DISPLAY_STORES = new Set(["Moorebank", "Castle Hill"]);
+
+function rrgStoreCount() {
+  return RRG_STORE_NETWORK.reduce((n, group) => n + group.stores.length, 0);
+}
+
+function rrgStorePillsHTML(name, status) {
+  const statusPill = status === 'order'
+    ? `<span class="stock-chip order">Order In — 1-2 Days</span>`
+    : `<span class="stock-chip in">In Stock</span>`;
+  const displayPill = ON_DISPLAY_STORES.has(name) ? `<span class="stock-chip display">On Display</span>` : '';
+  return statusPill + displayPill;
+}
+
+// ---- Store slide-out ("View all stores", Click & Collect + Showroom Finder widgets,
+// 2026-09-10) ----
+// Lists the full real store network (RRG_STORE_NETWORK above), grouped by state to match
+// the live site's own Store Inventory slide-out. Same modal-backdrop-as-once-per-page
+// convention as buildExdemoModal(), but as a slide-in drawer rather than a centered card.
+// Multiple triggers on one page (Click & Collect's link and, where present, the Showroom
+// Finder's) all open the same drawer.
+function buildStoreSlideout() {
+  const triggers = document.querySelectorAll('[data-store-slideout]');
+  if (!triggers.length || document.getElementById('storeSlideoutBackdrop')) return;
+  const backdrop = document.createElement('div');
+  backdrop.className = 'store-slideout-backdrop';
+  backdrop.id = 'storeSlideoutBackdrop';
+  backdrop.innerHTML = `
+    <div class="store-slideout">
+      <div class="store-slideout-head">
+        <h3>All Stores</h3>
+        <button type="button" class="store-slideout-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="store-slideout-body" id="storeSlideoutBody"></div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  document.getElementById('storeSlideoutBody').innerHTML = RRG_STORE_NETWORK.map(group => `
+    <h5 class="store-slideout-state">${group.state}</h5>
+    ${group.stores.map(s => `
+      <div class="dc-store">
+        <div>
+          <strong>${s.name}</strong>${rrgStorePillsHTML(s.name, 'in')}<br>
+          <span class="muted">${s.street}, ${s.city} ${s.postcode}</span><br>
+          <a class="store-phone" href="tel:${s.phone.replace(/[^0-9+]/g, '')}">${s.phone}</a>
+          <a class="store-map-link" href="${s.mapLink}" target="_blank" rel="noopener noreferrer">View on map</a>
+        </div>
+      </div>
+    `).join('')}
+  `).join('');
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeStoreSlideout(); });
+  backdrop.querySelector('.store-slideout-close').addEventListener('click', closeStoreSlideout);
+  triggers.forEach(trigger => trigger.addEventListener('click', e => { e.preventDefault(); openStoreSlideout(); }));
+}
+
+function openStoreSlideout() {
+  const backdrop = document.getElementById('storeSlideoutBackdrop');
+  if (backdrop) backdrop.classList.add('open');
+}
+
+function closeStoreSlideout() {
+  const backdrop = document.getElementById('storeSlideoutBackdrop');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+// ---- Interactive map (Showroom Finder widget, 2026-09-10 Graham Sowerby meeting) ----
+// Piloted on Vehicle-Specific only at first; locked in as the default and rolled out to all
+// 5 templates the same day after client review. No longer a Demo State Panel preview toggle
+// — called unconditionally from buildAdminPanel() wherever #showroomMap exists. Leaflet +
+// OpenStreetMap tiles (free, no API key). Runs the map ALONGSIDE the existing black block
+// (split-view), not as a full swap — corrected 2026-09-10 after the first version replaced
+// the block outright, which lost the postcode entry / "Find Nearest Showroom" CTA. Real
+// postcode-driven radius search isn't implemented (no geocoding service wired up) — the map
+// shows a fixed demo view of the store cluster; flagged here as the gap to close before this
+// leaves prototype stage.
+let showroomLeafletMap = null;
+
+function applyShowroomMapFlag(on) {
+  const mapEl = document.getElementById('showroomMap');
+  const widget = mapEl && mapEl.closest('.showroom-widget');
+  if (!mapEl) return;
+  mapEl.hidden = !on;
+  if (widget) widget.classList.toggle('split-view', on);
+  if (!on || typeof L === 'undefined') return;
+  const stores = window.SHOWROOM_MAP_STORES || [];
+  if (!showroomLeafletMap) {
+    showroomLeafletMap = L.map(mapEl).setView([-33.92, 150.92], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(showroomLeafletMap);
+    stores.forEach(s => {
+      L.marker([s.lat, s.lng]).addTo(showroomLeafletMap).bindPopup(`<strong>${s.name}</strong><br>${s.status}`);
+    });
+  }
+  setTimeout(() => showroomLeafletMap.invalidateSize(), 0);
 }
 
 // ---- Paid "Fitted" option (demo-preview only, 2026-09-10 client meeting) ----
@@ -696,6 +887,7 @@ function initTemplateSwitcher() {
 
 document.addEventListener('DOMContentLoaded', () => {
   buildExdemoModal();
+  buildStoreSlideout();
   initCopyButtons();
   initFitGalleryCarousel();
   initTemplateSwitcher();
@@ -710,7 +902,10 @@ function buildAdminPanel() {
   const initialSale = detectInitialSaleState();
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, ctaGold: false });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true });
+  // Interactive map is now the locked default for the Showroom Finder widget, all 5
+  // templates — no longer a Demo State Panel preview toggle.
+  applyShowroomMapFlag(true);
 
   const fab = document.createElement('button');
   fab.type = 'button';
@@ -750,7 +945,6 @@ function buildAdminPanel() {
         <label class="admin-toggle"><span>Special order item</span><input type="checkbox" data-admin-flag="specialOrder"></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
-        <label class="admin-toggle"><span>Gold Add to Cart button <span class="admin-note">(colour preview)</span></span><input type="checkbox" data-admin-flag="ctaGold"></label>
       </div>
       ${hasVariantPicker ? `
       <div class="admin-section">
@@ -795,7 +989,6 @@ function buildAdminPanel() {
         case 'specialOrder': applySpecialOrderFlag(on); break;
         case 'exdemo': applyExdemoFlag(on); break;
         case 'showroom': applyShowroomFlag(on); break;
-        case 'ctaGold': applyCtaColorFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;
         case 'fitGalleryRed': applyFitGalleryRedFlag(on); break;
       }

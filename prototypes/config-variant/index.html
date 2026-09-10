@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Config-Variant PDP — Rhino Rack Pioneer 6 Platform</title>
 <link rel="stylesheet" href="../_shared/shared.css">
+<!-- Leaflet — Showroom Finder interactive map, see applyShowroomMapFlag() in shared.js.
+     Free, no API key. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:28px 0 8px;align-items:start;}
   .decision-panel{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
@@ -161,15 +165,15 @@
 
       <div class="dc-widget" style="margin-top:18px;">
         <div class="dc-tabs">
-          <button class="dc-tab active" data-dc-tab="delivery">Delivery</button>
-          <button class="dc-tab" data-dc-tab="collect">Click &amp; Collect</button>
+          <button class="dc-tab" data-dc-tab="delivery"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="13" height="9"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg> Delivery</button>
+          <button class="dc-tab active" data-dc-tab="collect"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Click &amp; Collect</button>
         </div>
-        <div class="dc-panel" data-dc-panel="delivery">
-          <div class="dc-row">
-            <input type="text" class="dc-input" placeholder="Enter your postcode" id="deliveryPostcode">
-            <button class="btn btn-outline" onclick="revealResults('deliveryResults')">Check Delivery Cost</button>
-          </div>
-          <div class="dc-results" id="deliveryResults" hidden>
+        <div class="dc-postcode-row">
+          <input type="text" class="dc-input" id="dcPostcode" placeholder="Enter your postcode">
+          <button type="button" class="btn btn-outline" data-dc-update>Update</button>
+        </div>
+        <div class="dc-panel" data-dc-panel="delivery" hidden>
+          <div class="dc-results" id="deliveryResults">
             <div class="dc-option">
               <div><strong>Standard Freight</strong><br><span class="muted">3–5 business days to your postcode</span></div>
               <div class="dc-price">$35.00</div>
@@ -180,21 +184,18 @@
             </div>
           </div>
         </div>
-        <div class="dc-panel" data-dc-panel="collect" hidden>
-          <div class="dc-row">
-            <input type="text" class="dc-input" placeholder="Enter your postcode" id="collectPostcode">
-            <button class="btn btn-outline" onclick="revealResults('collectResults')">Find Nearest Store</button>
-          </div>
-          <div class="dc-results" id="collectResults" hidden>
+        <div class="dc-panel" data-dc-panel="collect">
+          <div class="dc-results" id="collectResults">
             <div class="dc-store">
-              <div><strong>Moorebank, NSW</strong><span class="stock-chip in">In Stock</span><br><span class="muted">12 Centenary Ave · 4.2km away · Free pickup</span></div>
+              <div><strong>Moorebank</strong><span class="stock-chip in">In Stock</span><span class="stock-chip display">On Display</span><br><span class="muted">12 Centenary Ave, Moorebank 2170</span><br><a class="store-phone" href="tel:0290538621">(02) 9053 8621</a><a class="store-map-link" href="https://maps.app.goo.gl/371QHZWa4pDU4qzA7" target="_blank" rel="noopener noreferrer">View on map</a></div>
               <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
             </div>
             <div class="dc-store">
-              <div><strong>Castle Hill, NSW</strong><span class="stock-chip in">In Stock</span><br><span class="muted">3/8 Anella Avenue · 11.6km away · Free pickup</span></div>
+              <div><strong>Castle Hill</strong><span class="stock-chip in">In Stock</span><span class="stock-chip display">On Display</span><br><span class="muted">3/8 Anella Avenue, Castle Hill 2154</span><br><a class="store-phone" href="tel:0298993256">(02) 9899 3256</a><a class="store-map-link" href="https://goo.gl/maps/QebgyjaDAjpKVDw96" target="_blank" rel="noopener noreferrer">View on map</a></div>
               <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
             </div>
           </div>
+          <div class="dc-viewall-row"><span class="dc-viewall-line">In stock and on display in 35 stores — </span><a href="#" class="dc-viewall" data-store-slideout>View all stores</a></div>
         </div>
       </div>
     </div>
@@ -208,21 +209,27 @@
   </div>
 
   <section id="showroom" style="margin:40px 0;">
-    <div class="showroom-widget">
-      <h3>See It In Person — On Display At 16 Stores Near You</h3>
-      <p>Compare the assembled and flat-pack platform side by side and check mounting channel spacing before you buy.</p>
-      <div class="dc-row">
-        <input type="text" class="dc-input" placeholder="Enter your postcode" id="showroomPostcode">
-        <button class="btn btn-primary" onclick="revealResults('showroomResults')">Find Nearest Showroom</button>
-      </div>
-      <div class="dc-results" id="showroomResults" hidden>
-        <div class="dc-store">
-          <div><strong>Moorebank, NSW</strong><span class="stock-chip in">On Display</span><br><span class="muted">4.2km away · Open today until 5:30pm</span></div>
+    <div class="showroom-widget split-view">
+      <div id="showroomDefaultView">
+        <h3>See It In Person — On Display At 16 Stores Near You</h3>
+        <p>Compare the assembled and flat-pack platform side by side and check mounting channel spacing before you buy.</p>
+        <div class="dc-row">
+          <input type="text" class="dc-input" placeholder="Enter your postcode" id="showroomPostcode">
+          <button class="btn btn-primary" onclick="revealResults('showroomResults')">Find Nearest Showroom</button>
         </div>
-        <div class="dc-store">
-          <div><strong>Castle Hill, NSW</strong><span class="stock-chip in">On Display</span><br><span class="muted">11.6km away · Open today until 5:30pm</span></div>
+        <div class="dc-results" id="showroomResults" hidden>
+          <div class="dc-store">
+            <div><strong>Moorebank, NSW</strong><span class="stock-chip display">On Display</span><br><span class="muted">4.2km away · Open today until 5:30pm</span></div>
+          </div>
+          <div class="dc-store">
+            <div><strong>Castle Hill, NSW</strong><span class="stock-chip display">On Display</span><br><span class="muted">11.6km away · Open today until 5:30pm</span></div>
+          </div>
         </div>
+        <div class="dc-viewall-row"><a href="#" class="dc-viewall" data-store-slideout>View all stores</a></div>
       </div>
+      <!-- Interactive map — locked-in default for this widget, see applyShowroomMapFlag()
+           in shared.js. -->
+      <div class="showroom-map" id="showroomMap"></div>
     </div>
   </section>
 
@@ -308,6 +315,16 @@
 </section>
 
 <script src="../_shared/shared.js"></script>
+<script>
+// Showroom Finder interactive map pin data — demo/placeholder coordinates, same caution as
+// the rest of this widget's store data.
+window.SHOWROOM_MAP_STORES = [
+  { name: "Moorebank, NSW", lat: -33.95, lng: 150.93, status: "On Display" },
+  { name: "Castle Hill, NSW", lat: -33.73, lng: 150.98, status: "On Display" },
+  { name: "Smeaton Grange, NSW", lat: -34.02, lng: 150.75, status: "Order In — 1-2 Days" },
+  { name: "Silverwater, NSW", lat: -33.84, lng: 151.05, status: "On Display" }
+];
+</script>
 <script>
 const MERGED_PRODUCT = {
   shared: {

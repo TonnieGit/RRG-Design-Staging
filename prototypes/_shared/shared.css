@@ -16,6 +16,8 @@
   --rrg-unknown-bg:#FFF4E5;
   --rrg-nofit:#A6192E;
   --rrg-nofit-bg:#FDEAEC;
+  --rrg-display:#8A6D23;
+  --rrg-display-bg:#FBF3E6;
   --radius:12px;
   --shadow:0 8px 22px rgba(0,0,0,.06);
   --maxw:1280px;
@@ -108,11 +110,12 @@ button{font-family:inherit;cursor:pointer;}
 .btn-primary:active{transform:scale(.98);}
 .btn-block{width:100%;}
 
-/* Add to Cart colour preview (Demo State Panel toggle) — applied via [data-cta-label] so it
-   hits every Add to Cart button on the page (decision panel, sticky mobile bar, persistent
-   bar) without needing per-button wiring. */
-[data-cta-label].cta-gold{background:#FFCA48;color:#000;}
-[data-cta-label].cta-gold:hover{background:#e6b53f;}
+/* Add to Cart is gold, not red (locked in per client, 2026-09-10) — [data-cta-label] hits
+   every Add to Cart button on the page (decision panel, sticky mobile bar, persistent bar)
+   without needing per-button wiring; other .btn-primary buttons (e.g. Find Nearest Showroom)
+   stay red. */
+[data-cta-label].btn-primary{background:#FFCA48;color:#000;}
+[data-cta-label].btn-primary:hover{background:#e6b53f;}
 .btn-lg{padding:18px 28px;font-size:16px;}
 .btn-outline{background:#fff;border:1.5px solid var(--rrg-black);color:var(--rrg-black);}
 
@@ -158,6 +161,12 @@ button{font-family:inherit;cursor:pointer;}
 .stock-status-line.in-stock{color:var(--rrg-fits);}
 .stock-status-line.low-stock{color:var(--rrg-unknown);}
 .stock-status-line.not-in-stock{color:var(--rrg-nofit);}
+
+/* "On Display" pill — corrected 2026-09-10 (client feedback): belongs on individual store
+   rows in the Click & Collect widget / store slide-out (a given store either has this
+   product on display or it doesn't), not as a blanket pill beside the product's overall
+   stock status. See .stock-chip.in/.order above and rrgStorePillsHTML() in shared.js. */
+.stock-chip.display{background:var(--rrg-display-bg);color:var(--rrg-display);border:1px solid var(--rrg-display);}
 
 /* Payment-plan badges — sits directly under Add to Cart, inside .cta-col, centered to
    match the button above. Real brand wordmarks (official SVGs), amount text computed
@@ -377,11 +386,13 @@ button{font-family:inherit;cursor:pointer;}
 .copy-btn{background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:11.5px;padding:2px 4px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;}
 .copy-btn.copied{color:var(--rrg-fits);}
 
-/* Ex-Demo / Factory Seconds CTA + modal — demo admin panel "B-Stock" toggle */
-.exdemo-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px dashed var(--rrg-gold);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:12.5px;font-weight:700;color:#6b5a3e;cursor:pointer;text-align:left;width:100%;font-family:inherit;}
-.exdemo-cta:hover{background:var(--rrg-gold-bg);}
-.exdemo-cta .ex-label{display:flex;align-items:center;gap:8px;}
-.exdemo-cta .ex-arrow{font-weight:900;font-size:15px;}
+/* Ex-Demo / Factory Seconds — demo admin panel "B-Stock" toggle. Appended inline to the
+   stock-status line itself (e.g. "In Stock — Ex-Demo/Factory Seconds from $1,495"), not a
+   separate button (Graham Sowerby meeting, 2026-09-10 — a standalone button risked being
+   missed; this needed to read as part of the existing stock line). Click opens the same
+   ex-demo modal as before. */
+.exdemo-inline-link{color:#1A56DB;font-weight:700;text-decoration:underline;}
+.exdemo-inline-link:hover{color:#123f9e;}
 
 /* Paid "Fitted" option — demo-preview only (2026-09-10 client meeting), not wired to
    real cart/checkout. Mode 1 injects this as a third card into .variant-picker (higher
@@ -434,12 +445,18 @@ button{font-family:inherit;cursor:pointer;}
 .rationale .tradeoff{border-left:3px solid var(--rrg-unknown);}
 .rationale .cite{font-size:12px;color:#767676;font-style:italic;margin-top:6px;}
 
-/* Delivery / Click & Collect widget — full-width, two tabs */
+/* Delivery / Click & Collect widget — full-width, two tabs. Reworked 2026-09-10 (Graham
+   Sowerby meeting): single postcode field shared across both tabs (.dc-postcode-row, sits
+   between the tab bar and whichever .dc-panel is active) instead of one per panel, results
+   visible by default instead of gated behind a click (see initDcPostcode() in shared.js),
+   default active tab flipped to Click & Collect, and small tab icons. */
 .dc-widget{border:1px solid var(--rrg-line);border-radius:var(--radius);overflow:hidden;background:#fff;}
 .dc-tabs{display:flex;border-bottom:1px solid var(--rrg-line);}
-.dc-tab{flex:1;background:#f7f7f7;border:none;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.02em;color:#767676;border-bottom:2px solid transparent;}
+.dc-tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#f7f7f7;border:none;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.02em;color:#767676;border-bottom:2px solid transparent;}
 .dc-tab.active{background:#fff;color:var(--rrg-black);border-bottom-color:var(--rrg-red);}
-.dc-panel{padding:16px 18px;}
+.dc-tab-icon{width:14px;height:14px;flex:0 0 auto;}
+.dc-postcode-row{display:flex;gap:10px;flex-wrap:wrap;padding:16px 18px 0;}
+.dc-panel{padding:12px 18px 16px;}
 .dc-row{display:flex;gap:10px;flex-wrap:wrap;}
 .dc-input{flex:1 1 220px;border:1px solid var(--rrg-line);border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;}
 .dc-results{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
@@ -450,6 +467,33 @@ button{font-family:inherit;cursor:pointer;}
 .stock-chip.in{background:var(--rrg-fits-bg);color:var(--rrg-fits);border:1px solid var(--rrg-fits);}
 .stock-chip.order{background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);}
 
+/* "View all stores" — opens the store slide-out drawer, see .store-slideout below and
+   buildStoreSlideout() in shared.js. Click & Collect panel and, where present, the Showroom
+   Finder widget. The line's leading text swaps between "no postcode entered" and "postcode
+   entered" copy — see initDcPostcode() in shared.js. */
+.dc-viewall-row{margin-top:10px;font-size:12px;color:#767676;}
+.dc-viewall{color:#1A56DB;font-weight:700;text-decoration:underline;cursor:pointer;}
+.dc-viewall:hover{color:#123f9e;}
+
+/* Store slide-out — right-edge drawer, "View all stores" from the Click & Collect and
+   Showroom Finder widgets. Real store network (RRG_STORE_NETWORK in shared.js), grouped by
+   state to match the live site's own Store Inventory slide-out. Reuses .dc-store/.stock-chip
+   row styling for visual consistency with the inline results, same modal-backdrop
+   convention as the Ex-Demo modal but as a slide-in panel. */
+.store-slideout-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.store-slideout-backdrop.open{opacity:1;pointer-events:auto;}
+.store-slideout{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
+.store-slideout-backdrop.open .store-slideout{transform:translateX(0);}
+.store-slideout-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
+.store-slideout-head h3{font-size:19px;margin:0;}
+.store-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;color:#333;flex:0 0 auto;}
+.store-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex:1 1 auto;}
+.store-slideout-state{font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--rrg-red);margin:14px 0 2px;}
+.store-slideout-state:first-child{margin-top:0;}
+.dc-store .store-phone,.dc-store .store-map-link{font-size:12px;font-weight:700;text-decoration:underline;margin-right:12px;}
+.dc-store .store-phone{color:var(--rrg-black);}
+.dc-store .store-map-link{color:#1A56DB;}
+
 /* Showroom Finder — prominent trust CTA, not a plain widget */
 .showroom-widget{background:var(--rrg-black);color:#fff;border-radius:var(--radius);padding:26px 28px;margin-top:20px;}
 .showroom-widget h3{color:#fff;margin-bottom:8px;}
@@ -458,7 +502,34 @@ button{font-family:inherit;cursor:pointer;}
 .showroom-widget .dc-results{margin-top:18px;}
 .showroom-widget .dc-store{background:#1c1c1c;border-color:#3a3a3a;color:#fff;}
 .showroom-widget .muted{color:#aaa;}
-.showroom-widget .stock-chip.in{background:#1E7A34;color:#fff;border-color:#1E7A34;}
+.showroom-widget .stock-chip.display{background:#FFCA48;color:#000;border-color:#FFCA48;}
+.showroom-widget .dc-viewall-row{color:#ccc;margin-top:14px;}
+.showroom-widget .dc-viewall{color:#fff;}
+.showroom-widget .dc-viewall:hover{color:#e6e6e6;}
+
+/* Experimental interactive map (Vehicle-Specific pilot, 2026-09-10 Graham Sowerby meeting)
+   — runs alongside the existing black block (split-view), not as a full swap; corrected
+   2026-09-10 after the first version replaced the block outright and lost the postcode
+   entry / CTA. .split-view puts #showroomDefaultView and #showroomMap side by side (1:2 —
+   text column narrower, map gets the larger two-thirds — client ask, same day follow-up);
+   stacks on narrow viewports. The map runs flush to the widget's edges (no padding/black
+   border around it, another same-day correction) — padding that used to live on
+   .showroom-widget itself moves onto #showroomDefaultView only in split-view, and
+   `overflow:hidden` on the widget clips the map's square corners to the widget's own
+   rounded ones. `position:relative;z-index:0` on .showroom-map gives Leaflet's internal
+   panes/controls (which default to z-index up to 1000) their own local stacking context, so
+   they can never render above the fixed Demo State Panel (z-index 60/61) — without this
+   they escape onto the whole page since neither Leaflet's container nor this block
+   otherwise establishes one. */
+.showroom-widget.split-view{display:grid;grid-template-columns:1fr 2fr;align-items:stretch;padding:0;overflow:hidden;min-height:360px;}
+.showroom-widget.split-view #showroomDefaultView{margin:0;padding:26px 24px;}
+.showroom-widget.split-view .showroom-map{margin:0;height:auto;border-radius:0;}
+@media (max-width:900px){
+  .showroom-widget.split-view{grid-template-columns:1fr;min-height:0;}
+  .showroom-widget.split-view .showroom-map{height:280px;}
+}
+.showroom-map{margin-top:18px;height:320px;border-radius:10px;overflow:hidden;position:relative;z-index:0;}
+.showroom-map .leaflet-container{height:100%;width:100%;font-family:inherit;}
 
 /* Sticky mobile Add-to-Cart bar — hidden by default, shown only on narrow viewports */
 .sticky-cta-mobile{display:none;}
