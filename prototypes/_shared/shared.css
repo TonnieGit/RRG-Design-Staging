@@ -214,7 +214,7 @@ button{font-family:inherit;cursor:pointer;}
 .tabs label::after{content:'+';position:absolute;right:4px;font-size:20px;}
 .tabs input:checked + label::after{content:'\2212';}
 .tabs .content{max-height:0;overflow:hidden;font-size:14.5px;color:#404247;transition:max-height .25s ease;}
-.tabs input:checked + label + .content{max-height:2000px;padding:16px 4px 24px;}
+.tabs input:checked + label + .content{max-height:30000px;padding:16px 4px 24px;}
 
 /* Desktop: same DOM/inputs, laid out as a horizontal tab bar with one panel below
    instead of a vertical accordion. Flexbox `order` (not CSS Grid track spanning —
