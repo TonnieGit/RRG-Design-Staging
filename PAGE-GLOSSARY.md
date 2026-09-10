@@ -58,7 +58,7 @@ Interactive or reusable components that live inside the sections above.
 | **Delivery / Click & Collect widget** | Tabbed widget (Delivery | Click & Collect) with postcode entry and live results, sits directly under Add to Cart in the Decision Panel — `.dc-widget` |
 | **Showroom Finder widget** | High-contrast black CTA block, "on display at N stores," postcode search — sits in its own full-width section below the hero (not the Decision Panel). **All 5 templates**, with a Demo State Panel toggle ("On display in-store") to preview a SKU that isn't on display anywhere — `.showroom-widget` / `#showroom` / `applyShowroomFlag()` |
 | **Package Contents / "What's Included"** | List of individual kit components with their own SKUs and copy buttons — **Vehicle-Specific & Grouped-Bundle only** — `.package-items` |
-| **Get It Installed CTA** | Installer photo + REVIEWS.io badge + "More Information + Bookings" button, paired with the product video under the gallery — **Config-Variant & Vehicle-Specific only** — `.install-media-row` / `.install-cta-panel` |
+| **Get It Installed CTA** | Installer photo + REVIEWS.io badge + "More Information + Bookings" button, paired with the product video under the gallery. **Now on all 5 templates** (client ask, 2026-09-10; previously Config-Variant & Vehicle-Specific only) — `.install-media-row` / `.install-cta-panel` |
 | **Product Video** | Embedded product video or placeholder, appears under the Main Product Gallery — `.video-wrap` / `.video-placeholder` |
 | **Sale Tag** | Corner ribbon graphic on the Decision Panel shown when a product is on sale — `.sale-tag` |
 | **Brand Logo** | Manufacturer logo at the top of the Decision Panel — `.brand-logo` |
