@@ -131,7 +131,7 @@
               <span class="reviews-io-badge">★ REVIEWS<span style="color:var(--rrg-red)">.io</span></span>
               <span class="stars">★★★★☆</span>
             </div>
-            <a href="#" class="btn">More Information + Bookings</a>
+            <a href="#fitGallerySection" class="btn">See 283 real fitments</a>
           </div>
         </div>
       </div>
@@ -149,7 +149,19 @@
       <div class="value-prop">Full track-mount kit — platform, Backbone spine &amp; tracks — engineered specifically for your Hilux, not a universal fit.</div>
       <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
 
-      <div class="fitment fits" data-fitment-slot></div>
+      <div class="fitment-wrap">
+        <div class="fitment fits" data-fitment-slot></div>
+        <img class="rack-fit-badge" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
+      </div>
+
+      <!-- Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — model-specific
+           fitment caveats, not present on every vehicle. Placeholder copy below needs real
+           per-vehicle content from the client before this leaves prototype stage. Starts
+           hidden; toggled via the Demo State Panel's "Vehicle Fit Notes" checkbox. -->
+      <div class="vehicle-fit-notes" id="vehicleFitNotes" hidden>
+        <strong>⚠ Important Vehicle Fit Notes</strong>
+        <p>Some Hilux N80 models fitted with an aftermarket sunroof, tonneau cover, or tow bar wiring harness may need minor clearance checks during installation — confirm with your fitting technician if your vehicle has any of these.</p>
+      </div>
 
       <div class="variant-label-row">
         <h4>Build Option</h4>
@@ -244,7 +256,7 @@
        Demo State Panel's "Fitted Photos Gallery Placement" toggle moves the section back
        here when set to Full width; see applyFitGalleryPlacement() in shared.js. -->
   <div id="fitGalleryHomeSlot">
-  <section class="fit-gallery-section" id="fitGallerySection">
+  <section class="fit-gallery-section" id="fitGallerySection" data-count="283">
     <div class="fit-gallery-panel" id="fitGalleryPanel">
       <div class="fit-gallery-head">
         <div class="fit-gallery-title">
@@ -362,6 +374,7 @@
 
 <div class="sticky-cta-mobile">
   <div class="info fitment fits" data-fitment-slot style="padding:8px;border-radius:8px;font-size:11px;"></div>
+  <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
@@ -371,6 +384,7 @@
 <div class="persistent-bar" id="persistentBar" style="top:0;">
   <div class="wrap persistent-inner">
     <div class="fitment fits" data-fitment-slot></div>
+    <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
     <div class="price-row">
       <span class="price-now">$1,893.09</span>
       <span class="price-was">$2,137.00</span>

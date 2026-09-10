@@ -69,6 +69,12 @@ function applyFitmentState(state) {
     el.className = el.className.replace(/\b(fits|unknown|no_fit)\b/g, '').trim();
     el.classList.add(state);
     el.innerHTML = renderFitmentHTML(state);
+    // Rack Fit Guarantee badge (2026-09-10) only makes sense when the vehicle is
+    // actually confirmed to fit — hide it for "confirm your vehicle"/"doesn't fit".
+    const badge = el.nextElementSibling;
+    if (badge && (badge.classList.contains('rack-fit-badge') || badge.classList.contains('rack-fit-badge-icon'))) {
+      badge.hidden = state !== 'fits';
+    }
   });
   document.querySelectorAll('[data-cta-label]').forEach(btn => {
     btn.textContent = c.cta;
@@ -221,7 +227,7 @@ document.addEventListener('DOMContentLoaded', initGalleryCarousels);
 // beyond one optional reapplySaleFlag() call pages with their own re-render loop should
 // make at the end of it (see config-variant / sibling-color).
 
-const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false };
+const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, fitGallery: true, vehicleFitNotes: false };
 
 function detectInitialVideoState() {
   const pairedRow = document.querySelector('.install-media-row');
@@ -253,6 +259,39 @@ function applyShowroomFlag(on) {
   adminState.showroom = on;
   const section = document.getElementById('showroom');
   if (section) section.hidden = !on;
+}
+
+function detectInitialFitGalleryState() {
+  return !!document.getElementById('fitGallerySection');
+}
+
+// Fitment Gallery on/off (2026-09-10, Graham Sowerby meeting) — toggle previews a vehicle
+// with no real Fitment Gallery: hides the section itself and swaps the Get It Installed
+// CTA back to the generic fallback copy, so the two stay in sync rather than showing a
+// changed CTA next to a gallery that's still there.
+function applyFitGalleryFlag(on) {
+  adminState.fitGallery = on;
+  const section = document.getElementById('fitGallerySection');
+  if (section) section.hidden = !on;
+  const cta = document.querySelector('.install-cta-panel .btn');
+  if (!cta) return;
+  if (on && section) {
+    const count = section.dataset.count || '';
+    cta.textContent = `See ${count} real fitments`;
+    cta.href = '#fitGallerySection';
+  } else {
+    cta.textContent = 'More Information + Bookings';
+    cta.href = '#';
+  }
+}
+
+// Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — variable-length,
+// not present on every vehicle, so it's demo-toggled off by default (no real per-vehicle
+// notes data source exists yet).
+function applyVehicleFitNotesFlag(on) {
+  adminState.vehicleFitNotes = on;
+  const block = document.getElementById('vehicleFitNotes');
+  if (block) block.hidden = !on;
 }
 
 function applyVideoFlag(on) {
@@ -902,12 +941,15 @@ function buildAdminPanel() {
   const needsVehicleDemo = !!document.querySelector('[data-fitment-slot]');
   const hasVariantPicker = !!document.querySelector('.variant-picker');
   const hasFitGalleryPlacementToggle = !!document.getElementById('fitGallerySection') && !!document.getElementById('fitGalleryNestedSlot');
+  const hasFitGallery = !!document.getElementById('fitGallerySection');
+  const hasVehicleFitNotes = !!document.getElementById('vehicleFitNotes');
   const hasShowroom = !!document.getElementById('showroom');
   const initialVideo = detectInitialVideoState();
   const initialSale = detectInitialSaleState();
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true });
+  const initialFitGallery = detectInitialFitGalleryState();
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false });
   // Interactive map is now the locked default for the Showroom Finder widget, all 5
   // templates — no longer a Demo State Panel preview toggle.
   applyShowroomMapFlag(true);
@@ -950,6 +992,8 @@ function buildAdminPanel() {
         <label class="admin-toggle"><span>Special order item</span><input type="checkbox" data-admin-flag="specialOrder"></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
+        ${hasFitGallery ? `<label class="admin-toggle"><span>Fitment Gallery exists for this product</span><input type="checkbox" data-admin-flag="fitGallery" ${initialFitGallery ? 'checked' : ''}></label>` : ''}
+        ${hasVehicleFitNotes ? `<label class="admin-toggle"><span>Important Vehicle Fit Notes</span><input type="checkbox" data-admin-flag="vehicleFitNotes"></label>` : ''}
       </div>
       ${hasVariantPicker ? `
       <div class="admin-section">
@@ -996,6 +1040,8 @@ function buildAdminPanel() {
         case 'showroom': applyShowroomFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;
         case 'fitGalleryRed': applyFitGalleryRedFlag(on); break;
+        case 'fitGallery': applyFitGalleryFlag(on); break;
+        case 'vehicleFitNotes': applyVehicleFitNotesFlag(on); break;
       }
     });
   });

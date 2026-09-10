@@ -143,6 +143,22 @@ button{font-family:inherit;cursor:pointer;}
 .fitment .actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;}
 .fitment .actions button{background:#fff;border:1px solid var(--rrg-line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:#333;}
 
+/* Rack Fit Guarantee (2026-09-10, Graham Sowerby meeting) — real client asset + copy.
+   Main decision panel gets icon+text packed into the fitment card's top-right corner;
+   the two condensed fitment strips (sticky mobile bar, persistent desktop bar) get an
+   icon-only version with a title tooltip since there's no room for the caption there. */
+.fitment-wrap{position:relative;}
+.fitment-wrap .fitment{padding-right:50px;}
+.rack-fit-badge{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:32px;height:auto;}
+.rack-fit-badge-icon{width:20px;height:auto;flex:0 0 auto;}
+
+/* Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — vehicle-specific only,
+   model-specific fitment caveats. Distinct amber/warning accent so it doesn't read as
+   another fitment-state box. Starts hidden — see applyVehicleFitNotesFlag() in shared.js. */
+.vehicle-fit-notes{background:#FFF8EC;border:1px solid #F0DDB8;border-left:3px solid #B36B00;border-radius:var(--radius);padding:12px 14px;font-size:13px;color:#4a4a4a;margin-bottom:16px;}
+.vehicle-fit-notes strong{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:13.5px;letter-spacing:.02em;color:#B36B00;margin-bottom:4px;}
+.vehicle-fit-notes p{margin:0;line-height:1.4;}
+
 /* reviews strip */
 .reviews-strip{display:flex;align-items:center;gap:8px;font-size:13px;color:#232323;}
 .stars{color:#E8A83C;letter-spacing:1px;font-size:15px;}
@@ -366,12 +382,15 @@ button{font-family:inherit;cursor:pointer;}
    which introduces Yakima — no real logo asset on hand, unlike the other three brands). */
 .brand-logo-text{height:26px;line-height:26px;font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:19px;letter-spacing:.01em;color:#111;text-transform:uppercase;margin-bottom:12px;}
 
-/* Sale tag — sits inline next to the price inside .price-row (right-aligned via
-   margin-left:auto), shown/hidden by the same "on sale" admin flag as the price
-   (syncSaleTag() in shared.js finds it via the price-row's containing .decision-panel,
-   so it works regardless of where inside the row it sits). */
-.price-row .sale-tag{margin-left:auto;align-self:center;width:86px;height:auto;flex:0 0 auto;pointer-events:none;}
-@media (max-width:640px){.price-row .sale-tag{width:64px;}}
+/* Sale tag — absolutely positioned against .price-block (not just .price-row), vertically
+   centered against the whole block (price row + stock-status line beneath it), not just
+   the price row's own line — matches the same corner-badge pattern as .rack-fit-badge.
+   Shown/hidden by the same "on sale" admin flag as the price (syncSaleTag() in shared.js
+   finds it via the price-row's containing .decision-panel, so it works regardless of
+   where inside the row it sits). */
+.price-block{position:relative;}
+.price-block .sale-tag{position:absolute;top:50%;right:0;transform:translateY(-50%);width:86px;height:auto;pointer-events:none;}
+@media (max-width:640px){.price-block .sale-tag{width:64px;}}
 
 /* Package contents (vehicle-specific kits) — each included item with its own SKU + copy
    button, so instore staff can copy individual part numbers without hunting through specs */
