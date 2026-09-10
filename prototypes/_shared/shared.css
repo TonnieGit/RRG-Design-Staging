@@ -69,6 +69,19 @@ button{font-family:inherit;cursor:pointer;}
 .rrg-nav a{color:var(--rrg-black);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
 .rrg-nav a:hover{color:var(--rrg-red);}
 .rrg-nav .sep{color:var(--rrg-line);}
+
+/* Template Switcher — internal-only dropdown on the header's "Products" item for jumping
+   between the 5 prototype templates without going back to prototypes/index.html. Not part
+   of the shipped design (mirrors the Demo State Panel's reviewer-tool status). */
+.template-switcher{position:relative;}
+.template-switcher-toggle{background:none;border:none;padding:0;font:inherit;font-weight:700;color:var(--rrg-black);display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+.template-switcher-toggle:hover{color:var(--rrg-red);}
+.template-switcher-menu{position:absolute;top:calc(100% + 16px);left:0;background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);box-shadow:var(--shadow);min-width:210px;padding:8px;display:none;flex-direction:column;gap:1px;z-index:80;}
+.template-switcher.open .template-switcher-menu{display:flex;}
+.template-switcher-menu .tsm-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#999;padding:6px 10px 4px;}
+.template-switcher-menu a{padding:9px 10px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--rrg-black);text-decoration:none;}
+.template-switcher-menu a:hover{background:#f4f4f4;color:var(--rrg-red);}
+.template-switcher-menu a.current{color:var(--rrg-red);background:#faf0ef;}
 .rrg-search{flex:1 1 260px;max-width:420px;display:flex;border:1.5px solid var(--rrg-line);border-radius:8px;overflow:hidden;margin-left:auto;}
 .rrg-search input{flex:1;border:none;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;min-width:0;}
 .rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}

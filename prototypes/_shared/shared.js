@@ -662,10 +662,36 @@ function initCopyButtons() {
   });
 }
 
+// Template Switcher — dropdown on the header's "Products" item, internal-only, for
+// jumping between the 5 prototype templates without going back to prototypes/index.html.
+function initTemplateSwitcher() {
+  const wrap = document.querySelector('.template-switcher');
+  if (!wrap) return;
+  const toggle = wrap.querySelector('.template-switcher-toggle');
+  const menu = wrap.querySelector('.template-switcher-menu');
+
+  const currentFolder = location.pathname.split('/').filter(Boolean).slice(-2, -1)[0];
+  menu.querySelectorAll('a[data-template]').forEach(a => {
+    if (a.dataset.template === currentFolder) a.classList.add('current');
+  });
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = wrap.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  menu.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => {
+    wrap.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   buildExdemoModal();
   initCopyButtons();
   initFitGalleryCarousel();
+  initTemplateSwitcher();
 });
 
 function buildAdminPanel() {
