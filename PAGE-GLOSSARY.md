@@ -28,7 +28,7 @@ Top-to-bottom structural blocks. Not every section appears on every template —
 |---|---|
 | **Utility Bar** | Thin top strip above the main header (nearest store, vehicle, call us, region, account) — `.rrg-utility-bar` |
 | **Main Header** | Logo, nav links, search bar, cart icon — `.rrg-main-header` |
-| **Breadcrumbs** | Category trail above the hero — `.rrg-crumbs` |
+| **Breadcrumbs** | Trail above the hero — `.rrg-crumbs`. 3 levels (Home → Category → Product) on Simple/Config-variant/Sibling-color/Grouped-bundle; 4 levels on Vehicle-specific (Home → Vehicle → Category → Product, e.g. Home → Toyota Hilux N80 → Platforms & Trays → product) per Graham's requested structure. Note: this class name doesn't contain the word "breadcrumb" — a session grepped for that literal word 2026-09-10 and wrongly concluded breadcrumbs didn't exist. Search for `.rrg-crumbs` instead. |
 | **Hero** | The main above-the-fold row: Main Product Gallery on the left, Decision Panel on the right — `section.hero` |
 | **Decision Panel** | The right-hand sidebar column in the Hero: brand logo, SKU, price, fitment status, variant/colour picker, Add to Cart, payment badges, Delivery/Click & Collect widget — `.decision-panel` |
 | **Trust Row** | 4-column strip of trust points (Trusted Since 1989, Trained Professionals, etc.) below the hero — `.trust-row` |
