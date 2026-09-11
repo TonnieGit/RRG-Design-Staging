@@ -26,7 +26,7 @@
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:28px 0 8px;align-items:start;}
   .decision-panel{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
   .decision-panel h1{font-size:25px;line-height:1.08;margin-bottom:6px;}
-  .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
+  .short-desc{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
   .decision-panel .reviews-strip{margin-bottom:14px;}
   .price-block{border-top:1px solid var(--rrg-line);border-bottom:1px solid var(--rrg-line);padding:16px 0;margin-bottom:14px;}
@@ -140,14 +140,17 @@
       <div class="install-media-row">
         <img class="video-placeholder" src="../_shared/video-thumbnail.png" alt="Product video (preview placeholder)">
         <div class="install-cta-panel">
-          <img src="../_shared/installer.png" alt="Roof Racks Galore fitter installing a roof rack">
-          <div class="install-overlay">
-            <h3>Get It Installed</h3>
-            <p class="install-tag">Friendly + trusted nationwide experts in roof rack supply and installation.</p>
-            <div class="install-cta-reviews">
-              <span class="stars">★★★★☆</span>
+          <img class="install-photo" src="../_shared/installer.png" alt="Roof Racks Galore fitter installing a roof rack">
+          <div class="install-body">
+            <div class="install-head">
+              <span class="install-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 7.24a5 5 0 0 1-6.16 6.16l-8.3 8.3a2 2 0 0 1-2.83-2.83l8.3-8.3A5 5 0 0 1 19.76 2l-3.4 3.4 1.24 1.24L21 3.24A5 5 0 0 1 22 7.24z"/></svg></span>
+              <h3>Get It Installed</h3>
             </div>
-            <a href="#" class="btn">More Information + Bookings</a>
+            <div class="install-usps">
+              <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Over 200,000 roof racks fitted</p></div>
+              <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Nationwide network of trained fitters</p></div>
+            </div>
+            <a href="/roof-rack-installation-and-fitting-costs" class="btn btn-outline" target="_blank" rel="noopener noreferrer">See Fitting Options</a>
           </div>
         </div>
       </div>
@@ -159,8 +162,7 @@
         <div class="sku-row">SKU: <span class="sku-copy" data-copy="FRWTAN063" role="button" title="Click to copy SKU">FRWTAN063</span></div>
       </div>
       <h1>Front Runner Pro Water Tank With Strap 42L</h1>
-      <div class="value-prop">Tank, mounting strap and hardware in one kit — ready to strap to your roof rack or carry to camp.</div>
-      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
+      <div class="short-desc">The 42L Pro Water Tank with Strap is everything you need for adventure hydration, all included in one kit. This tank offers an easily accessible water source, securely strapped to your roof rack or free for campsite usage. <a href="#t1" class="short-desc-readmore" data-jump-tab="t1">Read more</a></div>
       <div class="reviews-strip" data-review-sku="FRWTAN063"><span class="stars" data-stars>★★★★★</span> <span data-review-text>4.5+</span> <a href="#t6" data-jump-tab="t6">See reviews</a></div>
 
       <div class="price-block">
@@ -175,7 +177,7 @@
 
       <div class="scarcity">⚠ This item is limited — whilst stocks last</div>
 
-      <div class="cta-col">
+      <div class="cta-col" data-conflict-item="a Rhino-Rack Pioneer Platform" data-conflict-reason="this water tank's mounting kit isn't designed for that platform system">
         <button class="btn btn-primary btn-lg btn-block" data-cta-label>Add To Cart</button>
         <div class="payment-badges">
           <div class="payment-badge">
@@ -297,8 +299,6 @@
       </div>
     </div>
   </section>
-
-  <p class="short-desc">The 42L Pro Water Tank with Strap is everything you need for adventure hydration, all included in one kit. This tank offers an easily accessible water source, securely strapped to your roof rack or free for campsite usage.</p>
 
   <section class="body-cols">
     <div>

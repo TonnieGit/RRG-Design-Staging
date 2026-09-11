@@ -382,23 +382,44 @@ function detectInitialFitGalleryState() {
   return !!document.getElementById('fitGallerySection');
 }
 
-// Fitment Gallery on/off (2026-09-10, Graham Sowerby meeting) — toggle previews a vehicle
-// with no real Fitment Gallery: hides the section itself and swaps the Get It Installed
-// CTA back to the generic fallback copy, so the two stay in sync rather than showing a
-// changed CTA next to a gallery that's still there.
+// Fitment Gallery on/off (2026-09-10, Graham Sowerby meeting; count thresholds added
+// 2026-09-11, backlog item 17) — toggle previews a vehicle with no real Fitment Gallery:
+// hides the section itself and swaps the Get It Installed CTA back to the generic fallback
+// copy, so the two stay in sync rather than showing a changed CTA next to a gallery that's
+// still there. Count itself branches three ways: a real 5+ count is worth naming ("We've
+// fitted this N times"), 1-4 is technically real but too small to read as an impressive
+// number so it's dropped ("See real fitments"), and a gallery that exists but has zero
+// fitments has nothing to show at all — same literal "Get It Installed" copy and external
+// fallback link as the no-gallery-at-all state below, just kept as its own branch since it's
+// a genuinely different scenario (gallery present vs. gallery absent).
 function applyFitGalleryFlag(on) {
   adminState.fitGallery = on;
   const section = document.getElementById('fitGallerySection');
   if (section) section.hidden = !on;
   const cta = document.querySelector('.install-cta-panel .btn');
   if (!cta) return;
-  if (on && section) {
-    const count = section.dataset.count || '';
-    cta.textContent = `See ${count} real fitments`;
+  const count = section ? parseInt(section.dataset.count, 10) || 0 : 0;
+  const fallbackLink = () => {
+    cta.href = '/roof-rack-installation-and-fitting-costs';
+    cta.target = '_blank';
+    cta.rel = 'noopener noreferrer';
+  };
+  if (on && count >= 5) {
+    cta.textContent = `We've fitted this ${count} times — view the gallery`;
     cta.href = '#fitGallerySection';
+    cta.removeAttribute('target');
+    cta.removeAttribute('rel');
+  } else if (on && count > 0) {
+    cta.textContent = 'See real fitments';
+    cta.href = '#fitGallerySection';
+    cta.removeAttribute('target');
+    cta.removeAttribute('rel');
+  } else if (on) {
+    cta.textContent = 'Get It Installed';
+    fallbackLink();
   } else {
-    cta.textContent = 'More Information + Bookings';
-    cta.href = '#';
+    cta.textContent = 'See Fitting Options';
+    fallbackLink();
   }
 }
 
@@ -633,6 +654,38 @@ function applyStockStatus(status) {
       });
     }
   }
+  // col.hidden just changed above (discontinued toggling hides/shows .cta-col) — re-sync
+  // the compatibility banner, which must never show alongside a hidden CTA.
+  applyCartConflict(adminState.cartConflict);
+}
+
+// Compatibility feature (backlog item 24, 2026-09-11 backlog) — simulates cart contents
+// against the current PDP product, since this prototype has no real cart/session. Three
+// states: no item in cart (default), a compatible item in cart (shown as a selectable
+// state but renders nothing — nothing to warn about), and an incompatible item in cart
+// (renders a non-blocking warning banner above Add to Cart, same insertion pattern as
+// applyStockStatus()'s banners). The conflicting item's name/reason are read off
+// data-conflict-item/data-conflict-reason on each template's own .cta-col rather than
+// hardcoded here, so this function stays generic across all 5 templates — in a real
+// Magento build this pair would come from a per-product compatibility rule the team sets,
+// not a hardcoded string. Never disables the CTA — informational only, per spec.
+function applyCartConflict(state) {
+  adminState.cartConflict = state;
+  document.querySelectorAll('.cta-col').forEach(col => {
+    const parent = col.parentNode;
+    const banner = parent.querySelector(':scope > .cart-conflict-banner');
+    const show = state === 'incompatible' && !col.hidden;
+    if (show && !banner) {
+      const el = document.createElement('div');
+      el.className = 'cart-conflict-banner';
+      const item = col.dataset.conflictItem || 'an item';
+      const reason = col.dataset.conflictReason || 'may not be fully compatible with this product';
+      el.innerHTML = `Heads up — you also have <strong>${item}</strong> in your cart, which may not be compatible with this product (${reason}). You can still add this to your cart, just double-check compatibility before checkout.`;
+      parent.insertBefore(el, col);
+    } else if (!show && banner) {
+      banner.remove();
+    }
+  });
 }
 
 function applyAvailabilityFlags(shipping, collect) {
@@ -1486,7 +1539,7 @@ function initTemplateSwitcher() {
   });
 }
 
-// "Read more" under the clamped short value-prop line jumps to the Details tab
+// "Read more" under the clamped short-desc line jumps to the Details tab
 // (2026-09-10, Graham Sowerby meeting). The tabs accordion is pure CSS (a radio input +
 // label + sibling-selector .content, no JS anywhere) — a plain anchor jump would scroll to
 // the (hidden) radio without checking it, so the tab wouldn't actually switch. This checks
@@ -1520,6 +1573,49 @@ function initReviewSummary(root = document) {
       textEl.textContent = `${avg.toFixed(1)} (${count.toLocaleString()} reviews)`;
     } catch (e) {
       strip.hidden = true;
+    }
+  });
+}
+
+// Short description inline "Read more" (2026-09-11, follow-up to the value-prop/short-desc
+// consolidation) — Brenton caught the link landing on its own row below the 2 lines of text
+// instead of inline at the end of the visible text. CSS line-clamp can't guarantee that (it
+// clips straight through an inline child that doesn't fit on the truncated line), so this
+// measures the element's real rendered height with the full text + link both present, then
+// trims the text word-by-word until "<text>… Read more" fits within exactly 2 lines. The
+// link is expected to already be the last child inside .short-desc (see markup) so it's
+// naturally inline with whatever text precedes it — this only ever shortens that text.
+// Stores the untouched original text in a data attribute so repeat calls (resize) always
+// trim from the real full text, not an already-trimmed one.
+function layoutShortDesc(root = document) {
+  root.querySelectorAll('.short-desc').forEach(el => {
+    const link = el.querySelector('.short-desc-readmore');
+    if (!link) return;
+    if (!el.dataset.fullText) {
+      // el.textContent at this point still includes the link's own "Read more" label (it's
+      // markup-nested, not yet detached) — strip it out via a clone so the captured source
+      // text is just the description, not "...description text. Read more".
+      const clone = el.cloneNode(true);
+      clone.querySelector('.short-desc-readmore')?.remove();
+      el.dataset.fullText = clone.textContent.trim();
+    }
+    const fullText = el.dataset.fullText;
+    const cs = getComputedStyle(el);
+    const lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.4;
+    const maxHeight = lineHeight * 2 + 1;
+
+    const words = fullText.split(' ');
+    const render = n => {
+      const truncated = n < words.length;
+      el.textContent = words.slice(0, n).join(' ') + (truncated ? '… ' : ' ');
+      el.appendChild(link);
+    };
+
+    let n = words.length;
+    render(n);
+    while (n > 0 && el.scrollHeight > maxHeight) {
+      n--;
+      render(n);
     }
   });
 }
@@ -1600,6 +1696,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initFitGalleryCarousel();
   initTemplateSwitcher();
   initRegionSwitcher();
+  layoutShortDesc();
+  window.addEventListener('resize', () => {
+    clearTimeout(window._shortDescResizeTimer);
+    window._shortDescResizeTimer = setTimeout(() => layoutShortDesc(), 120);
+  });
   initTabJumpLinks();
   initReviewSummary();
   initMobileNav();
@@ -1643,7 +1744,7 @@ function buildAdminPanel() {
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
   const initialFitGallery = detectInitialFitGalleryState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false, cartConflict: 'none' });
   // Interactive map is the locked default for the Showroom Finder widget, all 5
   // templates — no longer a Demo State Panel preview toggle. Layout (split-view,
   // revealing #showroomMap) still applies immediately so there's no shift once the map
@@ -1703,11 +1804,18 @@ function buildAdminPanel() {
           <label><input type="radio" name="stockStatus" value="special_order"> Special Order</label>
           <label><input type="radio" name="stockStatus" value="discontinued"> Discontinued</label>
         </div>
+        <div class="admin-toggle-label"><span>Cart contents <span class="admin-note">(compatibility check)</span></span></div>
+        <div class="admin-radio-row">
+          <label><input type="radio" name="cartConflict" value="none" checked> Empty</label>
+          <label><input type="radio" name="cartConflict" value="compatible"> Compatible item in cart</label>
+          <label><input type="radio" name="cartConflict" value="incompatible"> Incompatible item in cart</label>
+        </div>
         <label class="admin-toggle"><span>Shipping available</span><input type="checkbox" data-admin-flag="shipping" ${initialShipping ? 'checked' : ''}></label>
         <label class="admin-toggle"><span>Click &amp; Collect available</span><input type="checkbox" data-admin-flag="collect" ${initialCollect ? 'checked' : ''}></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
-        ${hasFitGallery ? `<label class="admin-toggle"><span>Fitment Gallery exists for this product</span><input type="checkbox" data-admin-flag="fitGallery" ${initialFitGallery ? 'checked' : ''}></label>` : ''}
+        ${hasFitGallery ? `<label class="admin-toggle"><span>Fitment Gallery exists for this product</span><input type="checkbox" data-admin-flag="fitGallery" ${initialFitGallery ? 'checked' : ''}></label>
+        <label class="admin-toggle"><span>Fitment count <span class="admin-note">(preview CTA thresholds)</span></span><input type="number" min="0" data-admin-input="fitGalleryCount" value="${document.getElementById('fitGallerySection') ? (document.getElementById('fitGallerySection').dataset.count || 0) : 0}" style="width:64px"></label>` : ''}
         ${hasVehicleFitNotes ? `<label class="admin-toggle"><span>Product Notes</span><input type="checkbox" data-admin-flag="vehicleFitNotes"></label>` : ''}
       </div>
       ${hasVariantPicker ? `
@@ -1780,11 +1888,28 @@ function buildAdminPanel() {
     });
   });
 
+  panel.querySelectorAll('[data-admin-input]').forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.dataset.adminInput === 'fitGalleryCount') {
+        const section = document.getElementById('fitGallerySection');
+        if (section) section.dataset.count = input.value;
+        applyFitGalleryFlag(adminState.fitGallery);
+      }
+    });
+  });
+
   panel.querySelectorAll('input[name="stockStatus"]').forEach(input => {
     input.addEventListener('change', () => {
       if (!input.checked) return;
       adminState.stockOverride = true;
       applyStockStatus(input.value);
+    });
+  });
+
+  panel.querySelectorAll('input[name="cartConflict"]').forEach(input => {
+    input.addEventListener('change', () => {
+      if (!input.checked) return;
+      applyCartConflict(input.value);
     });
   });
 

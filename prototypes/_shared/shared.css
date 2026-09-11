@@ -423,6 +423,17 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    out from the surrounding trust-copy grey, no underline needed at that weight/colour. */
 .trust-row p a[href^="tel:"]{color:var(--rrg-red);font-weight:900;text-decoration:none;}
 
+/* USP dot points (backlog item 6, 2026-09-11) — real per-product marketing bullets sourced
+   from Rackit, count varies 3-6 per SKU. Vertical stacked list (not Trust Row's horizontal
+   4-column grid) since the real content is full sentences, not short labels — a rigid
+   equal-width column layout would cramp long text and cause uneven column heights across
+   a variable item count. Omitted entirely (no markup at all) on SKUs with no USPs set in
+   Rackit, rather than rendered empty. */
+.usp-row{display:flex;flex-direction:column;gap:10px;margin:28px 0;padding:20px 22px;background:#faf9f7;border:1px solid var(--rrg-line);border-radius:6px;}
+.usp-item{display:flex;align-items:flex-start;gap:10px;}
+.usp-icon{width:18px;height:18px;flex:0 0 18px;color:var(--rrg-red);margin-top:2px;}
+.usp-item p{margin:0;font-size:14.5px;line-height:1.45;color:#333;}
+
 /* tabs (accordion, mirrors live-site pattern). Scoped to the accordion's own direct-child
    radio inputs (`>`, `[type="radio"]`) rather than a blanket `.tabs input` — backlog item
    13 (2026-09-11) nested a real `.dc-widget` postcode text input inside a tab's `.content`,
@@ -486,15 +497,22 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .guarantee-learn-more{font-size:13px;color:var(--rrg-red);font-weight:700;text-decoration:none;}
 .guarantee-learn-more:hover{text-decoration:underline;}
 
-/* Short description 2-line clamp + "Read more" link (2026-09-10, Graham Sowerby meeting),
-   applied to .value-prop (the short value-prop line under the title, base rules declared
-   per-template — these clamp-specific properties aren't set there so nothing conflicts).
-   "Read more" jumps to the Details tab via initTabJumpLinks() below, since the tabs
-   accordion is pure CSS (radio + label + sibling selector, no JS) and a plain anchor jump
-   wouldn't check the tab's radio input. */
-.value-prop{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.value-prop-readmore{display:inline-block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--rrg-red);text-decoration:none;cursor:pointer;}
-.value-prop-readmore:hover{text-decoration:underline;}
+/* Short description, 2-line clamp with an inline "Read more" (2026-09-10, Graham Sowerby
+   meeting; consolidated 2026-09-11 — this used to be split across two elements, .value-prop
+   (this slot, under the title) and a second unclamped .short-desc paragraph lower on the page
+   duplicating the Details tab's opening line. .value-prop was never a real Rackit field;
+   .short-desc is, so the real content moved up here and the class name went with it).
+   "Read more" is now the link's LAST CHILD inside .short-desc itself (not a sibling row below
+   it) so it can sit inline at the end of the visible text — CSS line-clamp can't guarantee
+   that on its own (it clips straight through an inline child that doesn't fit on the
+   truncated line), so layoutShortDesc() in shared.js measures the real rendered height and
+   trims the text word-by-word until "<text>… Read more" fits within exactly 2 lines, re-run
+   on resize since available width changes how much fits per line. Base font-size/color
+   declared per-template. The link itself still jumps to the Details tab via
+   initTabJumpLinks() below, since the tabs accordion is pure CSS (radio + label + sibling
+   selector, no JS) and a plain anchor jump wouldn't check the tab's radio input. */
+.short-desc-readmore{margin-left:4px;font-size:12.5px;font-weight:700;color:var(--rrg-red);text-decoration:none;cursor:pointer;white-space:nowrap;}
+.short-desc-readmore:hover{text-decoration:underline;}
 
 /* Sticky left column (desktop only): when the decision-panel column ends up taller than
    the gallery/video/install column (variant pickers, showroom finder, package contents
@@ -537,27 +555,57 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    the demo admin panel's "Product has video" toggle. */
 .video-placeholder{display:block;width:100%;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;object-fit:cover;}
 
-/* Get It Installed — image + text CTA (was a plain sidebar button). .install-media-row
-   pairs it with the product video, side by side, under the gallery images. The .no-video
-   modifier (toggled by the demo admin panel, or present by default on products with no
-   video at all) drops it to a single full-width column instead. */
-.install-media-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+/* Get It Installed — full-bleed installer photo with real trust points overlaid on a dark
+   scrim, and a subdued outline CTA (redesigned 2026-09-11, spec.md item 16; refined twice
+   same day after Brenton's review). .install-cta-panel's own aspect-ratio controls the
+   card's height — locked to 16/9 when paired with the video so the two stay exactly the
+   same height side by side. Deliberately not styled as a second prominent CTA: the button
+   uses .btn-outline (site's existing subdued secondary style, reads fine in white over the
+   dark scrim), not red or gold, so it never competes with the one purchase CTA in the
+   decision panel (confirmed with Brenton — red still pulls the eye even though it isn't the
+   Add to Cart colour). .install-media-row pairs it with the product video, side by side,
+   under the gallery images. The .no-video modifier (toggled by the demo admin panel, or
+   present by default on products with no video at all) drops it to a single full-width
+   column instead, with larger text/icon sizing since there's more room and no video height
+   to match.
+   Second refinement (same day): installer.png itself has a ~10-25px black border baked
+   into the source file (confirmed by sampling pixels via canvas — not a CSS bug, the
+   getBoundingClientRect box was always pixel-exact). .install-photo is scaled up 1.16x
+   around its own centre to crop that border outside the visible/clipped frame — measured
+   against the worst-case border edge (top, ~5.2% of the image height) plus a safety margin,
+   confirmed clean via the same pixel-sampling technique after. Also fixed: .install-body
+   used to rely on height:100% to fill the card, which only resolves correctly when the
+   card's own height is *definite* (true for the paired 16/9 state, but not for .no-video's
+   min-height-only box) — it silently collapsed to its own content height instead, leaving
+   the .no-video card's text stuck at the top instead of vertically centred. Switched to
+   position:absolute;inset:0 (same reliable stretch technique .install-photo already used)
+   so centring now works in both states regardless of how the card's height is established. */
+.install-media-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;align-items:start;}
 .install-media-row.no-video{grid-template-columns:1fr;}
 .install-media-row.no-video .video-placeholder{display:none!important;}
 .install-cta-panel{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:#111;}
-.install-cta-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:85% 35%;}
-.install-cta-panel .install-overlay{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:22px 24px;background:linear-gradient(90deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.1) 100%);color:#fff;}
-.install-cta-panel h3{color:#fff;font-size:19px;margin:0;}
-.install-cta-panel .install-tag{font-size:12.5px;color:#ddd;line-height:1.35;max-width:230px;margin:0;}
-.install-cta-reviews{display:flex;align-items:center;gap:10px;}
-.install-cta-reviews .stars{color:#E8A83C;font-size:14px;}
-.reviews-io-badge{display:inline-flex;align-items:center;gap:2px;background:#fff;color:#232323;font-weight:900;font-size:12px;padding:4px 8px;border-radius:4px;letter-spacing:.02em;}
-/* White/black CTA (2026-09-11, client ask) — stands out more against the dark overlay
-   than the previous gold, which blended in. */
-.install-cta-panel .btn{background:#fff;color:#000;align-self:flex-start;padding:12px 20px;font-size:13px;border-radius:8px;line-height:1.25;}
-.install-cta-panel .btn:hover{background:#e6e6e6;}
-.install-media-row.no-video .install-cta-panel{aspect-ratio:auto;min-height:220px;}
-.install-media-row.no-video .install-cta-panel .install-overlay{max-width:520px;}
+.install-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:85% 35%;transform:scale(1.16);}
+.install-body{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:16px 18px;background:linear-gradient(90deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 48%, rgba(0,0,0,.05) 100%);}
+.install-head{display:flex;align-items:center;gap:8px;}
+.install-badge{width:24px;height:24px;flex:0 0 auto;border-radius:6px;background:var(--rrg-red);color:#fff;display:flex;align-items:center;justify-content:center;}
+.install-badge svg{width:13px;height:13px;}
+.install-cta-panel h3{font-size:16px;margin:0;color:#fff;}
+.install-usps{display:flex;flex-direction:column;gap:4px;}
+.install-usps .usp-item{gap:6px;}
+.install-usps .usp-icon{width:13px;height:13px;flex:0 0 13px;color:#fff;}
+.install-usps .usp-item p{margin:0;font-size:12px;line-height:1.3;color:#eee;}
+.install-cta-panel .btn{align-self:flex-start;padding:10px 18px;font-size:12.5px;line-height:1.2;}
+.install-media-row.no-video .install-cta-panel{aspect-ratio:auto;min-height:230px;}
+.install-media-row.no-video .install-body{max-width:460px;padding:22px 26px;gap:12px;}
+.install-media-row.no-video .install-head{gap:12px;}
+.install-media-row.no-video .install-badge{width:32px;height:32px;}
+.install-media-row.no-video .install-badge svg{width:17px;height:17px;}
+.install-media-row.no-video .install-cta-panel h3{font-size:21px;}
+.install-media-row.no-video .install-usps{gap:8px;}
+.install-media-row.no-video .install-usps .usp-item{gap:10px;}
+.install-media-row.no-video .install-usps .usp-icon{width:17px;height:17px;flex:0 0 17px;}
+.install-media-row.no-video .install-usps .usp-item p{font-size:14.5px;}
+.install-media-row.no-video .install-cta-panel .btn{padding:13px 24px;font-size:14px;}
 @media (max-width:900px){
   .install-media-row{grid-template-columns:1fr;}
   .install-cta-panel{aspect-ratio:16/9;}
@@ -655,6 +703,15 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Text recoloured black (2026-09-11, legibility fix) — box stays amber-tinted
    (background/border), only the yellow/orange text itself was hard to read. */
 .special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#000;background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+
+/* Compatibility banner — sits above Add to Cart, demo admin panel "Cart contents"
+   toggle (backlog item 24, 2026-09-11 backlog). Same amber informational tier as
+   .special-order-banner (never blocks purchase), not the red "not in stock" tier.
+   Deliberately NOT display:flex (2026-09-12 fix) — this banner's content is a text
+   run with an embedded <strong>, and flex turns each text/element chunk into its own
+   anonymous flex item/column instead of one wrapping paragraph, which read as broken
+   multi-column text. Plain block flow wraps it correctly as a single paragraph. */
+.cart-conflict-banner{font-size:13px;font-weight:700;color:#000;background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.4;}
 
 /* Discontinued banner — sits above Add to Cart in place of the button/payment-badges
    (which are hidden via .cta-col[hidden] while this state is active), demo admin panel
@@ -964,9 +1021,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .product-card .price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-bottom:8px;}
 .product-card .btn{padding:9px 12px;font-size:12px;}
 
-/* Short description block (Simple/lower-complexity templates) */
-.short-desc{font-size:15px;color:#333;max-width:760px;margin:24px 0;}
-
 /* Reviews tab (2026-09-11, then replaced with a real embed same day) — a real REVIEWS.io
    Polaris widget now renders here (see the inline <script> in each template's Reviews tab
    content, store: 'roof-racks-galore'), which natively provides its own Product/Company
@@ -1011,7 +1065,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    though the viewport meta tag itself is correct (not a zoom/scaling bug).
 
    !important is used deliberately, not as a shortcut: several of these selectors are
-   re-declared in each template's own local <style> block (e.g. .value-prop, .sku-row),
+   re-declared in each template's own local <style> block (e.g. .short-desc, .sku-row),
    which loads after this shared stylesheet in every page's <head> and would otherwise
    silently win the cascade on source order alone despite equal specificity. This block
    is meant to be the authoritative mobile floor regardless of what a given template
@@ -1033,9 +1087,9 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
   .fitment{font-size:16px!important;}
   .tabs .content{font-size:16px!important;}
   .short-desc{font-size:16px!important;}
-  .value-prop{font-size:16px!important;}
   .specs-table th,.specs-table td{font-size:15px!important;}
   .guarantee-usps li{font-size:16px!important;}
+  .usp-item p{font-size:16px!important;}
   .vehicle-fit-notes{font-size:15px!important;}
   .dc-option,.dc-store{font-size:15px!important;}
   .product-card h5{font-size:14.5px!important;}

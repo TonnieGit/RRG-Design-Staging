@@ -26,7 +26,7 @@
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:28px 0 8px;align-items:start;}
   .decision-panel{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
   .decision-panel h1{font-size:25px;line-height:1.08;margin-bottom:6px;}
-  .value-prop{font-size:14px;color:#555;margin-bottom:14px;}
+  .short-desc{font-size:14px;color:#555;margin-bottom:14px;}
   .sku-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#767676;margin-bottom:10px;}
   .decision-panel .reviews-strip{margin-bottom:16px;}
 
@@ -145,14 +145,17 @@
       <div class="install-media-row">
         <img class="video-placeholder" src="../_shared/video-thumbnail.png" alt="Product video (preview placeholder)">
         <div class="install-cta-panel">
-          <img src="../_shared/installer.png" alt="Roof Racks Galore fitter installing a roof rack">
-          <div class="install-overlay">
-            <h3>Get It Installed</h3>
-            <p class="install-tag">Friendly + trusted nationwide experts in roof rack supply and installation.</p>
-            <div class="install-cta-reviews">
-              <span class="stars">★★★★☆</span>
+          <img class="install-photo" src="../_shared/installer.png" alt="Roof Racks Galore fitter installing a roof rack">
+          <div class="install-body">
+            <div class="install-head">
+              <span class="install-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 7.24a5 5 0 0 1-6.16 6.16l-8.3 8.3a2 2 0 0 1-2.83-2.83l8.3-8.3A5 5 0 0 1 19.76 2l-3.4 3.4 1.24 1.24L21 3.24A5 5 0 0 1 22 7.24z"/></svg></span>
+              <h3>Get It Installed</h3>
             </div>
-            <a href="#" class="btn">More Information + Bookings</a>
+            <div class="install-usps">
+              <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Over 200,000 roof racks fitted</p></div>
+              <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Nationwide network of trained fitters</p></div>
+            </div>
+            <a href="/roof-rack-installation-and-fitting-costs" class="btn btn-outline" target="_blank" rel="noopener noreferrer">See Fitting Options</a>
           </div>
         </div>
       </div>
@@ -164,8 +167,7 @@
         <div class="sku-row">SKU: <span id="skuValue" class="sku-copy" data-copy-source="#skuValue" role="button" title="Click to copy SKU"></span></div>
       </div>
       <h1>MAXTRAX MKII Recovery Boards</h1>
-      <div class="value-prop">Get unstuck fast — aggressive cleats grip mud, sand or snow. 13 colours, same board.</div>
-      <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
+      <div class="short-desc">MAXTRAX is the lightweight, easy-to-use vehicle recovery and extraction device that's easily carried by almost anything with four-wheels ensuring an easy way out if your vehicle becomes stuck. <a href="#t1" class="short-desc-readmore" data-jump-tab="t1">Read more</a></div>
       <div class="reviews-strip" data-review-sku="MTX02BK;MTX02MA;MTX02GG;MTX02FJB;MTX02LG;MTX02BY;MTX02PK;MTX02FJR;MTX02TG;MTX02DT;MTX02TQ;MTX02OD;MTX02SO"><span class="stars" data-stars>★★★★★</span> <span data-review-text>4.5+</span> <a href="#t5" data-jump-tab="t5">See reviews</a></div>
 
       <div class="swatch-label-row">
@@ -185,7 +187,7 @@
         <div class="stock-status-line in-stock" id="stockLine">✓ In Stock</div>
       </div>
 
-      <div class="cta-col">
+      <div class="cta-col" data-conflict-item="a roof rack platform" data-conflict-reason="this board's mounting brackets aren't compatible with that platform">
         <button class="btn btn-primary btn-lg btn-block" data-cta-label>Add To Cart</button>
         <div class="payment-badges">
           <div class="payment-badge">
@@ -308,7 +310,12 @@
     </div>
   </section>
 
-  <p class="short-desc">MAXTRAX is the lightweight, easy-to-use vehicle recovery and extraction device that's easily carried by almost anything with four-wheels ensuring an easy way out if your vehicle becomes stuck.</p>
+  <div class="usp-row">
+    <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Aggressive traction cleats help recover vehicles from sand, mud, and snow</p></div>
+    <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Engineering-grade reinforced nylon delivers lightweight strength and flexibility</p></div>
+    <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Integrated handles, shovel ends, and mounting points improve usability</p></div>
+    <div class="usp-item"><svg class="usp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><p>Stackable low-profile design stores easily with touring and camping gear</p></div>
+  </div>
 
   <section class="body-cols">
     <div>
