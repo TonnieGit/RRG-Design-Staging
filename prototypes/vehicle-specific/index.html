@@ -16,6 +16,12 @@
      longer needs to block HTML parsing this early. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<!-- Leaflet.markercluster — groups Showroom Finder map pins when zoomed out, splits them
+     apart on zoom in (backlog item 22, 2026-09-11). Same free/no-key/deferred convention as
+     Leaflet itself above. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
 <style>
   .hero{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:28px 0 8px;align-items:start;}
   .decision-panel{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);position:sticky;top:56px;}
@@ -64,12 +70,6 @@
     .install-media-row{order:3;margin-top:22px;}
     #fitGalleryNestedSlot{order:3;}
   }
-  .sticky-cta-mobile{display:none;}
-  @media (max-width:640px){
-    .sticky-cta-mobile{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--rrg-line);padding:10px 16px;gap:10px;align-items:center;z-index:40;box-shadow:0 -6px 16px rgba(0,0,0,.08);}
-    .sticky-cta-mobile .info{flex:1;font-size:12px;}
-    body{padding-bottom:74px;}
-  }
 </style>
 </head>
 <body>
@@ -77,12 +77,20 @@
 <div class="rrg-utility-bar">
   <div class="wrap rrg-utility-inner">
     <div class="rrg-utility-left">
-      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#">North Lakes</a></span>
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#" data-admin-trigger>North Lakes</a></span>
       <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> <span class="u-item-label">Your Vehicle:</span> <a href="#">Toyota Hilux</a></span>
     </div>
     <div class="rrg-utility-right">
       <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg> Call Us</span>
-      <span class="u-item"><span class="flag-emoji">🇦🇺</span> Australia <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M6 9l6 6 6-6"/></svg></span>
+      <div class="region-switcher u-item">
+        <button type="button" class="region-switcher-toggle" aria-haspopup="true" aria-expanded="false"><span class="flag-emoji" data-region-flag>🇦🇺</span> <span data-region-label>Australia</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="region-switcher-menu">
+          <span class="tsm-label">Region</span>
+          <a href="#" data-region="AU" class="current"><span class="flag-emoji">🇦🇺</span> Australia</a>
+          <a href="#" data-region="NZ"><span class="flag-emoji">🇳🇿</span> New Zealand</a>
+          <a href="#" data-region="UK"><span class="flag-emoji">🇬🇧</span> United Kingdom</a>
+        </div>
+      </div>
       <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7v1H4v-1z"/></svg> <a href="#">Graham</a></span>
     </div>
   </div>
@@ -103,6 +111,7 @@
           <a href="../grouped-bundle/index.html" data-template="grouped-bundle">Grouped/Bundle</a>
         </div>
       </div>
+      <a href="../../dev-brief-viewer.html" target="_blank" rel="noopener" title="Internal only — not part of the shipped site">Dev Brief</a>
       <span class="sep">|</span>
       <a href="#">Store Finder</a>
       <a href="#">Fit My Vehicle</a>
@@ -158,7 +167,6 @@
             <h3>Get It Installed</h3>
             <p class="install-tag">Friendly + trusted nationwide experts in roof rack supply and installation.</p>
             <div class="install-cta-reviews">
-              <span class="reviews-io-badge">★ REVIEWS<span style="color:var(--rrg-red)">.io</span></span>
               <span class="stars">★★★★☆</span>
             </div>
             <a href="#fitGallerySection" class="btn">See 283 real fitments</a>
@@ -173,24 +181,28 @@
     </div>
 
     <div class="decision-panel">
-      <img class="brand-logo" src="../_shared/brand-rhino-rack.webp" alt="Rhino Rack">
-      <div class="sku-row">SKU: <span id="skuValue" class="sku-copy" data-copy-source="#skuValue" role="button" title="Click to copy SKU">GP01M1TZZ</span></div>
+      <div class="decision-panel-top">
+        <img class="brand-logo" src="../_shared/brand-rhino-rack.webp" alt="Rhino Rack">
+        <div class="sku-row">SKU: <span id="skuValue" class="sku-copy" data-copy-source="#skuValue" role="button" title="Click to copy SKU">GP01M1TZZ</span></div>
+      </div>
       <h1>Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</h1>
       <div class="value-prop">Full track-mount kit — platform, Backbone spine &amp; tracks — engineered specifically for your Hilux, not a universal fit.</div>
       <a href="#t1" class="value-prop-readmore" data-jump-tab="t1">Read more</a>
-      <div class="reviews-strip"><span class="stars">★★★★★</span> 4.5+ <a href="#">See reviews</a></div>
+      <div class="reviews-strip" data-review-sku="GP01M1TZZ;GP01M1TZZF"><span class="stars" data-stars>★★★★★</span> <span data-review-text>4.5+</span> <a href="#t6" data-jump-tab="t6">See reviews</a></div>
 
       <div class="fitment-wrap">
         <div class="fitment fits" data-fitment-slot></div>
         <img class="rack-fit-badge" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
       </div>
 
-      <!-- Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — model-specific
-           fitment caveats, not present on every vehicle. Placeholder copy below needs real
-           per-vehicle content from the client before this leaves prototype stage. Starts
-           hidden; toggled via the Demo State Panel's "Vehicle Fit Notes" checkbox. -->
+      <!-- Product Notes (renamed 2026-09-11 from "Important Vehicle Fit Notes" — same
+           block, widened so it isn't a vehicle-specific-only label; content below is
+           still this template's own model-specific fitment caveats, not present on every
+           vehicle. Placeholder copy needs real per-vehicle content from the client before
+           this leaves prototype stage. Starts hidden; toggled via the Demo State Panel's
+           "Product Notes" checkbox. -->
       <div class="vehicle-fit-notes" id="vehicleFitNotes" hidden>
-        <strong>⚠ Important Vehicle Fit Notes</strong>
+        <strong>⚠ Product Notes</strong>
         <p>Some Hilux N80 models fitted with an aftermarket sunroof, tonneau cover, or tow bar wiring harness may need minor clearance checks during installation — confirm with your fitting technician if your vehicle has any of these.</p>
       </div>
 
@@ -324,16 +336,17 @@
   </div>
 
   <div class="trust-row">
-    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
+    <div class="item" data-trust="founded"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
     <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg><h4>Trained Professionals</h4><p>Over 200,000 roof racks fitted</p></div>
-    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><h4>Australia's Largest</h4><p>We're the only nationwide roof rack specialists</p></div>
-    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: 1300 071 264</p></div>
+    <div class="item" data-trust="network"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><h4>Australia's Largest</h4><p>We're the only nationwide roof rack specialists</p></div>
+    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: <a href="tel:1300071264">1300 071 264</a></p></div>
   </div>
 
   <section id="showroom" style="margin:40px 0;">
+    <h3 class="showroom-heading">Showroom Finder</h3>
     <div class="showroom-widget split-view">
       <div id="showroomDefaultView">
-        <h3>See It In Person — On Display At 14 Stores Near You</h3>
+        <h3>See It In Person — On Display At 14 Stores Nationwide</h3>
         <p>This exact platform + Backbone + track kit is set up in-showroom so you can check fit, finish and load height before you buy.</p>
         <div class="dc-row">
           <input type="text" class="dc-input" placeholder="Enter your postcode" id="showroomPostcode">
@@ -358,6 +371,7 @@
 
   <section class="body-cols">
     <div>
+      <h3 class="tabs-heading">Product Information</h3>
       <div class="tabs">
         <input type="radio" name="tabs" id="t1" checked><label for="t1">Details</label>
         <div class="content">
@@ -495,13 +509,161 @@
         <input type="radio" name="tabs" id="t5"><label for="t5">Fitting Instructions</label>
         <div class="content">
           <ul>
-            <li><a id="fittingLink" href="https://assets.rhinorack.com/Instructions/Platforms/Pioneer-6-series/520-RFI-00132%20PIONEER%20SERIES%206%20Fitting%20Instruction.pdf" target="_blank">Platform Instructions</a> — specific to your selected build option above</li>
-            <li><a href="https://rackit.s3.amazonaws.com/manuals/RTHB1_uSPK3" target="_blank">RTHB1 Backbone Instructions</a></li>
-            <li><a href="https://rackit.s3.amazonaws.com/manuals/RTS556_bz5Sx" target="_blank">RTS556 Tracks Instructions</a></li>
-            <li><a href="https://www.roofracksgalore.com.au/pub/media/pdfs/roof-racks-safety.pdf" target="_blank">Roof Racks Safety</a></li>
+            <li><a id="fittingLink" class="pdf-link" href="https://assets.rhinorack.com/Instructions/Platforms/Pioneer-6-series/520-RFI-00132%20PIONEER%20SERIES%206%20Fitting%20Instruction.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H14a1 1 0 0 1-1-1V3.5zM8 13h2.2a1.8 1.8 0 0 1 0 3.6H9v1.4H8v-5zm1 1v1.6h1.2a.8.8 0 0 0 0-1.6H9zm4-1h1.8c1 0 1.7.8 1.7 2.5S15.8 18 14.8 18H13v-5zm1 1v3h.8c.5 0 .7-.5.7-1.5S14.3 14 13.8 14H14zm4-1h2.5v1H19v1.2h1.3v1H19V18h-1v-5z"/></svg>Platform Instructions</a> — specific to your selected build option above</li>
+            <li><a class="pdf-link" href="https://rackit.s3.amazonaws.com/manuals/RTHB1_uSPK3" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H14a1 1 0 0 1-1-1V3.5zM8 13h2.2a1.8 1.8 0 0 1 0 3.6H9v1.4H8v-5zm1 1v1.6h1.2a.8.8 0 0 0 0-1.6H9zm4-1h1.8c1 0 1.7.8 1.7 2.5S15.8 18 14.8 18H13v-5zm1 1v3h.8c.5 0 .7-.5.7-1.5S14.3 14 13.8 14H14zm4-1h2.5v1H19v1.2h1.3v1H19V18h-1v-5z"/></svg>RTHB1 Backbone Instructions</a></li>
+            <li><a class="pdf-link" href="https://rackit.s3.amazonaws.com/manuals/RTS556_bz5Sx" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H14a1 1 0 0 1-1-1V3.5zM8 13h2.2a1.8 1.8 0 0 1 0 3.6H9v1.4H8v-5zm1 1v1.6h1.2a.8.8 0 0 0 0-1.6H9zm4-1h1.8c1 0 1.7.8 1.7 2.5S15.8 18 14.8 18H13v-5zm1 1v3h.8c.5 0 .7-.5.7-1.5S14.3 14 13.8 14H14zm4-1h2.5v1H19v1.2h1.3v1H19V18h-1v-5z"/></svg>RTS556 Tracks Instructions</a></li>
+            <li><a class="pdf-link" href="https://www.roofracksgalore.com.au/pub/media/pdfs/roof-racks-safety.pdf" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H14a1 1 0 0 1-1-1V3.5zM8 13h2.2a1.8 1.8 0 0 1 0 3.6H9v1.4H8v-5zm1 1v1.6h1.2a.8.8 0 0 0 0-1.6H9zm4-1h1.8c1 0 1.7.8 1.7 2.5S15.8 18 14.8 18H13v-5zm1 1v3h.8c.5 0 .7-.5.7-1.5S14.3 14 13.8 14H14zm4-1h2.5v1H19v1.2h1.3v1H19V18h-1v-5z"/></svg>Roof Racks Safety</a></li>
           </ul>
         </div>
+        <input type="radio" name="tabs" id="t6"><label for="t6">Reviews</label>
+        <div class="content">
+          <script src="https://widget.reviews.io/polaris/build.js"></script>
+          <div id="ReviewsWidget"></div>
+          <script>
+          new ReviewsWidget('#ReviewsWidget', {
+            store: 'roof-racks-galore',
+            widget: 'polaris',
+            options: {
+              types: 'product_review,store_review',
+              enable_sentiment_analysis: true,
+              lang: 'en',
+              layout: '',
+              per_page: 15,
+              store_review: { hide_if_no_results: false },
+              third_party_review: { hide_if_no_results: false },
+              product_review: { sku: 'GP01M1TZZ;GP01M1TZZF', hide_if_no_results: false },
+              questions: {
+                hide_if_no_results: true,
+                enable_ask_question: true,
+                enable_ask_question_button_style: false,
+                show_dates: true,
+                include_qna_structured_data: true,
+                grouping: 'GP01M1TZZ'
+              },
+              header: {
+                enable_summary: true,
+                enable_ratings: true,
+                enable_attributes: true,
+                enable_image_gallery: true,
+                enable_percent_recommended: false,
+                enable_write_review: true,
+                enable_ask_question: true,
+                enable_sub_header: true,
+                rating_decimal_places: 2,
+                use_write_review_button: false,
+                enable_if_no_results: false,
+                show_review_title_field: false
+              },
+              sentiment: { badge_text: 'Our Customers Say', enable_rating_breakdown: false },
+              filtering: {
+                enable: true,
+                enable_text_search: true,
+                enable_sorting: true,
+                enable_product_filter: false,
+                enable_media_filter: true,
+                enable_overall_rating_filter: true,
+                enable_language_filter: false,
+                enable_language_filter_language_change: false,
+                enable_ratings_filters: true,
+                enable_attributes_filters: true,
+                enable_expanded_filters: false
+              },
+              reviews: {
+                enable_avatar: true,
+                enable_reviewer_name: true,
+                enable_reviewer_address: true,
+                reviewer_address_format: 'city, country',
+                enable_verified_badge: true,
+                verified_badge_position: '',
+                enable_subscriber_badge: true,
+                review_content_filter: 'all',
+                enable_reviewer_recommends: true,
+                enable_attributes: true,
+                enable_product_name: true,
+                enable_link_product: true,
+                enable_review_title: true,
+                enable_replies: true,
+                enable_images: true,
+                enable_ratings: true,
+                enable_share: true,
+                enable_helpful_vote: true,
+                enable_helpful_display: true,
+                enable_report: true,
+                enable_date: true,
+                date_format: undefined,
+                date_location: undefined,
+                enable_third_party_source: true,
+                enable_duplicate_reviews: undefined,
+                combine_title_stars: true,
+                show_untranslated: false
+              }
+            },
+            translations: { 'Verified Customer': 'Verified Customer' },
+            styles: {
+              '--base-font-size': '16px',
+              '--common-button-font-family': 'inherit',
+              '--common-button-font-size': '16px',
+              '--common-button-font-weight': '700',
+              '--common-button-letter-spacing': '0',
+              '--common-button-text-transform': 'none',
+              '--common-button-vertical-padding': '10px',
+              '--common-button-horizontal-padding': '20px',
+              '--common-button-border-width': '2px',
+              '--common-button-border-radius': '4px',
+              '--primary-button-bg-color': '#BB0220',
+              '--primary-button-border-color': '#BB0220',
+              '--primary-button-text-color': '#ffffff',
+              '--secondary-button-bg-color': 'transparent',
+              '--secondary-button-border-color': '#0E1311',
+              '--secondary-button-text-color': '#0E1311',
+              '--common-star-color': '#E8A83C',
+              '--common-star-disabled-color': 'rgba(0,0,0,0.2)',
+              '--medium-star-size': '22px',
+              '--small-star-size': '19px',
+              '--heading-text-color': '#0E1311',
+              '--heading-text-font-weight': '700',
+              '--heading-text-font-family': "'Barlow Condensed', sans-serif",
+              '--heading-text-line-height': '1.3',
+              '--heading-text-letter-spacing': '0',
+              '--heading-text-transform': 'none',
+              '--body-text-color': '#0E1311',
+              '--body-text-font-weight': '400',
+              '--body-text-font-family': 'inherit',
+              '--body-text-line-height': '1.4',
+              '--body-text-letter-spacing': '0',
+              '--body-text-transform': 'none',
+              '--pagination-tab-active-border-color': '#BB0220',
+              '--pagination-tab-active-text-color': '#BB0220',
+              '--sentiment-pagination-tab-active-border-color': '#BB0220',
+              '--sentiment-pagination-tab-active-text-color': '#BB0220',
+              '--sentiment-common-star-color': '#E8A83C'
+            }
+          });
+          </script>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h3 class="faq-heading">Frequently Asked Questions</h3>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Will this fit my Hilux if it's a different year to N80?</summary>
+        <div class="faq-answer"><p>This kit is matched to the Toyota Hilux N80 generation shown in the fitment status above. Confirm your exact vehicle using the vehicle selector — a different generation may need a different kit.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>What if my saved vehicle shows "Confirm your vehicle" instead of a fit?</summary>
+        <div class="faq-answer"><p>That means we need a couple more details (body style or roof type) to confirm fitment precisely — use "Find The Right Fit" beside the fitment status to resolve it before ordering.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Does the Rack Fit Guarantee cost extra?</summary>
+        <div class="faq-answer"><p>No — it's included automatically whenever your saved vehicle is a confirmed match. See the badge next to the fitment status for details.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I get this professionally fitted, and does it cost extra?</summary>
+        <div class="faq-answer"><p>Yes — select the "Get It Fitted" option where shown. Fitting charges apply and are confirmed in-store before installation; see the Gold Guarantee tab for what's covered.</p></div>
+      </details>
     </div>
   </section>
 
@@ -529,7 +691,11 @@
 </main>
 
 <div class="sticky-cta-mobile">
-  <div class="info fitment fits" data-fitment-slot style="padding:8px;border-radius:8px;font-size:11px;"></div>
+  <div class="persistent-product">
+    <img class="persistent-thumb" src="https://www.roofracksgalore.com.au/pub/media/catalog/product/e/7/e775e3debebdc8ba3b70b79f87a0a59466cb68e1b3800433f011a483b3fc2679_1_26.jpg" alt="">
+    <span class="persistent-name">Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</span>
+  </div>
+  <div class="info fitment fits" data-fitment-slot data-fitment-copyable="icon-only" style="padding:8px;border-radius:8px;font-size:11px;"></div>
   <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
@@ -539,7 +705,11 @@
      mobile widths, where .sticky-cta-mobile above already covers the same job. -->
 <div class="persistent-bar" id="persistentBar" style="top:0;">
   <div class="wrap persistent-inner">
-    <div class="fitment fits" data-fitment-slot></div>
+    <div class="persistent-product">
+      <img class="persistent-thumb" src="https://www.roofracksgalore.com.au/pub/media/catalog/product/e/7/e775e3debebdc8ba3b70b79f87a0a59466cb68e1b3800433f011a483b3fc2679_1_26.jpg" alt="">
+      <span class="persistent-name">Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</span>
+    </div>
+    <div class="fitment fits" data-fitment-slot data-fitment-copyable="compact"></div>
     <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
     <div class="price-row">
       <span class="price-now">$1,893.09</span>
@@ -555,7 +725,7 @@
     <div class="grid">
       <div class="card">
         <h4>Decisions</h4>
-        <p>Fitment status is the first thing under the title in a "decision panel," directly followed by the Build Option variant picker, then price, total-cost note, and Add to Cart — resolving spec Section 4 item 1 (a vehicle-specific kit can carry a config-variant alongside fitment logic, not either/or). The picker reuses config-variant's comparison-card pattern rather than introducing a new UI convention, and it live-updates SKU, price, specifications and the Fitting Instructions link the same way. Once the initial panel scrolls out of view, a condensed persistent bar (fitment + price + Add to Cart) pins to the top of the page for the rest of the scroll. Delivery/Click &amp; Collect is now a full-width tabbed widget (not a small button), and Showroom Finder is a standalone high-contrast CTA block that leads with "on display at N stores near you" rather than a plain link.</p>
+        <p>Fitment status is the first thing under the title in a "decision panel," directly followed by the Build Option variant picker, then price, total-cost note, and Add to Cart — resolving spec Section 4 item 1 (a vehicle-specific kit can carry a config-variant alongside fitment logic, not either/or). The picker reuses config-variant's comparison-card pattern rather than introducing a new UI convention, and it live-updates SKU, price, specifications and the Fitting Instructions link the same way. Once the initial panel scrolls out of view, a condensed persistent bar (fitment + price + Add to Cart) pins to the top of the page for the rest of the scroll. Delivery/Click &amp; Collect is now a full-width tabbed widget (not a small button), and Showroom Finder is a standalone high-contrast CTA block that leads with "on display at N stores nationwide" rather than a plain link.</p>
       </div>
       <div class="card">
         <h4>Grounded in</h4>
@@ -571,18 +741,6 @@
 </section>
 
 <script src="../_shared/shared.js"></script>
-<script>
-// Interactive-map pin data (experimental Showroom Finder toggle) — the store slide-out now
-// pulls from the canonical real RRG_STORE_NETWORK in shared.js instead of a per-template
-// list. Map pin coordinates are still demo/placeholder (approximate suburb centroids, not
-// geocoded from the real addresses).
-window.SHOWROOM_MAP_STORES = [
-  { name: "Moorebank, NSW", lat: -33.95, lng: 150.93, status: "On Display" },
-  { name: "Castle Hill, NSW", lat: -33.73, lng: 150.98, status: "On Display" },
-  { name: "Smeaton Grange, NSW", lat: -34.02, lng: 150.75, status: "Order In — 1-2 Days" },
-  { name: "Silverwater, NSW", lat: -33.84, lng: 151.05, status: "On Display" }
-];
-</script>
 <script>
 // Build-option variant model for this kit, combined with the fitment object shared.js
 // already defines (PRODUCT_FITMENT) — spec Section 4 item 1: fitment + variants[] on one
@@ -624,7 +782,7 @@ const VEHICLE_PRODUCT = {
 
 let selectedVehicleVariantIndex = 0;
 
-function fmtMoney(n) { return '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtMoney(n) { return regionCurrencySymbol() + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
 function renderVehicleVariantPicker() {
   const picker = document.getElementById('variantPicker');

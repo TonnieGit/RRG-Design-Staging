@@ -19,8 +19,8 @@
   --rrg-unknown-bg:#FFF4E5;
   --rrg-nofit:#A6192E;
   --rrg-nofit-bg:#FDEAEC;
-  --rrg-display:#8A6D23;
-  --rrg-display-bg:#FBF3E6;
+  --rrg-display:#1A56DB;
+  --rrg-display-bg:#EAF1FD;
   --radius:12px;
   --shadow:0 8px 22px rgba(0,0,0,.06);
   --maxw:1280px;
@@ -66,6 +66,19 @@ button{font-family:inherit;cursor:pointer;}
 .u-item a{color:#fff;text-decoration:underline;font-weight:700;}
 .u-item .flag-emoji{font-size:14px;line-height:1;}
 
+/* Region Selector (2026-09-11, backlog item 21) — the utility bar's country item, previously
+   static/decorative, is now a working dropdown. Same toggle-a-class-on-click,
+   click-outside-to-close interaction as .template-switcher below, just recoloured for
+   sitting on the red utility bar (white trigger text) instead of the white main header. */
+.region-switcher{position:relative;}
+.region-switcher-toggle{background:none;border:none;padding:0;font:inherit;font-size:12.5px;color:#fff;cursor:pointer;}
+.region-switcher-menu{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);box-shadow:var(--shadow);min-width:180px;padding:8px;display:none;flex-direction:column;gap:1px;z-index:80;}
+.region-switcher.open .region-switcher-menu{display:flex;}
+.region-switcher-menu .tsm-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#999;padding:6px 10px 4px;}
+.region-switcher-menu a{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--rrg-black);text-decoration:none;}
+.region-switcher-menu a:hover{background:#f4f4f4;color:var(--rrg-red);}
+.region-switcher-menu a.current{color:var(--rrg-red);background:#faf0ef;}
+
 .rrg-main-header{background:#fff;border-bottom:1px solid var(--rrg-line);padding:16px 0;}
 .rrg-main-inner{display:flex;align-items:center;gap:32px;padding:0 24px;flex-wrap:wrap;}
 .rrg-main-inner .rrg-logo{flex:0 0 auto;}
@@ -94,7 +107,13 @@ button{font-family:inherit;cursor:pointer;}
    up on desktop where the input has a value; initSearchClear() in shared.js toggles it. */
 .rrg-search-clear{background:none;border:none;color:#999;padding:0 8px;font-size:18px;line-height:1;flex:0 0 auto;cursor:pointer;}
 .rrg-search-clear:hover{color:#666;}
-.rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
+/* align-self:stretch (not height:100%, 2026-09-11 fix) — .rrg-search has no explicit height
+   of its own (it's sized by its tallest child, the input), so a percentage height on this
+   button had nothing definite to resolve against and fell back to the button's own content
+   height (~16px, just the icon) — the red background covered only that vertically-centered
+   16px sliver instead of the full ~40px pill, which read as a rendering bug. align-self
+   stretches the button to match the flex line's actual cross-size instead. */
+.rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;align-self:stretch;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
 .rrg-search-btn svg{width:16px;height:16px;flex:0 0 auto;}
 .rrg-cart{position:relative;flex:0 0 auto;color:var(--rrg-black);cursor:pointer;}
 .rrg-cart svg{width:24px;height:24px;}
@@ -203,6 +222,92 @@ button{font-family:inherit;cursor:pointer;}
 .btn-lg{padding:18px 28px;font-size:16px;}
 .btn-outline{background:#fff;border:1.5px solid var(--rrg-black);color:var(--rrg-black);}
 
+/* UK brand skin (Region Selector, 2026-09-11) — RRG trades in the UK as "The Roof Box
+   Company" (roofbox.co.uk), a real sister brand. Scope confirmed with Brenton: logo + core
+   colour only, not a typography change. Overriding --rrg-red/--rrg-red-dark here recolours
+   every component already built against those tokens (utility bar, trust icons, links, tab
+   underline, sale badges, etc.) for free — see applyRegionBrand() in shared.js, which
+   toggles this class. Add to Cart needs its own override since it isn't on the --rrg-red
+   token to begin with (RRG's own gold default, directly above) — colours are their real
+   scraped brand values: navy #2E41AE / #FFFF19 from their logo SVG itself, green #26B226
+   from their live "Click Here To Order" button (confirmed with Brenton as the preferred
+   option over keeping RRG's gold). */
+body.region-uk{--rrg-red:#2E41AE;--rrg-red-dark:#1F2E82;}
+body.region-uk [data-cta-label].btn-primary{background:#26B226;color:#fff;}
+body.region-uk [data-cta-label].btn-primary:hover{background:#1e8f1e;}
+/* The Roof Box Company's real logo is a tall vertical rectangle (117.89x143.63, ~0.82:1),
+   not RRG's wide horizontal wordmark (360x58, ~6.2:1) — Brenton asked for it to actually
+   span both header bars (the red/navy Utility Bar above + the white Main Header row below)
+   rather than just sit taller within the Main Header alone, since it reads as a nice badge
+   effect with a portrait logo like this — on **both** desktop and mobile, not desktop only.
+   `.rrg-logo` stays a normal flex/grid item (reserving its own footprint so the other
+   header items don't shift), but its `<img>` is pulled out of flow and absolutely
+   positioned against it. Neither bar clips overflow, and the Main Header simply paints
+   after (on top of) the Utility Bar in normal DOM order, so no z-index juggling is needed
+   for the overlap itself — the explicit z-index below is just a safety margin against
+   future stacking-context changes nearby.
+   Span amount, per Brenton's exact spec (not flush like the first attempt): the logo's
+   **bottom** edge sits flush with the base of the white Main Header (or, on mobile, the
+   base of the icon row specifically — see below), and its **top** edge reaches only
+   halfway up through the blue Utility Bar, not all the way to the Utility Bar's own top.
+   `.rrg-utility-left` gets matching left margin (desktop only, where it's a single row of
+   text) so "Your Nearest Store" / "Your Vehicle" visibly starts clear of the logo instead
+   of sitting underneath it.
+   Known gotcha (hit twice building this): once the `<img>` is the ONLY child of `.rrg-logo`
+   and gets pulled `position:absolute`, `.rrg-logo`'s own box collapses to ~0 height/width,
+   which shifts a *centre*-aligned item's apparent anchor point away from where simple
+   "row height" math assumes. `align-self:flex-start` (flex) / `align-self:start` (grid)
+   fixes this by anchoring to the row's actual top edge instead of a collapsed box's
+   centre — confirmed by measuring the rendered position with Playwright
+   (`getBoundingClientRect()`), not just eyeballing a screenshot. */
+@media (min-width:901px){
+  /* Desktop: Utility Bar 36px tall, Main Header 73px tall, row content starts 52px down
+     the page (Main Header's own 36px top + its 16px top padding). Halfway through the
+     Utility Bar = 18px down the page; base of the Main Header = 109px down the page. */
+  body.region-uk .rrg-main-header .rrg-logo{position:relative;width:90px;flex:0 0 90px;align-self:flex-start;}
+  body.region-uk .rrg-main-header .rrg-logo img{position:absolute;top:-34px;left:0;height:91px;width:auto;z-index:5;}
+  body.region-uk .rrg-utility-left{margin-left:120px;}
+}
+@media (max-width:900px){
+  /* Mobile: `.rrg-main-inner` is a 2-row grid here (icon row, then the search bar right
+     underneath) — "base of the Main Header" means the base of the icon row specifically,
+     not the full header including the search row, or the logo would run down through the
+     search input. Same 52px row-start and 18px Utility-Bar-halfway values as desktop (the
+     Utility Bar itself doesn't change between breakpoints), but the icon row's own base
+     sits at 86px down the page (measured — it's shorter than desktop's Main Header).
+     Horizontal centring uses left:50%/translateX(-50%) instead of left:0, since
+     `.rrg-logo` here is `justify-self:center` in the grid (not left-aligned like desktop)
+     and its own collapsed-box width can't be relied on to centre a `left:0` child. */
+  /* width:56px on the DIV too (not just the img below) — the real bug here wasn't
+     width:auto resolution, it was the global `img{max-width:100%}` reset (this
+     file's base image reset) clamping the img's width against its own containing
+     block. `.rrg-logo` has no explicit width on mobile once its only child is pulled
+     `position:absolute` (unlike desktop, which reserves 90px), so it collapses to 0 —
+     and max-width:100% of a 0-width containing block clamps the img itself to 0,
+     which is why it visually vanished (confirmed with Playwright: computed width was
+     0px despite the rule below plainly saying width:56px in the CSSOM — max-width
+     was silently winning). Giving the div the same fixed width the img itself needs
+     fixes both the collapse and the max-width clamp in one move. */
+  body.region-uk .rrg-main-header .rrg-logo{position:relative;align-self:start;width:56px;}
+  body.region-uk .rrg-main-header .rrg-logo img{position:absolute;top:-34px;left:50%;transform:translateX(-50%);height:68px;width:56px;z-index:5;}
+}
+/* Sticky condensed mobile header (2026-09-11 follow-up): Brenton pointed out that if the
+   logo spans "into the blue bar," that has to stay true once the page is scrolled and the
+   Utility Bar itself is gone — replaced by this fixed hamburger/logo/cart bar. So the UK
+   sticky header grows its own blue band to span into, via a thick `border-top` (adds to
+   the element's own box height automatically, no extra markup, no off-screen positioning
+   tricks — unlike the Utility Bar above, which already exists in-flow, this fixed bar has
+   nothing above it, so the "blue bar" has to be invented as a literal part of this box)
+   sized to roughly the same Utility-Bar-to-Main-Header proportion as the top-of-page
+   header (~36:73, roughly 2:4). The white hamburger/logo/cart row's own vertical centring
+   is unaffected by the border (borders sit outside the padding/content box, so they don't
+   compress it) — only the box's total rendered height grows to make room. */
+body.region-uk .rrg-sticky-header{border-top:20px solid var(--rrg-red);}
+/* width:49px on the div too — same max-width:100%-clamps-a-collapsed-container bug as
+   the Main Header logo above, same fix. */
+body.region-uk .rrg-sticky-header .rrg-logo{position:relative;align-self:flex-start;width:49px;}
+body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left:50%;transform:translateX(-50%);height:60px;width:49px;z-index:5;}
+
 /* badges */
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:5px 12px;border-radius:999px;}
 .badge-save{background:var(--rrg-red);color:#fff;}
@@ -213,17 +318,29 @@ button{font-family:inherit;cursor:pointer;}
    competing visually with price/Add to Cart. Label + dot keep the state color for
    quick scanning; body copy is neutral gray, not tinted. */
 .fitment{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:14px 16px;font-size:14px;color:#4a4a4a;}
-.fitment .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;margin-top:4px;}
+/* Car icon (2026-09-11) replaces the old plain colour dot — same state colour via
+   currentColor/fill, just a more legible fitment-state indicator at a glance.
+   align-self:center (2026-09-11 follow-up) centers it against the full bar height,
+   not just the text block's top line, and it's sized up to read clearly at a glance. */
+.fitment .dot{width:26px;height:26px;flex:0 0 auto;align-self:center;display:inline-flex;}
+.fitment .dot svg{width:100%;height:100%;display:block;}
+.persistent-bar .fitment .dot,.sticky-cta-mobile .fitment .dot{width:18px;height:18px;}
+/* Copy-to-clipboard variant (2026-09-11, backlog item 10) — persistent bar + mobile
+   sticky bar only, see [data-fitment-copyable] in applyFitmentState(). Green flash on
+   click reuses the same confirmation colour as .sku-copy.copied elsewhere, regardless
+   of the icon's current fitment-state colour. */
+.dot-copy{cursor:pointer;}
+.dot-copy.copied{color:var(--rrg-fits)!important;}
 .fitment strong{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:15px;letter-spacing:.02em;margin-bottom:2px;}
 .fitment.fits{border-left:3px solid var(--rrg-fits);}
 .fitment.fits strong{color:var(--rrg-fits);}
-.fitment.fits .dot{background:var(--rrg-fits);}
+.fitment.fits .dot{color:var(--rrg-fits);}
 .fitment.unknown{border-left:3px solid var(--rrg-unknown);}
 .fitment.unknown strong{color:var(--rrg-unknown);}
-.fitment.unknown .dot{background:var(--rrg-unknown);}
+.fitment.unknown .dot{color:var(--rrg-unknown);}
 .fitment.no_fit{border-left:3px solid var(--rrg-nofit);}
 .fitment.no_fit strong{color:var(--rrg-nofit);}
-.fitment.no_fit .dot{background:var(--rrg-nofit);}
+.fitment.no_fit .dot{color:var(--rrg-nofit);}
 .fitment .actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;}
 /* min-height 48px (2026-09-11, mobile audit) — was 6px/12px padding at 12px font, well
    under Google's 48px tap-target minimum for a real "change vehicle"-type action. */
@@ -241,13 +358,16 @@ button{font-family:inherit;cursor:pointer;}
 /* Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — vehicle-specific only,
    model-specific fitment caveats. Distinct amber/warning accent so it doesn't read as
    another fitment-state box. Starts hidden — see applyVehicleFitNotesFlag() in shared.js. */
-.vehicle-fit-notes{background:#FFF8EC;border:1px solid #F0DDB8;border-left:3px solid #B36B00;border-radius:var(--radius);padding:12px 14px;font-size:13px;color:#4a4a4a;margin-bottom:16px;}
-.vehicle-fit-notes strong{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:13.5px;letter-spacing:.02em;color:#B36B00;margin-bottom:4px;}
+.vehicle-fit-notes{background:#FFF8EC;border:1px solid #F0DDB8;border-left:3px solid #B36B00;border-radius:var(--radius);padding:12px 14px;font-size:13px;color:#000;margin-bottom:16px;}
+/* Text/icon recoloured black (2026-09-11, legibility fix) — box stays amber-tinted
+   (background/border), only the yellow/orange text itself was hard to read. */
+.vehicle-fit-notes strong{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:13.5px;letter-spacing:.02em;color:#000;margin-bottom:4px;}
 .vehicle-fit-notes p{margin:0;line-height:1.4;}
 
 /* reviews strip */
 .reviews-strip{display:flex;align-items:center;gap:8px;font-size:13px;color:#232323;}
 .stars{color:#E8A83C;letter-spacing:1px;font-size:15px;}
+.stars .stars-empty{opacity:.35;}
 .reviews-strip a{font-weight:700;text-decoration:underline;color:var(--rrg-black);}
 
 /* price block */
@@ -293,6 +413,9 @@ button{font-family:inherit;cursor:pointer;}
 .trust-icon{width:26px;height:26px;color:var(--rrg-red);margin-bottom:10px;display:block;}
 .trust-row h4{font-size:15px;margin-bottom:4px;}
 .trust-row p{font-size:12.5px;color:#666;margin:0;}
+/* Phone number link (2026-09-11 follow-up) — bold RRG red so the tappable number stands
+   out from the surrounding trust-copy grey, no underline needed at that weight/colour. */
+.trust-row p a[href^="tel:"]{color:var(--rrg-red);font-weight:900;text-decoration:none;}
 
 /* tabs (accordion, mirrors live-site pattern) */
 .tabs input{display:none;}
@@ -326,6 +449,22 @@ button{font-family:inherit;cursor:pointer;}
 .specs-table th,.specs-table td{padding:9px 10px 9px 0;text-align:left;font-size:13.5px;font-weight:400;vertical-align:top;}
 .specs-table th{color:#767676;font-weight:600;width:44%;white-space:nowrap;}
 .specs-table td{color:#222;}
+/* Row hover, desktop only (2026-09-11) — a mobile tap can't "hover", so this is a
+   pointer-only affordance, not a touch one. */
+@media (min-width:901px){
+  .specs-table tr:hover{background:#f7f7f7;}
+}
+
+/* PDF icon on Fitting Instructions links (2026-09-11) — wraps each link's existing text,
+   no markup restructuring beyond adding the icon + this class. */
+.pdf-link{display:inline-flex;align-items:center;gap:6px;}
+.pdf-link svg{width:14px;height:14px;flex:0 0 auto;color:var(--rrg-red);}
+
+/* SKU moved to the decision panel's top-right (2026-09-11) — sits beside the brand logo
+   on one row instead of its own row below it. */
+.decision-panel-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px;}
+.decision-panel-top .brand-logo,.decision-panel-top .brand-logo-text{margin-bottom:0;flex:0 0 auto;}
+.decision-panel-top .sku-row{margin-bottom:0;flex:0 0 auto;white-space:nowrap;}
 
 /* Gold Guarantee tab condensed to 2 USP lines + a "Learn more" link, rather than the full
    guarantee copy inline (2026-09-10, Graham Sowerby meeting). No dedicated guarantee page
@@ -395,15 +534,17 @@ button{font-family:inherit;cursor:pointer;}
 .install-media-row.no-video{grid-template-columns:1fr;}
 .install-media-row.no-video .video-placeholder{display:none!important;}
 .install-cta-panel{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:#111;}
-.install-cta-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:65% 35%;}
+.install-cta-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:85% 35%;}
 .install-cta-panel .install-overlay{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:22px 24px;background:linear-gradient(90deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.1) 100%);color:#fff;}
 .install-cta-panel h3{color:#fff;font-size:19px;margin:0;}
 .install-cta-panel .install-tag{font-size:12.5px;color:#ddd;line-height:1.35;max-width:230px;margin:0;}
 .install-cta-reviews{display:flex;align-items:center;gap:10px;}
 .install-cta-reviews .stars{color:#E8A83C;font-size:14px;}
 .reviews-io-badge{display:inline-flex;align-items:center;gap:2px;background:#fff;color:#232323;font-weight:900;font-size:12px;padding:4px 8px;border-radius:4px;letter-spacing:.02em;}
-.install-cta-panel .btn{background:var(--rrg-gold);color:#232323;align-self:flex-start;padding:12px 20px;font-size:13px;border-radius:8px;line-height:1.25;}
-.install-cta-panel .btn:hover{background:#a8916f;}
+/* White/black CTA (2026-09-11, client ask) — stands out more against the dark overlay
+   than the previous gold, which blended in. */
+.install-cta-panel .btn{background:#fff;color:#000;align-self:flex-start;padding:12px 20px;font-size:13px;border-radius:8px;line-height:1.25;}
+.install-cta-panel .btn:hover{background:#e6e6e6;}
 .install-media-row.no-video .install-cta-panel{aspect-ratio:auto;min-height:220px;}
 .install-media-row.no-video .install-cta-panel .install-overlay{max-width:520px;}
 @media (max-width:900px){
@@ -483,7 +624,13 @@ button{font-family:inherit;cursor:pointer;}
 .admin-toggle input:checked{background:var(--rrg-fits);}
 .admin-toggle input:checked::after{left:17px;}
 @media (max-width:640px){
-  .admin-fab,.admin-panel{bottom:84px;}
+  /* FAB hidden on mobile (2026-09-11, Brenton's ask) — it's reviewer-only tooling that
+     was crowding an already tight mobile viewport. Opens instead via the "North Lakes"
+     nearest-store link in the utility bar (data-admin-trigger, wired in buildAdminPanel())
+     — the panel itself stays fully functional, just without a dedicated floating button
+     on small screens. .admin-panel keeps its bottom offset for when it's open. */
+  .admin-fab{display:none;}
+  .admin-panel{bottom:84px;}
 }
 
 /* Out-of-stock banner, inserted above the Add to Cart column by the demo admin panel */
@@ -494,7 +641,9 @@ button{font-family:inherit;cursor:pointer;}
 .dc-unavailable-note{font-size:12.5px;color:#767676;padding:12px 14px;border:1px dashed var(--rrg-line);border-radius:8px;}
 
 /* Special order banner — sits above Add to Cart, demo admin panel "Special order" toggle */
-.special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-unknown);background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+/* Text recoloured black (2026-09-11, legibility fix) — box stays amber-tinted
+   (background/border), only the yellow/orange text itself was hard to read. */
+.special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#000;background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
 
 /* Brand logo — required on every product page, sits at the top of the decision panel.
    Fixed height/auto width made MAXTRAX (and Front Runner, same source aspect ratio)
@@ -697,33 +846,86 @@ button{font-family:inherit;cursor:pointer;}
 .showroom-map{margin-top:18px;height:320px;border-radius:10px;overflow:hidden;position:relative;z-index:0;}
 .showroom-map .leaflet-container{height:100%;width:100%;font-family:inherit;}
 
-/* Sticky mobile Add-to-Cart bar — hidden by default, shown only on narrow viewports */
-.sticky-cta-mobile{display:none;}
+/* Map rework (2026-09-11, backlog item 22) — custom divIcon pins (no image assets) instead
+   of Leaflet's default blue marker, and Leaflet.markercluster bubbles restyled to match the
+   RRG palette instead of the plugin's default green/yellow/orange. Grey = not on display,
+   red = on display (per ON_DISPLAY_STORES) — a cluster renders red the moment any store
+   inside it is on display, per rrgClusterIcon() in shared.js, so that signal reads before a
+   viewer zooms in. */
+.rrg-map-pin span{display:block;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#8a8a8a;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.rrg-map-pin.on-display span{background:var(--rrg-red);}
+.rrg-map-cluster{display:flex;align-items:center;justify-content:center;}
+.rrg-map-cluster span{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#8a8a8a;color:#fff;font-weight:800;font-size:13px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.rrg-map-cluster.on-display span{background:var(--rrg-red);}
+
+/* Sticky mobile Add-to-Cart bar (2026-09-11 rework, backlog item 26) — visibility is now
+   driven by whether the real Add to Cart button is on-screen (initStickyCta() in
+   shared.js), not just viewport width. One rule now covers both cases: shows immediately
+   on load if Add to Cart starts below the fold, and reappears once the user scrolls past
+   it later — previously only the second case worked, since the bar used to be
+   unconditionally visible at mobile widths regardless of scroll position. */
+.sticky-cta-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--rrg-line);padding:10px 16px;gap:10px;align-items:center;z-index:40;box-shadow:0 -6px 16px rgba(0,0,0,.08);}
 @media (max-width:640px){
-  .sticky-cta-mobile{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--rrg-line);padding:10px 16px;gap:10px;align-items:center;z-index:40;box-shadow:0 -6px 16px rgba(0,0,0,.08);}
-  body{padding-bottom:74px;}
+  .sticky-cta-mobile.visible{display:flex;}
+  body.has-sticky-cta{padding-bottom:74px;}
 }
 
 /* Persistent decision bar — appears once the primary decision panel scrolls out of view */
 .persistent-bar{position:fixed;left:0;right:0;background:#fff;border-bottom:1px solid var(--rrg-line);box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:35;transform:translateY(-120%);transition:transform .25s ease;}
 .persistent-bar .persistent-inner{display:flex;align-items:center;gap:20px;padding:10px 24px;}
 .persistent-bar.visible{transform:translateY(0);}
-.persistent-bar .fitment{margin:0;flex:1 1 260px;padding:8px 12px;font-size:12px;}
+/* Fitment box now shares the row with .persistent-product instead of taking the whole
+   flexible width itself (2026-09-11, backlog item 10) — both flex:1 1 0 so it settles to
+   roughly half its old width. */
+.persistent-bar .fitment{margin:0;flex:1 1 0;min-width:0;padding:8px 12px;font-size:12px;}
 .persistent-bar .fitment strong{font-size:12.5px;}
+/* Compact fitment content (icon + short label only, see renderFitmentHTML() in
+   shared.js) — centered as a row instead of top-aligned against a taller text block,
+   since there's no detail paragraph underneath to align against anymore. */
+.persistent-bar .fitment,.sticky-cta-mobile .info.fitment{align-items:center;}
+.persistent-bar .fitment strong,.sticky-cta-mobile .info.fitment strong{margin-bottom:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .persistent-bar .price-now{font-size:20px;}
 .persistent-bar .price-was{font-size:12px;}
 .persistent-bar .btn{padding:12px 20px;font-size:13px;flex:0 0 auto;}
 @media (max-width:640px){.persistent-bar{display:none;}}
 
+/* Product thumbnail + truncated name (2026-09-11, backlog item 10) — gives the sticky
+   bars back the "what am I looking at" context lost once the main gallery/title scroll
+   out of view. Shared between the desktop persistent bar and the mobile sticky bar. */
+.persistent-product{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0;}
+.persistent-thumb{width:34px;height:34px;object-fit:cover;border-radius:6px;flex:0 0 auto;}
+.persistent-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.sticky-cta-mobile .persistent-thumb{width:30px;height:30px;}
+.sticky-cta-mobile .persistent-name{font-size:12px;}
+/* Icon-only on mobile (see renderFitmentHTML() 'icon-only' mode) needs only its own
+   content width, not an even flex:1 split with .persistent-product — that would starve
+   the product name of the room it actually needs at this width. */
+.sticky-cta-mobile .info.fitment{flex:0 0 auto;}
+.sticky-cta-mobile .persistent-product{flex:1 1 auto;}
+/* Add to Cart is the one element that must never shrink/wrap here — the product-name
+   ellipsis is what absorbs the width squeeze instead. */
+.sticky-cta-mobile .btn{flex:0 0 auto;white-space:nowrap;}
+
 /* Related / cross-sell product carousel */
 .related-heading{margin-bottom:16px;}
+
+/* Heading above the Tabs widget (2026-09-11) */
+.tabs-heading{margin-bottom:16px;}
+
+/* Heading above the Showroom Finder widget (2026-09-11) — sits inside #showroom itself
+   (not just .showroom-widget), so it's already hidden/shown by applyShowroomFlag()'s
+   existing section.hidden toggle without any extra JS. */
+.showroom-heading{margin-bottom:16px;}
 
 /* Section heading style — shared by every top-level section label (Related Products,
    Showroom Finder's "See It In Person...", the Fitment Gallery panel) so they all read as
    one consistent typographic level, per client request 2026-09-10. */
 .related-heading,
 .showroom-widget h3,
-.fit-gallery-title h2{
+.fit-gallery-title h2,
+.faq-heading,
+.tabs-heading,
+.showroom-heading{
   font-family:'Barlow Condensed',Arial,sans-serif;
   font-weight:700;
   font-style:italic;
@@ -741,6 +943,29 @@ button{font-family:inherit;cursor:pointer;}
 
 /* Short description block (Simple/lower-complexity templates) */
 .short-desc{font-size:15px;color:#333;max-width:760px;margin:24px 0;}
+
+/* Reviews tab (2026-09-11, then replaced with a real embed same day) — a real REVIEWS.io
+   Polaris widget now renders here (see the inline <script> in each template's Reviews tab
+   content, store: 'roof-racks-galore'), which natively provides its own Product/Company
+   sub-tabs via options.types: 'product_review,store_review' — this replaced an earlier
+   hand-rolled pill-toggle + placeholder review-card scaffold (initReviewTabs(),
+   .rvw-tabs/.review-card in shared.css) that's no longer needed now that real data/UI comes
+   from the widget itself. */
+
+/* FAQ accordion (2026-09-11) — sits below the Tabs widget, above Related Products. Not a
+   tab (spec item 20 is explicit about that), and unlike the Tabs widget's single-open-panel
+   radio hack, FAQ items should open independently, so this uses native <details>/<summary> —
+   no JS needed, consistent with the project's plain-HTML-first approach. */
+.faq-section{margin:40px 0;}
+.faq-heading{margin-bottom:16px;}
+.faq-list{display:flex;flex-direction:column;gap:10px;}
+.faq-item{border:1px solid var(--rrg-line);border-radius:8px;padding:0 16px;background:#fff;}
+.faq-item summary{list-style:none;cursor:pointer;padding:14px 26px 14px 0;font-weight:700;font-size:14.5px;position:relative;}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary::after{content:'+';position:absolute;right:2px;top:12px;font-size:19px;color:#767676;}
+.faq-item[open] summary::after{content:'\2212';}
+.faq-answer{padding:0 0 16px;font-size:13.5px;color:#404247;}
+.faq-answer p{margin:0;}
 
 .nav-strip{background:#fff;border-bottom:1px solid var(--rrg-line);padding:12px 0;font-size:13px;}
 .nav-strip .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;}

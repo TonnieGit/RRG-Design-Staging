@@ -10,6 +10,12 @@ const PRODUCT_FITMENT = {
   roof_type: "Bare Roof"
 };
 
+// Vehicle slug/ID for the sticky-bar copy-to-clipboard icon (2026-09-11, backlog item 10)
+// — no real per-vehicle slug/ID field exists in the data model yet, so this is derived
+// from PRODUCT_FITMENT the same way a URL slug would be, same demo-data caveat as
+// DEMO_VEHICLES below.
+const VEHICLE_SLUG = `${PRODUCT_FITMENT.vehicle_make}-${PRODUCT_FITMENT.vehicle_model}-${PRODUCT_FITMENT.vehicle_generation}`.toLowerCase().replace(/\s+/g, '-');
+
 // body_style/roof_type (2026-09-10, Graham Sowerby meeting) — added so the "doesn't fit"
 // message can name the customer's saved vehicle's full spec, not just its name (two
 // vehicles can share a make/model/generation but differ by roof/rail type). No real
@@ -56,14 +62,34 @@ const FITMENT_COPY = {
   }
 };
 
-function renderFitmentHTML(state, vehicle) {
+function renderFitmentHTML(state, vehicle, mode) {
   const c = FITMENT_COPY[state];
+  const icon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>`;
+  // Compact + copy-to-clipboard variants (2026-09-11, backlog item 10) — the two condensed
+  // sticky bars get no detail sentence/actions (there's no room at that width, and the
+  // full explanation already showed once in the main decision-panel card above). The
+  // desktop persistent bar has room for icon + short label ("compact"); the mobile sticky
+  // bar is tighter still (competing with the new product-name block) so it's icon-only
+  // there, same "icon only, tooltip carries the caption" convention already used for the
+  // Rack Fit Guarantee badge. Icon doubles as a click-to-copy button for the vehicle
+  // slug/ID in both; the main card keeps a plain, non-interactive icon plus its full copy.
+  // See applyFitmentState() below for which slots opt into which mode via
+  // [data-fitment-copyable]'s value.
+  if (mode === 'icon-only') {
+    return `<span class="dot dot-copy" data-vehicle-copy="${VEHICLE_SLUG}" role="button" tabindex="0" title="${c.label} — click to copy vehicle ID">${icon}</span>`;
+  }
+  if (mode === 'compact') {
+    return `
+      <span class="dot dot-copy" data-vehicle-copy="${VEHICLE_SLUG}" role="button" tabindex="0" title="Click to copy vehicle ID">${icon}</span>
+      <strong>${c.label}</strong>
+    `;
+  }
   const detail = typeof c.detail === 'function' ? c.detail(vehicle) : c.detail;
   const actions = c.actions.length
     ? `<div class="actions">${c.actions.map(a => `<button type="button">${a}</button>`).join("")}</div>`
     : "";
   return `
-    <span class="dot"></span>
+    <span class="dot">${icon}</span>
     <div>
       <strong>${c.label}</strong>
       ${detail}
@@ -77,7 +103,7 @@ function applyFitmentState(state, vehicle) {
   document.querySelectorAll('[data-fitment-slot]').forEach(el => {
     el.className = el.className.replace(/\b(fits|unknown|no_fit)\b/g, '').trim();
     el.classList.add(state);
-    el.innerHTML = renderFitmentHTML(state, vehicle);
+    el.innerHTML = renderFitmentHTML(state, vehicle, el.dataset.fitmentCopyable);
     // Rack Fit Guarantee badge (2026-09-10) only makes sense when the vehicle is
     // actually confirmed to fit — hide it for "confirm your vehicle"/"doesn't fit".
     const badge = el.nextElementSibling;
@@ -90,6 +116,32 @@ function applyFitmentState(state, vehicle) {
     btn.disabled = state === 'no_fit';
     btn.classList.toggle('btn-outline', state !== 'fits');
     btn.classList.toggle('btn-primary', state === 'fits');
+  });
+  initVehicleIdCopy();
+}
+
+// Vehicle ID copy-to-clipboard (2026-09-11, backlog item 10) — bound fresh every time
+// applyFitmentState() re-renders a [data-fitment-copyable] slot's innerHTML (re-binding
+// is cheap and dataset.copyBound guards against double-binding on unaffected slots).
+// A dedicated handler rather than the generic .sku-copy convention in initCopyButtons()
+// above: that one replaces the clicked element's own textContent with "✓ Copied", which
+// would blank out this element's <svg> icon instead of giving visible feedback.
+function initVehicleIdCopy() {
+  document.querySelectorAll('[data-vehicle-copy]').forEach(el => {
+    if (el.dataset.copyBound) return;
+    el.dataset.copyBound = 'true';
+    const activate = () => {
+      const text = el.dataset.vehicleCopy || '';
+      if (!text) return;
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).catch(() => {});
+      el.classList.add('copied');
+      clearTimeout(el._copyTimer);
+      el._copyTimer = setTimeout(() => el.classList.remove('copied'), 1400);
+    };
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
   });
 }
 
@@ -146,16 +198,28 @@ function initDcPostcode(root = document) {
     const deliveryResults = widget.querySelector('[data-dc-panel="delivery"] .dc-results');
     const deliveryPrompt = widget.querySelector('[data-dc-panel="delivery"] .dc-postcode-prompt');
     if (!input || !btn) return;
+    // Region Selector (2026-09-11, backlog item 21): NZ/UK are single-store demo regions
+    // with no real postcode-matched store data (the named `.dc-store` rows and 100km-radius
+    // copy are all real AU network content) — while either is selected, the line always
+    // shows the fixed single-store copy and named results stay hidden regardless of what's
+    // typed, rather than searching AU postcodes against a region that isn't AU.
     const update = () => {
       const val = input.value.trim();
       if (line) {
-        line.firstChild.textContent = val
-          ? `Showing stores within 100km of ${val} — `
-          : `In stock and on display in ${rrgStoreCount()} stores — `;
+        if (currentRegion !== 'AU') {
+          // No trailing " — " here (unlike the AU branch below) since the "View all
+          // stores" link that dash used to lead into is hidden for single-store regions.
+          line.firstChild.textContent = `On display at the ${REGION_SINGLE_STORES[currentRegion].name} Store`;
+        } else {
+          line.firstChild.textContent = val
+            ? `Showing stores within 100km of ${val} — `
+            : `In stock and on display in ${rrgStoreCount()} stores — `;
+        }
       }
-      if (collectResults) collectResults.hidden = !val;
-      if (deliveryResults) deliveryResults.hidden = !val;
-      if (deliveryPrompt) deliveryPrompt.hidden = !!val;
+      const regionOk = currentRegion === 'AU';
+      if (collectResults) collectResults.hidden = !val || !regionOk;
+      if (deliveryResults) deliveryResults.hidden = !val || !regionOk;
+      if (deliveryPrompt) deliveryPrompt.hidden = !!val && regionOk;
     };
     btn.addEventListener('click', update);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); update(); } });
@@ -335,7 +399,7 @@ function syncPaymentBadges(block) {
   const zipText = badges.querySelector('[data-pb-amount="zip"]');
   if (afterpayText) afterpayText.textContent = `4 payments of ${quarter}`;
   if (paypalText) paypalText.textContent = `4 payments of ${quarter}`;
-  if (zipText) zipText.textContent = `From $${weekly} a week`;
+  if (zipText) zipText.textContent = `From ${regionCurrencySymbol()}${weekly} a week`;
 }
 
 // Hides the real sale price/badge if the panel currently has "on sale" switched off, and
@@ -520,7 +584,15 @@ const EXDEMO_OPTION_SPECS = [
   { tag: 'Factory Second', cut: 0.15 }
 ];
 
-function fmtAud(n) { return '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+// regionCurrencySymbol() lives here (not just in the Region Selector section further down)
+// since fmtAud() below and the per-template fmtMoney() helpers all need it and this file is
+// parsed top-to-bottom before any of them can actually be called — `currentRegion` itself
+// (declared later in the Region Selector section) is safe to reference here too, for the
+// same reason: this is a plain function declaration (hoisted), and nothing calls it until
+// after the whole script has finished executing.
+function regionCurrencySymbol() { return currentRegion === 'UK' ? '£' : '$'; }
+
+function fmtAud(n) { return regionCurrencySymbol() + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 function buildExdemoOptions(basePrice) {
   return EXDEMO_OPTION_SPECS.map((spec, i) => {
@@ -594,59 +666,62 @@ function applyExdemoFlag(on) {
 // Stock") ----
 // Real names, addresses, phone numbers and Google Maps links for every physical store —
 // store identity doesn't vary by product, so this is one canonical list shared by every
-// template's Click & Collect widget and the store slide-out, grouped by state to match the
-// live site's own presentation. Per-store IN-STOCK/ORDER-IN status and the ON_DISPLAY_STORES
-// set below are still demo/placeholder (no real per-SKU per-store stock feed exists) — same
-// caution as the rest of this widget's data.
+// template's Click & Collect widget, the store slide-out, and the Showroom Finder map,
+// grouped by state to match the live site's own presentation. Per-store IN-STOCK/ORDER-IN
+// status and the ON_DISPLAY_STORES set below are still demo/placeholder (no real per-SKU
+// per-store stock feed exists) — same caution as the rest of this widget's data. `lat`/`lng`
+// are approximate suburb-centre coordinates (demo precision, same caution), added 2026-09-11
+// for the Showroom Finder map rework so every store can be plotted without a separate
+// per-template pin list.
 const RRG_STORE_NETWORK = [
   { state: "New South Wales", stores: [
-    { name: "Moorebank", street: "12 Centenary Ave", city: "Moorebank", postcode: "2170", phone: "(02) 9053 8621", mapLink: "https://maps.app.goo.gl/371QHZWa4pDU4qzA7" },
-    { name: "Smeaton Grange", street: "3/18 Exchange Parade", city: "Smeaton Grange", postcode: "2567", phone: "(02) 8215 7092", mapLink: "https://maps.app.goo.gl/Khp5w9LoxReciEho7" },
-    { name: "Matraville", street: "35 Raymond Avenue", city: "Matraville", postcode: "2036", phone: "(02) 9159 6777", mapLink: "https://maps.app.goo.gl/U7Cfof4Wkkk77KqM8" },
-    { name: "Warriewood", street: "3 Vuko Place", city: "Warriewood", postcode: "2102", phone: "(02) 8007 6177", mapLink: "https://maps.app.goo.gl/paxnS1CPK26xbeC59" },
-    { name: "Silverwater", street: "1/104 Wetherill St N", city: "Silverwater", postcode: "2128", phone: "(02) 8007 6155", mapLink: "https://maps.app.goo.gl/NCofTPDD28BDfZRv5" },
-    { name: "Miranda", street: "132 Wyralla Rd", city: "Miranda", postcode: "2228", phone: "(02) 9526 2777", mapLink: "https://goo.gl/maps/f3wCEmtgtHEGBPcn8" },
-    { name: "Castle Hill", street: "3/8 Anella Avenue", city: "Castle Hill", postcode: "2154", phone: "(02) 9899 3256", mapLink: "https://goo.gl/maps/QebgyjaDAjpKVDw96" }
+    { name: "Moorebank", street: "12 Centenary Ave", city: "Moorebank", postcode: "2170", phone: "(02) 9053 8621", mapLink: "https://maps.app.goo.gl/371QHZWa4pDU4qzA7", lat: -33.95, lng: 150.93 },
+    { name: "Smeaton Grange", street: "3/18 Exchange Parade", city: "Smeaton Grange", postcode: "2567", phone: "(02) 8215 7092", mapLink: "https://maps.app.goo.gl/Khp5w9LoxReciEho7", lat: -34.02, lng: 150.75 },
+    { name: "Matraville", street: "35 Raymond Avenue", city: "Matraville", postcode: "2036", phone: "(02) 9159 6777", mapLink: "https://maps.app.goo.gl/U7Cfof4Wkkk77KqM8", lat: -33.965, lng: 151.225 },
+    { name: "Warriewood", street: "3 Vuko Place", city: "Warriewood", postcode: "2102", phone: "(02) 8007 6177", mapLink: "https://maps.app.goo.gl/paxnS1CPK26xbeC59", lat: -33.688, lng: 151.298 },
+    { name: "Silverwater", street: "1/104 Wetherill St N", city: "Silverwater", postcode: "2128", phone: "(02) 8007 6155", mapLink: "https://maps.app.goo.gl/NCofTPDD28BDfZRv5", lat: -33.84, lng: 151.05 },
+    { name: "Miranda", street: "132 Wyralla Rd", city: "Miranda", postcode: "2228", phone: "(02) 9526 2777", mapLink: "https://goo.gl/maps/f3wCEmtgtHEGBPcn8", lat: -34.031, lng: 151.103 },
+    { name: "Castle Hill", street: "3/8 Anella Avenue", city: "Castle Hill", postcode: "2154", phone: "(02) 9899 3256", mapLink: "https://goo.gl/maps/QebgyjaDAjpKVDw96", lat: -33.73, lng: 150.98 }
   ]},
   { state: "Victoria", stores: [
-    { name: "Hoppers Crossing", street: "352 Old Geelong Road", city: "Hoppers Crossing", postcode: "3029", phone: "(03) 9015 8615", mapLink: "https://maps.app.goo.gl/HPHsUyA4yfpUVp8V6" },
-    { name: "Frankston", street: "43 New Street", city: "Frankston", postcode: "3199", phone: "(03) 9015 8656", mapLink: "https://maps.app.goo.gl/tjTwH36rzw1oQJso6" },
-    { name: "Preston", street: "3/1 Bell St", city: "Preston", postcode: "3072", phone: "(03) 9484 3447", mapLink: "https://goo.gl/maps/6DDmf3KREjGmqn8z8" },
-    { name: "Geelong", street: "34/8 Lewalan St", city: "Grovedale", postcode: "3216", phone: "(03) 5221 3433", mapLink: "https://maps.app.goo.gl/NGfvQ9yKvYPv3hwq9" },
-    { name: "Moorabbin", street: "6/265 - 269 Wickham Rd", city: "Moorabbin", postcode: "3189", phone: "(03) 9553 2799", mapLink: "https://goo.gl/maps/3bj1XdzQqReSdaJz7" },
-    { name: "Hallam", street: "1/237 Princes Hwy", city: "Hallam", postcode: "3803", phone: "(03) 9703 1295", mapLink: "https://goo.gl/maps/sX8KjK28XqjC5BVMA" },
-    { name: "Mitcham", street: "3/660 Whitehorse Rd", city: "Mitcham", postcode: "3132", phone: "(03) 9874 6261", mapLink: "https://goo.gl/maps/eqRzmAGA7RDZ7Go79" },
-    { name: "Maidstone", street: "3/72 - 80 Hampstead Rd", city: "Maidstone", postcode: "3012", phone: "(03) 9318 5846", mapLink: "https://goo.gl/maps/gocCgS8Jk5tNZfw48" },
-    { name: "Epping", street: "8/168 Jersey Dr", city: "Epping", postcode: "3076", phone: "(03) 7006 5180", mapLink: "https://goo.gl/maps/HGZxbcKqbiZeDjTE6" }
+    { name: "Hoppers Crossing", street: "352 Old Geelong Road", city: "Hoppers Crossing", postcode: "3029", phone: "(03) 9015 8615", mapLink: "https://maps.app.goo.gl/HPHsUyA4yfpUVp8V6", lat: -37.877, lng: 144.694 },
+    { name: "Frankston", street: "43 New Street", city: "Frankston", postcode: "3199", phone: "(03) 9015 8656", mapLink: "https://maps.app.goo.gl/tjTwH36rzw1oQJso6", lat: -38.146, lng: 145.123 },
+    { name: "Preston", street: "3/1 Bell St", city: "Preston", postcode: "3072", phone: "(03) 9484 3447", mapLink: "https://goo.gl/maps/6DDmf3KREjGmqn8z8", lat: -37.740, lng: 145.005 },
+    { name: "Geelong", street: "34/8 Lewalan St", city: "Grovedale", postcode: "3216", phone: "(03) 5221 3433", mapLink: "https://maps.app.goo.gl/NGfvQ9yKvYPv3hwq9", lat: -38.204, lng: 144.335 },
+    { name: "Moorabbin", street: "6/265 - 269 Wickham Rd", city: "Moorabbin", postcode: "3189", phone: "(03) 9553 2799", mapLink: "https://goo.gl/maps/3bj1XdzQqReSdaJz7", lat: -37.939, lng: 145.048 },
+    { name: "Hallam", street: "1/237 Princes Hwy", city: "Hallam", postcode: "3803", phone: "(03) 9703 1295", mapLink: "https://goo.gl/maps/sX8KjK28XqjC5BVMA", lat: -38.005, lng: 145.267 },
+    { name: "Mitcham", street: "3/660 Whitehorse Rd", city: "Mitcham", postcode: "3132", phone: "(03) 9874 6261", mapLink: "https://goo.gl/maps/eqRzmAGA7RDZ7Go79", lat: -37.814, lng: 145.192 },
+    { name: "Maidstone", street: "3/72 - 80 Hampstead Rd", city: "Maidstone", postcode: "3012", phone: "(03) 9318 5846", mapLink: "https://goo.gl/maps/gocCgS8Jk5tNZfw48", lat: -37.780, lng: 144.870 },
+    { name: "Epping", street: "8/168 Jersey Dr", city: "Epping", postcode: "3076", phone: "(03) 7006 5180", mapLink: "https://goo.gl/maps/HGZxbcKqbiZeDjTE6", lat: -37.650, lng: 145.019 }
   ]},
   { state: "South Australia", stores: [
-    { name: "Pooraka", street: "222 Bridge Road", city: "Pooraka", postcode: "5095", phone: "(08) 7078 4574", mapLink: "https://maps.app.goo.gl/qKNoRaN4etFaXJhd9" },
-    { name: "Adelaide City", street: "37 Gilbert St", city: "Adelaide", postcode: "5000", phone: "(08) 8211 7600", mapLink: "https://goo.gl/maps/9DA31eWAsSPAgcCe9" },
-    { name: "Lonsdale", street: "8/4 Aldenhoven Rd", city: "Lonsdale", postcode: "5160", phone: "(08) 7081 5535", mapLink: "https://goo.gl/maps/a9PHVjoo3PzQbaHj6" },
-    { name: "Edinburgh", street: "1/5b Peachey Rd", city: "Edinburgh North", postcode: "5113", phone: "(08) 7081 5550", mapLink: "https://maps.app.goo.gl/KJxUWzc6gj2B6U1aA" }
+    { name: "Pooraka", street: "222 Bridge Road", city: "Pooraka", postcode: "5095", phone: "(08) 7078 4574", mapLink: "https://maps.app.goo.gl/qKNoRaN4etFaXJhd9", lat: -34.831, lng: 138.628 },
+    { name: "Adelaide City", street: "37 Gilbert St", city: "Adelaide", postcode: "5000", phone: "(08) 8211 7600", mapLink: "https://goo.gl/maps/9DA31eWAsSPAgcCe9", lat: -34.928, lng: 138.601 },
+    { name: "Lonsdale", street: "8/4 Aldenhoven Rd", city: "Lonsdale", postcode: "5160", phone: "(08) 7081 5535", mapLink: "https://goo.gl/maps/a9PHVjoo3PzQbaHj6", lat: -35.117, lng: 138.501 },
+    { name: "Edinburgh", street: "1/5b Peachey Rd", city: "Edinburgh North", postcode: "5113", phone: "(08) 7081 5550", mapLink: "https://maps.app.goo.gl/KJxUWzc6gj2B6U1aA", lat: -34.708, lng: 138.667 }
   ]},
   { state: "Tasmania", stores: [
-    { name: "Hobart", street: "134-136 Main Rd", city: "Moonah", postcode: "7009", phone: "(03) 6273 7555", mapLink: "https://goo.gl/maps/Cyi2N7UE4qvE5ZFb6" }
+    { name: "Hobart", street: "134-136 Main Rd", city: "Moonah", postcode: "7009", phone: "(03) 6273 7555", mapLink: "https://goo.gl/maps/Cyi2N7UE4qvE5ZFb6", lat: -42.833, lng: 147.302 }
   ]},
   { state: "Queensland", stores: [
-    { name: "Kedron", street: "Unit 1/14 Boothby Street", city: "Kedron", postcode: "4031", phone: "(07) 3350 3711", mapLink: "https://goo.gl/maps/FGRrDi9CrZS2" },
-    { name: "East Brisbane", street: "46 Caswell St", city: "East Brisbane", postcode: "4169", phone: "(07) 3256 3630", mapLink: "https://goo.gl/maps/JAqUCMi5rYmZhZ1T7" },
-    { name: "Sunshine Coast", street: "1/224 Nicklin Way", city: "Warana", postcode: "4575", phone: "(07) 5408 5040", mapLink: "https://goo.gl/maps/twjqFgLGGMXotKtcA" },
-    { name: "Gold Coast", street: "3/10 Kamholtz Court", city: "Molendinar", postcode: "4214", phone: "(07) 5619 5800", mapLink: "https://g.page/roof-racks-galore-gold-coast?share" },
-    { name: "Springwood", street: "3/11 Judds Court", city: "Slacks Creek", postcode: "4127", phone: "(07) 3103 8422", mapLink: "https://goo.gl/maps/GShsfi9yfoK2" },
-    { name: "North Lakes", street: "1/74 Flinders Parade", city: "North Lakes", postcode: "4509", phone: "(07) 3103 8414", mapLink: "https://goo.gl/maps/VaQxwqVsnXw" },
-    { name: "Burleigh Heads", street: "1/11 Hutchinson Street", city: "Burleigh Heads", postcode: "4220", phone: "(07) 5619 5822", mapLink: "https://maps.app.goo.gl/m9cdKVoTojrfBC82A" },
-    { name: "Rocklea", street: "Unit 2/1620 Ipswich Road", city: "Rocklea", postcode: "4106", phone: "(07) 3277 5722", mapLink: "https://goo.gl/maps/HxDPHYUJnYm" }
+    { name: "Kedron", street: "Unit 1/14 Boothby Street", city: "Kedron", postcode: "4031", phone: "(07) 3350 3711", mapLink: "https://goo.gl/maps/FGRrDi9CrZS2", lat: -27.408, lng: 153.038 },
+    { name: "East Brisbane", street: "46 Caswell St", city: "East Brisbane", postcode: "4169", phone: "(07) 3256 3630", mapLink: "https://goo.gl/maps/JAqUCMi5rYmZhZ1T7", lat: -27.480, lng: 153.045 },
+    { name: "Sunshine Coast", street: "1/224 Nicklin Way", city: "Warana", postcode: "4575", phone: "(07) 5408 5040", mapLink: "https://goo.gl/maps/twjqFgLGGMXotKtcA", lat: -26.760, lng: 153.117 },
+    { name: "Gold Coast", street: "3/10 Kamholtz Court", city: "Molendinar", postcode: "4214", phone: "(07) 5619 5800", mapLink: "https://g.page/roof-racks-galore-gold-coast?share", lat: -28.002, lng: 153.379 },
+    { name: "Springwood", street: "3/11 Judds Court", city: "Slacks Creek", postcode: "4127", phone: "(07) 3103 8422", mapLink: "https://goo.gl/maps/GShsfi9yfoK2", lat: -27.664, lng: 153.150 },
+    { name: "North Lakes", street: "1/74 Flinders Parade", city: "North Lakes", postcode: "4509", phone: "(07) 3103 8414", mapLink: "https://goo.gl/maps/VaQxwqVsnXw", lat: -27.226, lng: 153.019 },
+    { name: "Burleigh Heads", street: "1/11 Hutchinson Street", city: "Burleigh Heads", postcode: "4220", phone: "(07) 5619 5822", mapLink: "https://maps.app.goo.gl/m9cdKVoTojrfBC82A", lat: -28.093, lng: 153.450 },
+    { name: "Rocklea", street: "Unit 2/1620 Ipswich Road", city: "Rocklea", postcode: "4106", phone: "(07) 3277 5722", mapLink: "https://goo.gl/maps/HxDPHYUJnYm", lat: -27.539, lng: 153.007 }
   ]},
   { state: "Australian Capital Territory", stores: [
-    { name: "Canberra", street: "107 Wollongong Street", city: "Fyshwick", postcode: "2609", phone: "(02) 6176 1909", mapLink: "https://goo.gl/maps/6EP4rtQWnJu9hrRBA" }
+    { name: "Canberra", street: "107 Wollongong Street", city: "Fyshwick", postcode: "2609", phone: "(02) 6176 1909", mapLink: "https://goo.gl/maps/6EP4rtQWnJu9hrRBA", lat: -35.339, lng: 149.166 }
   ]},
   { state: "Western Australia", stores: [
-    { name: "Joondalup", street: "Tenancy 4, 27-29 Sundew Rise", city: "Joondalup", postcode: "6027", phone: "(08) 9513 7225", mapLink: "https://goo.gl/maps/2Tnnk6qAgDCxcSBA9" },
-    { name: "Osborne Park", street: "51 Frobisher Street", city: "Osborne Park", postcode: "6017", phone: "(08) 9444 5061", mapLink: "https://maps.app.goo.gl/zEvXaoWceNKR7TgeA" },
-    { name: "Welshpool", street: "74 Dowd St", city: "Welshpool", postcode: "6106", phone: "(08) 9258 7663", mapLink: "https://maps.app.goo.gl/y6btYejbz9eQ39vD8" },
-    { name: "Malaga", street: "9 Rowe St", city: "Malaga", postcode: "6090", phone: "(08) 6102 6767", mapLink: "https://maps.app.goo.gl/ZFEKHyycGL8YhgoE8" },
-    { name: "Rockingham", street: "6B Leach Crescent", city: "Rockingham", postcode: "6168", phone: "(08) 6102 6722", mapLink: "https://maps.app.goo.gl/fvpWNyA1HTyT2Rwf7" }
+    { name: "Joondalup", street: "Tenancy 4, 27-29 Sundew Rise", city: "Joondalup", postcode: "6027", phone: "(08) 9513 7225", mapLink: "https://goo.gl/maps/2Tnnk6qAgDCxcSBA9", lat: -31.744, lng: 115.766 },
+    { name: "Osborne Park", street: "51 Frobisher Street", city: "Osborne Park", postcode: "6017", phone: "(08) 9444 5061", mapLink: "https://maps.app.goo.gl/zEvXaoWceNKR7TgeA", lat: -31.891, lng: 115.816 },
+    { name: "Welshpool", street: "74 Dowd St", city: "Welshpool", postcode: "6106", phone: "(08) 9258 7663", mapLink: "https://maps.app.goo.gl/y6btYejbz9eQ39vD8", lat: -31.988, lng: 115.940 },
+    { name: "Malaga", street: "9 Rowe St", city: "Malaga", postcode: "6090", phone: "(08) 6102 6767", mapLink: "https://maps.app.goo.gl/ZFEKHyycGL8YhgoE8", lat: -31.861, lng: 115.895 },
+    { name: "Rockingham", street: "6B Leach Crescent", city: "Rockingham", postcode: "6168", phone: "(08) 6102 6722", mapLink: "https://maps.app.goo.gl/fvpWNyA1HTyT2Rwf7", lat: -32.277, lng: 115.729 }
   ]}
 ];
 
@@ -718,7 +793,8 @@ function closeStoreSlideout() {
   if (backdrop) backdrop.classList.remove('open');
 }
 
-// ---- Interactive map (Showroom Finder widget, 2026-09-10 Graham Sowerby meeting) ----
+// ---- Interactive map (Showroom Finder widget, 2026-09-10 Graham Sowerby meeting; reworked
+// 2026-09-11 per backlog item 22) ----
 // Piloted on Vehicle-Specific only at first; locked in as the default and rolled out to all
 // 5 templates the same day after client review. No longer a Demo State Panel preview toggle
 // — called unconditionally from buildAdminPanel() wherever #showroomMap exists. Leaflet +
@@ -726,9 +802,78 @@ function closeStoreSlideout() {
 // (split-view), not as a full swap — corrected 2026-09-10 after the first version replaced
 // the block outright, which lost the postcode entry / "Find Nearest Showroom" CTA. Real
 // postcode-driven radius search isn't implemented (no geocoding service wired up) — the map
-// shows a fixed demo view of the store cluster; flagged here as the gap to close before this
+// shows a fixed demo view of the store network; flagged here as the gap to close before this
 // leaves prototype stage.
+//
+// 2026-09-11 rework: pins now come straight from RRG_STORE_NETWORK (all 35 real stores,
+// every state) instead of a separate 4-store-NSW-only demo list duplicated per template —
+// the old per-template `window.SHOWROOM_MAP_STORES` arrays are gone. Default view is
+// `fitBounds()` over every store (zoomed out to the whole country) rather than a fixed
+// Sydney zoom. Pins are colour-coded red (on display, per ON_DISPLAY_STORES) vs grey (not)
+// via a custom `L.divIcon` — no image assets needed. Leaflet.markercluster groups pins when
+// zoomed out and splits them apart on zoom in; cluster bubbles are grey by default and red
+// if any store inside has the product on display (`rrgClusterIcon()` below), so the "on
+// display nearby" signal is visible before a viewer even zooms in.
+// 2026-09-11 (Region Selector, backlog item 21): the map is now region-aware. AU keeps the
+// full 35-store clustered network from the rework above; NZ/UK are single-store demo
+// regions (RRG has no real stores there — this previews a hypothetical future expansion,
+// not a real network) so the map just zooms to one always-on-display pin instead. See
+// REGION_SINGLE_STORES below and applyRegion()/renderShowroomMapPins() further down.
 let showroomLeafletMap = null;
+let showroomPinLayer = null;
+
+function rrgPinIcon(onDisplay) {
+  return L.divIcon({
+    className: `rrg-map-pin${onDisplay ? ' on-display' : ''}`,
+    html: '<span></span>',
+    iconSize: [22, 22],
+    iconAnchor: [11, 22],
+    popupAnchor: [0, -20]
+  });
+}
+
+function rrgClusterIcon(cluster) {
+  const markers = cluster.getAllChildMarkers();
+  const hasDisplay = markers.some(m => m.options.rrgOnDisplay);
+  return L.divIcon({
+    className: `rrg-map-cluster${hasDisplay ? ' on-display' : ''}`,
+    html: `<span>${cluster.getChildCount()}</span>`,
+    iconSize: [36, 36]
+  });
+}
+
+// Rebuilds whatever pins/clusters are currently on the map for the given region — called
+// once on first map init and again every time the header region dropdown changes. Removes
+// the previous pin layer first (region switches, not just initial load, can call this).
+function renderShowroomMapPins(region) {
+  if (!showroomLeafletMap) return;
+  if (showroomPinLayer) {
+    showroomLeafletMap.removeLayer(showroomPinLayer);
+    showroomPinLayer = null;
+  }
+  if (region === 'AU') {
+    const clusterGroup = typeof L.markerClusterGroup === 'function'
+      ? L.markerClusterGroup({ iconCreateFunction: rrgClusterIcon, maxClusterRadius: 60 })
+      : L.layerGroup();
+    const latLngs = [];
+    RRG_STORE_NETWORK.forEach(group => group.stores.forEach(s => {
+      const onDisplay = ON_DISPLAY_STORES.has(s.name);
+      L.marker([s.lat, s.lng], { icon: rrgPinIcon(onDisplay), rrgOnDisplay: onDisplay })
+        .bindPopup(`<strong>${s.name}</strong><br>${s.street}, ${s.city}<br>${onDisplay ? 'On Display' : 'In-store stock varies'}`)
+        .addTo(clusterGroup);
+      latLngs.push([s.lat, s.lng]);
+    }));
+    showroomPinLayer = clusterGroup.addTo(showroomLeafletMap);
+    showroomLeafletMap.fitBounds(L.latLngBounds(latLngs), { padding: [24, 24] });
+  } else {
+    const s = REGION_SINGLE_STORES[region];
+    if (!s) return;
+    showroomPinLayer = L.marker([s.lat, s.lng], { icon: rrgPinIcon(true), rrgOnDisplay: true })
+      .bindPopup(`<strong>${s.name} Store</strong><br>${s.note}<br>On Display`)
+      .addTo(showroomLeafletMap);
+    showroomLeafletMap.setView([s.lat, s.lng], 12);
+  }
+}
 
 function applyShowroomMapFlag(on) {
   const mapEl = document.getElementById('showroomMap');
@@ -737,18 +882,198 @@ function applyShowroomMapFlag(on) {
   mapEl.hidden = !on;
   if (widget) widget.classList.toggle('split-view', on);
   if (!on || typeof L === 'undefined') return;
-  const stores = window.SHOWROOM_MAP_STORES || [];
   if (!showroomLeafletMap) {
-    showroomLeafletMap = L.map(mapEl).setView([-33.92, 150.92], 10);
+    showroomLeafletMap = L.map(mapEl);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 18
     }).addTo(showroomLeafletMap);
-    stores.forEach(s => {
-      L.marker([s.lat, s.lng]).addTo(showroomLeafletMap).bindPopup(`<strong>${s.name}</strong><br>${s.status}`);
-    });
+    renderShowroomMapPins(currentRegion);
   }
   setTimeout(() => showroomLeafletMap.invalidateSize(), 0);
+}
+
+// ---- Region Selector (header dropdown, 2026-09-11, backlog item 21) ----
+// A header dropdown (the utility bar's existing "🇦🇺 Australia" item, previously
+// decorative-only) that behaves like the Demo State Panel toggles elsewhere on this
+// prototype: a live, client-side copy/widget swap across all 5 templates, no page reload,
+// no separate per-region page files. Resets to AU on every fresh page load — same
+// no-persistence convention as the rest of the demo-state toggles, not saved across visits.
+//
+// RRG's real store network (RRG_STORE_NETWORK, 35 stores) is AU-only — NZ/UK are entirely
+// hypothetical single-store demo regions for previewing what an international expansion
+// would look like on this page, not real business fact. Their address/copy below is
+// explicitly placeholder (flagged in DEVELOPER-BRIEF.md's Region-specific heading copy
+// note) — don't mistake it for real store data if this file is read out of context.
+const REGION_SINGLE_STORES = {
+  NZ: { name: 'Auckland', lat: -36.8485, lng: 174.7633, note: 'Address TBD — placeholder for prototype' },
+  UK: { name: 'London', lat: 51.5074, lng: -0.1278, note: 'Real UK store TBD — placeholder for prototype' }
+};
+
+const REGION_LABELS = { AU: 'Australia', NZ: 'New Zealand', UK: 'United Kingdom' };
+const REGION_FLAGS = { AU: '🇦🇺', NZ: '🇳🇿', UK: '🇬🇧' };
+
+// AU/UK default to the Click & Collect tab, NZ defaults to Delivery — per spec.md item 21.
+const REGION_DEFAULT_DC_TAB = { AU: 'collect', NZ: 'delivery', UK: 'collect' };
+
+// Trust row's founded/network claims are real facts about the current AU-only business —
+// swapped to honest regional placeholders rather than a literal "Australia's Largest" claim
+// showing while NZ/UK is selected. Placeholder copy, flagged for real client wording once
+// this leaves prototype stage (same convention as the rest of this project's demo copy).
+const REGION_TRUST_COPY = {
+  AU: {
+    founded: { h4: 'Trusted Since 1989', p: 'Now with over 30 locations Australia wide' },
+    network: { h4: "Australia's Largest", p: "We're the only nationwide roof rack specialists" }
+  },
+  NZ: {
+    founded: { h4: 'Trusted Since 1989', p: 'Now serving New Zealand' },
+    network: { h4: 'Visit In Person', p: 'Check it out at our Auckland showroom' }
+  },
+  UK: {
+    founded: { h4: 'Trusted Since 1989', p: 'Now serving the United Kingdom' },
+    network: { h4: 'Visit In Person', p: 'Check it out at our London showroom' }
+  }
+};
+
+let currentRegion = 'AU';
+
+// Showroom Finder heading text is per-template static markup (each product shows a
+// different AU on-display store count) — cached the first time this runs so switching back
+// to AU restores the real per-page count instead of a hardcoded generic string.
+function applyRegionShowroomHeading(region, heading) {
+  if (!heading) return;
+  if (!heading.dataset.auHeading) heading.dataset.auHeading = heading.textContent;
+  heading.textContent = region === 'AU'
+    ? heading.dataset.auHeading
+    : `See It In Person — On Display At the ${REGION_SINGLE_STORES[region].name} Store`;
+}
+
+function applyRegion(region) {
+  currentRegion = region;
+
+  // Utility bar trigger label/flag
+  const flagEl = document.querySelector('[data-region-flag]');
+  const labelEl = document.querySelector('[data-region-label]');
+  if (flagEl) flagEl.textContent = REGION_FLAGS[region];
+  if (labelEl) labelEl.textContent = REGION_LABELS[region];
+  document.querySelectorAll('.region-switcher-menu a').forEach(a => {
+    a.classList.toggle('current', a.dataset.region === region);
+  });
+
+  // Click & Collect vs Delivery default tab — reuses the existing tab-click handler
+  // (initDeliveryCollectTabs) via a real click, rather than duplicating its class/hidden
+  // toggling logic here. Also hides the Click & Collect card's own "View all stores" link
+  // for NZ/UK (its store slide-out lists the real 35-store AU network, which doesn't apply
+  // to a single-store region) and re-triggers the existing postcode-widget's update() via
+  // its real Update button, so `.dc-viewall-line`'s text picks up the region-aware copy
+  // from initDcPostcode() below rather than staying stuck on whatever it last showed.
+  document.querySelectorAll('.dc-widget').forEach(widget => {
+    const tab = widget.querySelector(`[data-dc-tab="${REGION_DEFAULT_DC_TAB[region]}"]`);
+    if (tab && !tab.hidden) tab.click();
+    const viewAllLink = widget.querySelector('.dc-viewall-row .dc-viewall');
+    if (viewAllLink) viewAllLink.hidden = region !== 'AU';
+    widget.querySelector('[data-dc-update]')?.click();
+  });
+
+  // Showroom Finder heading + map pins + "View all stores" (real AU-only store list, so it
+  // doesn't apply once a single-store region is showing)
+  document.querySelectorAll('#showroomDefaultView').forEach(view => {
+    applyRegionShowroomHeading(region, view.querySelector('h3'));
+    const viewAllRow = view.querySelector('.dc-viewall-row');
+    if (viewAllRow) viewAllRow.hidden = region !== 'AU';
+  });
+  renderShowroomMapPins(region);
+
+  // Trust row founded/network claims
+  const copy = REGION_TRUST_COPY[region];
+  document.querySelectorAll('[data-trust]').forEach(item => {
+    const c = copy[item.dataset.trust];
+    if (!c) return;
+    const h4 = item.querySelector('h4'), p = item.querySelector('p');
+    if (h4) h4.textContent = c.h4;
+    if (p) p.textContent = c.p;
+  });
+
+  // Currency symbol (UK backlog ask, 2026-09-11) and UK brand skin — run last, after every
+  // other region-driven re-render above, so both act on the final DOM state rather than
+  // something about to be overwritten.
+  applyRegionCurrency(region);
+  applyRegionBrand(region);
+}
+
+// fmtAud()/fmtMoney() (this file + the per-template inline scripts) already pick up the
+// right symbol on their NEXT call via regionCurrencySymbol() — this sweep instead fixes
+// whatever's already sitting in the DOM at the moment the region changes: static per-SKU
+// markup (Related Products' `.price` divs, Simple/Grouped-Bundle's non-variant price block)
+// and anything rendered before this specific switch (payment badges, exdemo suffix, etc.).
+// Same numeric values either way — this is a symbol swap, not a currency conversion; no FX
+// math anywhere in this prototype. Scoped away from <script>/<style> (their text nodes are
+// still part of the DOM text-node tree, so an unscoped walk would silently corrupt inline
+// JS/CSS) and the Demo State Panel (a reviewer tool, not page content).
+function applyRegionCurrency(region) {
+  const symbol = region === 'UK' ? '£' : '$';
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!/[$£]\d/.test(node.nodeValue)) return NodeFilter.FILTER_SKIP;
+      return node.parentElement && node.parentElement.closest('script, style, .admin-panel')
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node => { node.nodeValue = node.nodeValue.replace(/[$£](?=\d)/g, symbol); });
+}
+
+// UK brand skin (backlog ask, 2026-09-11): RRG trades in the UK as "The Roof Box Company"
+// (roofbox.co.uk) — a real sister brand, not a reskin RRG invented. Scope confirmed with
+// Brenton: logo + the core brand colour (navy, replacing RRG red everywhere `--rrg-red` is
+// already used, so every component built against that token picks it up for free) plus
+// their real Add to Cart green — NOT a typography change, Barlow Condensed/Lato stay for
+// build simplicity and consistency with the rest of the prototype. NZ is unaffected (real
+// scraped tab copy already treats AU+NZ as one brand/network) — this only ever toggles for
+// 'UK'. Logo swap is a straight `src`/`alt` swap on every `.rrg-logo img` on the page (main
+// header + the sticky condensed mobile header both reuse the same markup pattern); colours
+// are driven by toggling a `body.region-uk` class that overrides the `--rrg-red`/
+// `--rrg-red-dark` custom properties in shared.css, plus a direct override for the Add to
+// Cart button (which isn't on the `--rrg-red` token to begin with — it's RRG's separate
+// locked-in gold default, see shared.css).
+const RRG_LOGO = { src: '../_shared/headerlogo.png', alt: 'Roof Racks Galore' };
+const UK_LOGO = { src: '../_shared/brand-roofbox-uk-logo.svg', alt: 'The Roof Box Company' };
+
+function applyRegionBrand(region) {
+  document.body.classList.toggle('region-uk', region === 'UK');
+  const logo = region === 'UK' ? UK_LOGO : RRG_LOGO;
+  document.querySelectorAll('.rrg-logo img').forEach(img => {
+    img.src = logo.src;
+    img.alt = logo.alt;
+  });
+}
+
+function initRegionSwitcher() {
+  const wrap = document.querySelector('.region-switcher');
+  if (!wrap) return;
+  const toggle = wrap.querySelector('.region-switcher-toggle');
+  const menu = wrap.querySelector('.region-switcher-menu');
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = wrap.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  menu.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => {
+    wrap.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  });
+  menu.querySelectorAll('a[data-region]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      applyRegion(a.dataset.region);
+      wrap.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+  applyRegion('AU');
 }
 
 // ---- Paid "Fitted" option (demo-preview only, 2026-09-10 client meeting) ----
@@ -955,6 +1280,39 @@ function initTemplateSwitcher() {
 // label + sibling-selector .content, no JS anywhere) — a plain anchor jump would scroll to
 // the (hidden) radio without checking it, so the tab wouldn't actually switch. This checks
 // the target radio directly, then scrolls its .tabs container into view.
+// Decision Panel star-rating summary (2026-09-11) — same real data source as the Reviews
+// tab's REVIEWS.io Polaris embed, just a compact custom-built badge since REVIEWS.io doesn't
+// ship a standalone widget for this above-the-fold placement. Calls the same
+// api.reviews.io/timeline/data endpoint the Polaris widget itself calls (confirmed via
+// network inspection — it's CORS-open, since it's designed to be embedded on arbitrary
+// merchant sites), but with per_page=1 since only the `stats` summary is needed, not the
+// review list itself. Deliberately does NOT fall back to the store-wide rating when a SKU
+// has zero product reviews (an earlier version did) — on an individual product page, a
+// company-wide figure next to that specific product reads as a real per-product rating and
+// is misleading, even if technically sourced from real data. So: no product reviews yet =
+// hide the whole strip, same as a fetch failure or the account having no data at all.
+function initReviewSummary(root = document) {
+  root.querySelectorAll('.reviews-strip[data-review-sku]').forEach(async strip => {
+    const sku = strip.dataset.reviewSku;
+    const starsEl = strip.querySelector('[data-stars]');
+    const textEl = strip.querySelector('[data-review-text]');
+    if (!starsEl || !textEl) return;
+    try {
+      const url = `https://api.reviews.io/timeline/data?type=product_review&store=roof-racks-galore&per_page=1&sku=${encodeURIComponent(sku)}&lang=en`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const avg = parseFloat(data.stats?.average_rating || '0');
+      const count = data.stats?.review_count || 0;
+      if (!count) { strip.hidden = true; return; }
+      const filled = Math.round(avg);
+      starsEl.innerHTML = '★'.repeat(filled) + `<span class="stars-empty">${'★'.repeat(5 - filled)}</span>`;
+      textEl.textContent = `${avg.toFixed(1)} (${count.toLocaleString()} reviews)`;
+    } catch (e) {
+      strip.hidden = true;
+    }
+  });
+}
+
 function initTabJumpLinks() {
   document.querySelectorAll('[data-jump-tab]').forEach(link => {
     link.addEventListener('click', e => {
@@ -1030,7 +1388,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initCopyButtons();
   initFitGalleryCarousel();
   initTemplateSwitcher();
+  initRegionSwitcher();
   initTabJumpLinks();
+  initReviewSummary();
   initMobileNav();
   initSearchClear();
   // Sticky condensed mobile header (2026-09-11) — reuses the same sentinel/.visible
@@ -1038,7 +1398,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // .rrg-sticky-header once .rrg-search (the top-of-page search row) scrolls out of
   // view. Generic across all pages since every template has both elements identically.
   initPersistentBar('.rrg-search', '.rrg-sticky-header');
+  initStickyCta();
 });
+
+// Sticky mobile Add-to-Cart bar (2026-09-11, backlog item 26) — shows whenever the real
+// Add to Cart button isn't currently on-screen, which covers both "starts below the fold
+// on load" and "scrolled past it" with one rule (previously the bar was just always
+// visible at mobile widths regardless of scroll position, so it showed even while the
+// real button was already on-screen). The real button is present in the initial markup
+// on every template (only its label/href update dynamically), so this doesn't need to
+// wait on any page's own render cycle.
+function initStickyCta() {
+  const bar = document.querySelector('.sticky-cta-mobile');
+  const target = document.querySelector('.decision-panel [data-cta-label]');
+  if (!bar || !target) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    const offscreen = !entry.isIntersecting;
+    bar.classList.toggle('visible', offscreen);
+    document.body.classList.toggle('has-sticky-cta', offscreen);
+  }, { threshold: 0 });
+  observer.observe(target);
+}
 
 function buildAdminPanel() {
   const needsVehicleDemo = !!document.querySelector('[data-fitment-slot]');
@@ -1116,7 +1496,7 @@ function buildAdminPanel() {
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
         ${hasFitGallery ? `<label class="admin-toggle"><span>Fitment Gallery exists for this product</span><input type="checkbox" data-admin-flag="fitGallery" ${initialFitGallery ? 'checked' : ''}></label>` : ''}
-        ${hasVehicleFitNotes ? `<label class="admin-toggle"><span>Important Vehicle Fit Notes</span><input type="checkbox" data-admin-flag="vehicleFitNotes"></label>` : ''}
+        ${hasVehicleFitNotes ? `<label class="admin-toggle"><span>Product Notes</span><input type="checkbox" data-admin-flag="vehicleFitNotes"></label>` : ''}
       </div>
       ${hasVariantPicker ? `
       <div class="admin-section">
@@ -1142,8 +1522,28 @@ function buildAdminPanel() {
   document.body.appendChild(panel);
   document.body.appendChild(fab);
 
-  fab.addEventListener('click', () => panel.classList.add('open'));
+  // Click-outside-to-close (2026-09-11, Brenton's ask — the panel is sizable on mobile,
+  // so relying on the small X button alone was awkward) — same stopPropagation-on-the-
+  // panel-itself pattern already used for the nav drawer and template switcher, so clicks
+  // on toggles/buttons inside the panel never bubble out and trigger a close.
+  fab.addEventListener('click', (e) => { e.stopPropagation(); panel.classList.add('open'); });
   panel.querySelector('.admin-close').addEventListener('click', () => panel.classList.remove('open'));
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => panel.classList.remove('open'));
+
+  // The FAB is hidden on mobile (see .admin-fab in shared.css) since it was crowding an
+  // already tight viewport — the "North Lakes" nearest-store link in the utility bar
+  // doubles as the mobile trigger instead (data-admin-trigger, added to that anchor in
+  // every template's header). Still wired up on desktop too since there's no harm in it
+  // working there as well, just redundant with the visible FAB.
+  const adminTrigger = document.querySelector('[data-admin-trigger]');
+  if (adminTrigger) {
+    adminTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      panel.classList.add('open');
+    });
+  }
 
   panel.querySelectorAll('[data-admin-flag]').forEach(input => {
     input.addEventListener('change', () => {
