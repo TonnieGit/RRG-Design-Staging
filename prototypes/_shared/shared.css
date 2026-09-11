@@ -1,6 +1,9 @@
 /* Roof Racks Galore — shared design tokens & component library, used across all four PDP templates */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&family=Lato:wght@400;700;900&display=swap');
+/* Google Fonts are loaded via <link rel="preconnect">/<link rel="stylesheet"> in each
+   page's <head> now, not an @import here (2026-09-11, mobile audit) — @import blocks
+   the browser from discovering/fetching the font until after this whole stylesheet is
+   parsed, which is a real render/LCP cost on mobile networks that <link> avoids. */
 
 :root{
   --rrg-black:#000;
@@ -84,20 +87,101 @@ button{font-family:inherit;cursor:pointer;}
 .template-switcher-menu a{padding:9px 10px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--rrg-black);text-decoration:none;}
 .template-switcher-menu a:hover{background:#f4f4f4;color:var(--rrg-red);}
 .template-switcher-menu a.current{color:var(--rrg-red);background:#faf0ef;}
-.rrg-search{flex:1 1 260px;max-width:420px;display:flex;border:1.5px solid var(--rrg-line);border-radius:8px;overflow:hidden;margin-left:auto;}
+.rrg-search{flex:1 1 260px;max-width:420px;display:flex;align-items:center;border:1.5px solid var(--rrg-line);border-radius:8px;overflow:hidden;margin-left:auto;}
 .rrg-search input{flex:1;border:none;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;min-width:0;}
-.rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+/* Clear (x) button — matched to client-supplied Figma export "Navbar - Logged In -
+   Final.png", which shows it beside the search icon on mobile. Generic, so it also shows
+   up on desktop where the input has a value; initSearchClear() in shared.js toggles it. */
+.rrg-search-clear{background:none;border:none;color:#999;padding:0 8px;font-size:18px;line-height:1;flex:0 0 auto;cursor:pointer;}
+.rrg-search-clear:hover{color:#666;}
+.rrg-search-btn{background:var(--rrg-red);border:none;color:#fff;padding:0 16px;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
 .rrg-search-btn svg{width:16px;height:16px;flex:0 0 auto;}
 .rrg-cart{position:relative;flex:0 0 auto;color:var(--rrg-black);cursor:pointer;}
 .rrg-cart svg{width:24px;height:24px;}
 .cart-badge{position:absolute;top:-6px;right:-8px;background:var(--rrg-red);color:#fff;font-size:10px;font-weight:900;border-radius:999px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;}
+
+/* Mobile nav toggle + drawer (2026-09-11, mobile audit) — .rrg-nav (Products / Store
+   Finder / Fit My Vehicle / Catalogue / Services) used to just display:none below 900px
+   with nothing replacing it, making the entire main nav unreachable on mobile/tablet.
+   Hidden by default (desktop hamburger icon would be pointless); shown + wired up to
+   toggle .rrg-nav open only inside the 900px media query below. Reuses the same
+   toggle-a-class-on-click, click-outside-to-close pattern as .template-switcher
+   (initTemplateSwitcher() in shared.js) via the new initMobileNav(). */
+.mobile-nav-toggle{display:none;background:none;border:none;padding:10px;margin:-10px;color:var(--rrg-black);flex:0 0 auto;}
+.mobile-nav-toggle svg{width:22px;height:22px;display:block;}
+/* Main header, mobile layout (2026-09-11, matched to client-supplied Figma export "Navbar
+   - Logged In - Final.png") — hamburger / centered logo / cart as one row, search bar as
+   its own full-width row below, instead of everything crammed into one flex row like
+   desktop. Grid (not flex) so the search row can sit on an explicit row 2 without needing
+   flex `order` tricks that would also disturb the hamburger/logo/cart row. */
 @media (max-width:900px){
-  .rrg-nav{display:none;}
-  .rrg-search{margin-left:0;}
+  .rrg-main-header{position:relative;}
+  .mobile-nav-toggle{display:flex;align-items:center;justify-content:center;}
+  .rrg-main-inner{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:12px;row-gap:10px;}
+  .mobile-nav-toggle{grid-row:1;grid-column:1;}
+  .rrg-main-inner .rrg-logo{grid-row:1;grid-column:2;justify-self:center;}
+  .rrg-cart{grid-row:1;grid-column:3;justify-self:end;}
+  .rrg-search{grid-row:2;grid-column:1/-1;margin-left:0;max-width:none;}
+  /* .rrg-nav is position:fixed (see below) so it's out of normal flow — no grid placement
+     needed for it, its own top offset is computed at open-time in initMobileNav(). */
+  .rrg-nav{
+    display:none;
+    position:fixed;left:0;right:0;
+    flex-direction:column;align-items:stretch;gap:0;
+    background:#fff;border-top:1px solid var(--rrg-line);box-shadow:0 12px 24px rgba(0,0,0,.14);
+    padding:4px 24px 16px;z-index:56;max-height:calc(100vh - 60px);overflow-y:auto;
+  }
+  .rrg-nav.mobile-open{display:flex;}
+  .rrg-nav .sep{display:none;}
+  .rrg-nav > a,
+  .rrg-nav .template-switcher-toggle{
+    width:100%;padding:15px 2px;border-bottom:1px solid #f0f0f0;
+    justify-content:space-between;font-size:15px;
+  }
 }
-@media (max-width:640px){
-  .rrg-utility-inner{justify-content:center;text-align:center;}
-  .rrg-utility-left,.rrg-utility-right{justify-content:center;}
+
+/* Sticky condensed header (2026-09-11, matched to client-supplied Figma export "Mob
+   Navbar - Final - Sticky.png") — hamburger/logo/cart only, no utility bar or search,
+   fixed to the top once the top-of-page search row scrolls out of view. Reuses
+   initPersistentBar()'s existing sentinel/.visible convention (already used for the
+   desktop decision bar on vehicle-specific) rather than writing a second scroll observer.
+   Hidden entirely on desktop — the whole point is replacing the mobile-only search row
+   once it's scrolled away, desktop's header has no equivalent collapsed state. */
+.rrg-sticky-header{display:none;}
+@media (max-width:900px){
+  .rrg-sticky-header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    position:fixed;top:0;left:0;right:0;z-index:55;
+    background:#fff;border-bottom:1px solid var(--rrg-line);
+    padding:10px 16px;
+    transform:translateY(-100%);
+    transition:transform .2s ease;
+    box-shadow:0 4px 14px rgba(0,0,0,.08);
+  }
+  .rrg-sticky-header.visible{transform:translateY(0);}
+  .rrg-sticky-header .rrg-logo img{height:26px;}
+  .rrg-sticky-header .mobile-nav-toggle{display:flex;}
+}
+/* Mobile utility bar (2026-09-11, matched to client-supplied Figma exports "Navbar -
+   Logged In - Final.png" / "Mob Navbar - Final - Sticky.png") — condenses to just
+   Nearest Store (left) and Vehicle (right), dropping Call Us / country / account.
+   display:contents on the two wrapper divs (same technique as .gallery-col's mobile
+   reorder above) lifts every .u-item to be a direct flex child of .rrg-utility-inner so
+   `order` can freely reposition across the original left/right grouping; hiding every
+   .u-item by default then re-showing just the two wanted ones by position keeps this a
+   pure-CSS fix with no markup changes needed across all 6 pages. */
+@media (max-width:900px){
+  .rrg-utility-left,.rrg-utility-right{display:contents;}
+  .rrg-utility-inner{justify-content:space-between;text-align:left;flex-wrap:nowrap;}
+  .u-item{display:none;min-width:0;}
+  .rrg-utility-left .u-item:first-child{display:inline-flex;order:1;}
+  .rrg-utility-left .u-item:nth-child(2){display:inline-flex;order:2;}
+  /* Figma's mobile utility bar shows icon + value only ("North Lakes", "Toyota Hilux"),
+     dropping the "Your Nearest Store:"/"Your Vehicle:" prefix — matches the export exactly
+     and was also a real overflow bug fix: that label text couldn't fit both items on one
+     390px-wide row with flex-wrap:nowrap above (needed to keep them fixed at opposite
+     ends rather than wrapping to a second line under the label). */
+  .u-item-label{display:none;}
 }
 .rrg-crumbs{font-size:12px;color:#767676;padding:14px 0;}
 .rrg-crumbs a{color:#767676;text-decoration:none;}
@@ -141,7 +225,9 @@ button{font-family:inherit;cursor:pointer;}
 .fitment.no_fit strong{color:var(--rrg-nofit);}
 .fitment.no_fit .dot{background:var(--rrg-nofit);}
 .fitment .actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;}
-.fitment .actions button{background:#fff;border:1px solid var(--rrg-line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:#333;}
+/* min-height 48px (2026-09-11, mobile audit) — was 6px/12px padding at 12px font, well
+   under Google's 48px tap-target minimum for a real "change vehicle"-type action. */
+.fitment .actions button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;background:#fff;border:1px solid var(--rrg-line);border-radius:999px;padding:6px 16px;font-size:12.5px;font-weight:700;color:#333;}
 
 /* Rack Fit Guarantee (2026-09-10, Graham Sowerby meeting) — real client asset + copy.
    Main decision panel gets icon+text packed into the fitment card's top-right corner;
@@ -315,7 +401,7 @@ button{font-family:inherit;cursor:pointer;}
 .install-cta-panel .install-tag{font-size:12.5px;color:#ddd;line-height:1.35;max-width:230px;margin:0;}
 .install-cta-reviews{display:flex;align-items:center;gap:10px;}
 .install-cta-reviews .stars{color:#E8A83C;font-size:14px;}
-.reviews-io-badge{display:inline-flex;align-items:center;gap:2px;background:#fff;color:#232323;font-weight:900;font-size:10.5px;padding:4px 8px;border-radius:4px;letter-spacing:.02em;}
+.reviews-io-badge{display:inline-flex;align-items:center;gap:2px;background:#fff;color:#232323;font-weight:900;font-size:12px;padding:4px 8px;border-radius:4px;letter-spacing:.02em;}
 .install-cta-panel .btn{background:var(--rrg-gold);color:#232323;align-self:flex-start;padding:12px 20px;font-size:13px;border-radius:8px;line-height:1.25;}
 .install-cta-panel .btn:hover{background:#a8916f;}
 .install-media-row.no-video .install-cta-panel{aspect-ratio:auto;min-height:220px;}
@@ -443,7 +529,7 @@ button{font-family:inherit;cursor:pointer;}
 /* Quantity per row (2026-09-10, Graham Sowerby meeting) — so a customer adding what looks
    like one product isn't confused when a multi-part kit arrives with no visible reason
    why. Real per-component quantities aren't confirmed by the client yet — see spec.md §7. */
-.package-item .pi-qty{flex:0 0 auto;color:#999;font-size:11px;font-weight:700;white-space:nowrap;}
+.package-item .pi-qty{flex:0 0 auto;color:#999;font-size:12px;font-weight:700;white-space:nowrap;}
 .package-item .pi-sku{display:flex;align-items:center;gap:6px;color:#767676;white-space:nowrap;}
 
 /* Generic copy-to-clipboard button, used by the main SKU row and package-item rows */
@@ -451,7 +537,11 @@ button{font-family:inherit;cursor:pointer;}
    click target now, not a separate copy-icon button (main SKU row + What's Included
    rows). Dashed underline in the current text colour signals "clickable" without adding
    a second visual element next to a value that used to look purely static. */
-.sku-copy{cursor:pointer;border-bottom:1px dashed currentColor;}
+/* Padding + negative margin (2026-09-11, mobile audit) so the click/tap area is bigger
+   than the visible underlined text without shifting surrounding layout — a full 48px
+   box here would look like an odd gap in an inline text row, so this is a deliberate
+   partial improvement (~34px tap height), not a full 48px compliance claim. */
+.sku-copy{cursor:pointer;border-bottom:1px dashed currentColor;display:inline-block;padding:8px 2px;margin:-8px -2px;}
 .sku-copy.copied{color:var(--rrg-fits);border-bottom-color:var(--rrg-fits);}
 
 /* Ex-Demo / Factory Seconds — demo admin panel "B-Stock" toggle. Appended inline to the
@@ -470,7 +560,7 @@ button{font-family:inherit;cursor:pointer;}
 .variant-option.fitted-option.selected{border-color:var(--rrg-gold);box-shadow:0 0 0 1px var(--rrg-gold);}
 .fitted-upsell-checkbox{display:flex;align-items:flex-start;gap:10px;background:var(--rrg-gold-bg);border:1px solid var(--rrg-gold);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5c4d34;cursor:pointer;margin-bottom:2px;}
 .fitted-upsell-checkbox input{margin-top:2px;flex:0 0 auto;}
-.fitted-upsell-checkbox .fitted-sub{display:block;color:#8a7a5c;font-size:11px;margin-top:2px;}
+.fitted-upsell-checkbox .fitted-sub{display:block;color:#8a7a5c;font-size:12px;margin-top:2px;}
 
 .admin-section h5 .admin-note{text-transform:none;font-weight:400;color:#aaa;letter-spacing:0;}
 .admin-radio-row{display:flex;flex-direction:column;gap:6px;margin:8px 0 0;padding-top:8px;border-top:1px dashed #eee;}
@@ -488,12 +578,12 @@ button{font-family:inherit;cursor:pointer;}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 4px;}
 .modal-head h3{font-size:19px;margin:0 0 4px;}
 .modal-head p{font-size:12.5px;color:#666;margin:0;}
-.modal-close{background:#f2f2f2;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;flex:0 0 auto;color:#333;}
+.modal-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;flex:0 0 auto;color:#333;}
 .modal-body{padding:14px 22px 22px;display:flex;flex-direction:column;gap:12px;}
 .exdemo-option{border:1px solid var(--rrg-line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
 .exdemo-option .eo-img{width:64px;height:64px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:6px;flex:0 0 auto;}
 .exdemo-option .eo-info{flex:1;min-width:0;}
-.exdemo-option .eo-tag{display:inline-block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
+.exdemo-option .eo-tag{display:inline-block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
 .exdemo-option .eo-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
 .exdemo-option .eo-was{font-size:12px;color:#8a8a8a;text-decoration:line-through;margin-left:6px;}
 .exdemo-option .eo-note{font-size:12px;color:#666;margin-top:2px;}
@@ -520,7 +610,7 @@ button{font-family:inherit;cursor:pointer;}
    default active tab flipped to Click & Collect, and small tab icons. */
 .dc-widget{border:1px solid var(--rrg-line);border-radius:var(--radius);overflow:hidden;background:#fff;}
 .dc-tabs{display:flex;border-bottom:1px solid var(--rrg-line);}
-.dc-tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#f7f7f7;border:none;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.02em;color:#767676;border-bottom:2px solid transparent;}
+.dc-tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:48px;background:#f7f7f7;border:none;padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.02em;color:#767676;border-bottom:2px solid transparent;}
 .dc-tab.active{background:#fff;color:var(--rrg-black);border-bottom-color:var(--rrg-red);}
 .dc-tab-icon{width:14px;height:14px;flex:0 0 auto;}
 .dc-postcode-row{display:flex;gap:10px;flex-wrap:wrap;padding:16px 18px 0;}
@@ -559,11 +649,14 @@ button{font-family:inherit;cursor:pointer;}
 .store-slideout-backdrop.open .store-slideout{transform:translateX(0);}
 .store-slideout-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
 .store-slideout-head h3{font-size:19px;margin:0;}
-.store-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;color:#333;flex:0 0 auto;}
+.store-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;color:#333;flex:0 0 auto;}
 .store-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex:1 1 auto;}
 .store-slideout-state{font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--rrg-red);margin:14px 0 2px;}
 .store-slideout-state:first-child{margin-top:0;}
-.dc-store .store-phone,.dc-store .store-map-link{font-size:12px;font-weight:700;text-decoration:underline;margin-right:12px;}
+/* Padding + negative margin (2026-09-11, mobile audit), same partial-tap-target
+   convention as .sku-copy above — these are real conversion actions (call a store, open
+   its map) that were plain 12px inline text with no hit-area padding at all. */
+.dc-store .store-phone,.dc-store .store-map-link{display:inline-block;font-size:12px;font-weight:700;text-decoration:underline;padding:8px 0;margin:-8px 12px -8px 0;}
 .dc-store .store-phone{color:var(--rrg-black);}
 .dc-store .store-map-link{color:#1A56DB;}
 
@@ -658,4 +751,59 @@ button{font-family:inherit;cursor:pointer;}
   .trust-row{grid-template-columns:repeat(2,1fr);}
   .trust-row .item:nth-child(2n+1){border-left:0;}
   .trust-row .item:nth-child(n+3){border-top:1px solid var(--rrg-line);}
+}
+
+/* ==========================================================================
+   Mobile content type scale (2026-09-11, mobile audit)
+   ==========================================================================
+   Real, structural finding: only headings/prices (Barlow Condensed, 18px+) sit above
+   Google's 16px mobile-readability floor. Nearly everything a shopper actually reads —
+   fitment status, tab content, specs, delivery/collect info, descriptions — was set
+   12.5–15px across the component library, which reads as uniformly small on mobile even
+   though the viewport meta tag itself is correct (not a zoom/scaling bug).
+
+   !important is used deliberately, not as a shortcut: several of these selectors are
+   re-declared in each template's own local <style> block (e.g. .value-prop, .sku-row),
+   which loads after this shared stylesheet in every page's <head> and would otherwise
+   silently win the cascade on source order alone despite equal specificity. This block
+   is meant to be the authoritative mobile floor regardless of what a given template
+   re-set locally — that's the point of centralizing it here rather than patching five
+   separate files piecemeal.
+
+   Two tiers only, kept deliberately close to the original design so this reads as a
+   readability fix, not a redesign:
+   - "Reading" tier → 16px: content meant to be read as sentences/paragraphs (fitment
+     copy, tab panels, short description, specs, delivery/collect fields and results).
+   - "Secondary" tier → 14px: short supporting lines (stock status, trust copy, package
+     rows, view-all links, install tag copy) — still comfortably above the old 11–13px,
+     short of full "reading" size since these were never meant to carry equal weight.
+   True badges/chips/pills (stock-chip, badge-save, cart-badge count) are intentionally
+   left out — enlarging those breaks their fixed pill/circle shapes; the worst offenders
+   there (reviews.io badge, ex-demo tag, package quantity, fitted-option sub-copy) were
+   already bumped in their base rules above, not gated to mobile only. */
+@media (max-width:640px){
+  .fitment{font-size:16px!important;}
+  .tabs .content{font-size:16px!important;}
+  .short-desc{font-size:16px!important;}
+  .value-prop{font-size:16px!important;}
+  .specs-table th,.specs-table td{font-size:15px!important;}
+  .guarantee-usps li{font-size:16px!important;}
+  .vehicle-fit-notes{font-size:15px!important;}
+  .dc-option,.dc-store{font-size:15px!important;}
+  .product-card h5{font-size:14.5px!important;}
+  /* Inputs specifically need >=16px on iOS Safari, or focusing one auto-zooms the whole
+     page in — a real, well-known mobile bug, not just a readability nicety here. */
+  .dc-input{font-size:16px!important;}
+
+  .muted{font-size:14px!important;}
+  .stock-status-line{font-size:14px!important;}
+  .package-item{font-size:14px!important;}
+  .trust-row p{font-size:14px!important;}
+  .pb-text{font-size:13px!important;}
+  .rrg-crumbs{font-size:13px!important;}
+  .sku-row{font-size:14px!important;}
+  .dc-viewall-row{font-size:13px!important;}
+  .install-cta-panel .install-tag{font-size:13.5px!important;}
+  .modal-head p{font-size:13px!important;}
+  .exdemo-option .eo-note{font-size:13px!important;}
 }

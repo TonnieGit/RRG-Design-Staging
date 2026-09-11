@@ -967,6 +967,63 @@ function initTabJumpLinks() {
   });
 }
 
+// Mobile nav drawer (2026-09-11, mobile audit) — .rrg-nav (Products / Store Finder /
+// Fit My Vehicle / Catalogue / Services) previously just display:none'd below 900px
+// with nothing replacing it, making the whole main nav unreachable on mobile/tablet.
+// Two hamburger triggers now exist (the top-of-page header and the sticky condensed
+// header, see .rrg-sticky-header below) — both open the same drawer, so this wires up
+// every .mobile-nav-toggle found rather than just the first. The drawer is
+// position:fixed (not absolute) since it needs to work correctly whichever header
+// triggered it — top's natural position vs. the sticky header's fixed position — so its
+// `top` offset is computed from whichever header the click came from, not fixed in CSS.
+// Otherwise mirrors initTemplateSwitcher()'s toggle/click-outside-to-close pattern.
+function initMobileNav() {
+  const toggles = document.querySelectorAll('.mobile-nav-toggle');
+  const nav = document.querySelector('.rrg-nav');
+  if (!toggles.length || !nav) return;
+  const setExpanded = (open) => toggles.forEach(t => t.setAttribute('aria-expanded', open));
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const header = toggle.closest('.rrg-sticky-header') || toggle.closest('.rrg-main-header');
+      if (header) nav.style.top = header.getBoundingClientRect().bottom + 'px';
+      const open = nav.classList.toggle('mobile-open');
+      setExpanded(open);
+    });
+  });
+  nav.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => {
+    nav.classList.remove('mobile-open');
+    setExpanded(false);
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900 && nav.classList.contains('mobile-open')) {
+      nav.classList.remove('mobile-open');
+      setExpanded(false);
+    }
+  });
+}
+
+// Search clear (x) button (2026-09-11, matched to client-supplied Figma export) — shown
+// only once the input has a value, clears + refocuses + hides itself on click. Generic
+// over every .rrg-search on the page (there's exactly one per template today, but this
+// doesn't assume that).
+function initSearchClear() {
+  document.querySelectorAll('.rrg-search').forEach(wrap => {
+    const input = wrap.querySelector('input');
+    const clearBtn = wrap.querySelector('.rrg-search-clear');
+    if (!input || !clearBtn) return;
+    const sync = () => { clearBtn.hidden = !input.value; };
+    input.addEventListener('input', sync);
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      sync();
+      input.focus();
+    });
+    sync();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   buildExdemoModal();
   buildStoreSlideout();
@@ -974,6 +1031,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initFitGalleryCarousel();
   initTemplateSwitcher();
   initTabJumpLinks();
+  initMobileNav();
+  initSearchClear();
+  // Sticky condensed mobile header (2026-09-11) — reuses the same sentinel/.visible
+  // mechanism already built for the desktop persistent decision bar: shows
+  // .rrg-sticky-header once .rrg-search (the top-of-page search row) scrolls out of
+  // view. Generic across all pages since every template has both elements identically.
+  initPersistentBar('.rrg-search', '.rrg-sticky-header');
 });
 
 function buildAdminPanel() {
@@ -989,9 +1053,29 @@ function buildAdminPanel() {
   const initialCollect = detectInitialCollectState();
   const initialFitGallery = detectInitialFitGalleryState();
   Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false });
-  // Interactive map is now the locked default for the Showroom Finder widget, all 5
-  // templates — no longer a Demo State Panel preview toggle.
-  applyShowroomMapFlag(true);
+  // Interactive map is the locked default for the Showroom Finder widget, all 5
+  // templates — no longer a Demo State Panel preview toggle. Layout (split-view,
+  // revealing #showroomMap) still applies immediately so there's no shift once the map
+  // loads, but the actual Leaflet init/tile fetch (2026-09-11, mobile audit — this used
+  // to eagerly load map tiles on every page load even when the widget was off-screen,
+  // a real mobile data/LCP cost) is deferred until the widget scrolls near the viewport.
+  const showroomMapEl = document.getElementById('showroomMap');
+  if (showroomMapEl) {
+    const showroomMapWidget = showroomMapEl.closest('.showroom-widget');
+    showroomMapEl.hidden = false;
+    if (showroomMapWidget) showroomMapWidget.classList.add('split-view');
+    if ('IntersectionObserver' in window) {
+      const showroomMapObserver = new IntersectionObserver((entries, obs) => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          applyShowroomMapFlag(true);
+          obs.disconnect();
+        }
+      }, { rootMargin: '600px 0px' });
+      showroomMapObserver.observe(showroomMapEl);
+    } else {
+      applyShowroomMapFlag(true);
+    }
+  }
 
   const fab = document.createElement('button');
   fab.type = 'button';
