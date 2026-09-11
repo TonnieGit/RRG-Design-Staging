@@ -377,12 +377,19 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 
 /* Stock status line — replaces the old generic "estimate shipping" copy with the
    product's actual stock state (mirrors the fitment-state colour language: green/amber/
-   red). Driven by the demo admin panel's 3-way "Stock status" control, see
+   red). Driven by the demo admin panel's 4-way "Stock status" control, see
    applyStockStatus() in shared.js — defaults to whatever's in the static markup below. */
 .stock-status-line{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:4px;}
 .stock-status-line.in-stock{color:var(--rrg-fits);}
 .stock-status-line.low-stock{color:var(--rrg-unknown);}
 .stock-status-line.not-in-stock{color:var(--rrg-nofit);}
+.stock-status-line.special-order{color:var(--rrg-unknown);}
+.stock-status-line.discontinued{color:var(--rrg-nofit);}
+
+/* Discontinued state (backlog item 23) keeps the last real selling price on screen
+   ("the price it was sold at") rather than hiding it — struck through, same visual
+   language as .price-was's original-price crossout when on sale. */
+.price-block.discontinued .price-now{text-decoration:line-through;color:#8a8a8a;}
 
 /* "On Display" pill — corrected 2026-09-10 (client feedback): belongs on individual store
    rows in the Click & Collect widget / store slide-out (a given store either has this
@@ -398,7 +405,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .payment-badge{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;flex:1;min-width:0;padding:0 14px;text-align:center;}
 .payment-badge:not(:first-child){border-left:1px solid var(--rrg-line);}
 .pb-logo{height:15px;width:auto;display:block;}
-.payment-badge.pb-zip .pb-logo{height:13px;}
 /* white-space:nowrap removed (2026-09-10) — forced the instalment line ("4 payments of
    $473.27") to stay on one line regardless of available width, which at narrow mobile
    widths (~390px) couldn't shrink to fit 3 badges side by side and forced the whole page
@@ -417,8 +423,13 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    out from the surrounding trust-copy grey, no underline needed at that weight/colour. */
 .trust-row p a[href^="tel:"]{color:var(--rrg-red);font-weight:900;text-decoration:none;}
 
-/* tabs (accordion, mirrors live-site pattern) */
-.tabs input{display:none;}
+/* tabs (accordion, mirrors live-site pattern). Scoped to the accordion's own direct-child
+   radio inputs (`>`, `[type="radio"]`) rather than a blanket `.tabs input` — backlog item
+   13 (2026-09-11) nested a real `.dc-widget` postcode text input inside a tab's `.content`,
+   and the old blanket selector was silently display:none-ing it along with every other
+   input anywhere inside the tabs (the intended target was always just these radio hacks,
+   which are real direct children of `.tabs`, siblings of their `<label>`/`.content`). */
+.tabs>input[type="radio"]{display:none;}
 .tabs label{display:block;padding:16px 4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;text-transform:uppercase;border-bottom:1px solid var(--rrg-line);cursor:pointer;position:relative;}
 .tabs label::after{content:'+';position:absolute;right:4px;font-size:20px;}
 .tabs input:checked + label::after{content:'\2212';}
@@ -645,6 +656,11 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    (background/border), only the yellow/orange text itself was hard to read. */
 .special-order-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#000;background:var(--rrg-unknown-bg);border:1px solid var(--rrg-unknown);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
 
+/* Discontinued banner — sits above Add to Cart in place of the button/payment-badges
+   (which are hidden via .cta-col[hidden] while this state is active), demo admin panel
+   "Discontinued" stock-status option, backlog item 23, 2026-09-11. */
+.discontinued-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-nofit);background:var(--rrg-nofit-bg);border:1px solid var(--rrg-nofit);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+
 /* Brand logo — required on every product page, sits at the top of the decision panel.
    Fixed height/auto width made MAXTRAX (and Front Runner, same source aspect ratio)
    render ~40% narrower than Rhino Rack/Yakima, since MAXTRAX's source file is a more
@@ -674,7 +690,8 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .package-items h5{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#767676;padding:10px 12px;margin:0;background:#f7f7f7;border-bottom:1px solid var(--rrg-line);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
 .package-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:12.5px;border-top:1px solid var(--rrg-line);}
 .package-item:first-of-type{border-top:none;}
-.package-item .pi-name{flex:1;color:#333;}
+.package-item .pi-name{flex:1;color:#333;text-decoration:none;}
+.package-item .pi-name:hover{text-decoration:underline;}
 /* Quantity per row (2026-09-10, Graham Sowerby meeting) — so a customer adding what looks
    like one product isn't confused when a multi-part kit arrives with no visible reason
    why. Real per-component quantities aren't confirmed by the client yet — see spec.md §7. */
@@ -697,7 +714,8 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    stock-status line itself (e.g. "In Stock — Ex-Demo/Factory Seconds from $1,495"), not a
    separate button (Graham Sowerby meeting, 2026-09-10 — a standalone button risked being
    missed; this needed to read as part of the existing stock line). Click opens the same
-   ex-demo modal as before. */
+   ex-demo slide-in drawer as before. UK region shows "Graded" instead of "Ex-Demo/Factory
+   Seconds" for this umbrella term (see exdemoTermLabel() in shared.js) — AU/NZ unaffected. */
 .exdemo-inline-link{color:#1A56DB;font-weight:700;text-decoration:underline;}
 .exdemo-inline-link:hover{color:#123f9e;}
 
@@ -721,14 +739,20 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    of the .fit-gallery-panel rules above; this is just outer spacing. */
 .fit-gallery-section.nested{margin:16px 0 0;}
 
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .15s ease;}
-.modal-backdrop.open{opacity:1;pointer-events:auto;}
-.modal-card{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.35);}
-.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 4px;}
-.modal-head h3{font-size:19px;margin:0 0 4px;}
-.modal-head p{font-size:12.5px;color:#666;margin:0;}
-.modal-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;flex:0 0 auto;color:#333;}
-.modal-body{padding:14px 22px 22px;display:flex;flex-direction:column;gap:12px;}
+/* Ex-Demo slide-out — right-edge drawer, backlog item 4 (2026-09-11: replaces the previous
+   centered modal to match the Store Slide-out pattern below). Structurally identical to
+   .store-slideout* — same backdrop/drawer/transition/close-button rules, just its own
+   class family since the two drawers are independent (only one open at a time in practice,
+   but nothing enforces that). */
+.exdemo-slideout-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.exdemo-slideout-backdrop.open{opacity:1;pointer-events:auto;}
+.exdemo-slideout{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
+.exdemo-slideout-backdrop.open .exdemo-slideout{transform:translateX(0);}
+.exdemo-slideout-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
+.exdemo-slideout-head h3{font-size:19px;margin:0 0 4px;}
+.exdemo-slideout-head p{font-size:12.5px;color:#666;margin:0;}
+.exdemo-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;flex:0 0 auto;color:#333;}
+.exdemo-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;flex:1 1 auto;}
 .exdemo-option{border:1px solid var(--rrg-line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
 .exdemo-option .eo-img{width:64px;height:64px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:6px;flex:0 0 auto;}
 .exdemo-option .eo-info{flex:1;min-width:0;}
@@ -741,16 +765,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
   .exdemo-option{flex-wrap:wrap;}
   .exdemo-option .btn{flex:1 0 100%;}
 }
-
-/* rationale panel */
-.rationale{background:var(--rrg-bg);border-top:4px solid var(--rrg-red);margin-top:56px;padding:40px 0 64px;}
-.rationale h2{font-size:28px;}
-.rationale .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:20px;}
-.rationale .card{background:#fff;border:1px solid var(--rrg-line);border-radius:var(--radius);padding:20px;}
-.rationale .card h4{font-size:13px;letter-spacing:.04em;color:var(--rrg-red);margin-bottom:8px;}
-.rationale .card p{font-size:14px;color:#333;margin:0;}
-.rationale .tradeoff{border-left:3px solid var(--rrg-unknown);}
-.rationale .cite{font-size:12px;color:#767676;font-style:italic;margin-top:6px;}
 
 /* Delivery / Click & Collect widget — full-width, two tabs. Reworked 2026-09-10 (Graham
    Sowerby meeting): single postcode field shared across both tabs (.dc-postcode-row, sits
@@ -790,8 +804,8 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Store slide-out — right-edge drawer, "View all stores" from the Click & Collect and
    Showroom Finder widgets. Real store network (RRG_STORE_NETWORK in shared.js), grouped by
    state to match the live site's own Store Inventory slide-out. Reuses .dc-store/.stock-chip
-   row styling for visual consistency with the inline results, same modal-backdrop
-   convention as the Ex-Demo modal but as a slide-in panel. */
+   row styling for visual consistency with the inline results, same right-edge slide-in
+   drawer convention as .exdemo-slideout* above (independent instance). */
 .store-slideout-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s ease;}
 .store-slideout-backdrop.open{opacity:1;pointer-events:auto;}
 .store-slideout{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
@@ -799,9 +813,18 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .store-slideout-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
 .store-slideout-head h3{font-size:19px;margin:0;}
 .store-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;color:#333;flex:0 0 auto;}
-.store-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex:1 1 auto;}
-.store-slideout-state{font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--rrg-red);margin:14px 0 2px;}
-.store-slideout-state:first-child{margin-top:0;}
+.store-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;flex:1 1 auto;}
+/* Groups (2026-09-11, backlog item 14): native <details>/<summary>, same no-JS accordion
+   convention as .faq-item below — "Within 100km" (when a postcode resolves to a state, see
+   renderStoreSlideoutBody()/postcodeToState() in shared.js) starts open, every state group
+   starts collapsed alongside it so the nearby stores are what a shopper sees first. */
+.store-slideout-group{border-bottom:1px solid var(--rrg-line);padding-bottom:6px;}
+.store-slideout-group:last-child{border-bottom:none;padding-bottom:0;}
+.store-slideout-state{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--rrg-red);padding:10px 2px;}
+.store-slideout-state::-webkit-details-marker{display:none;}
+.store-slideout-state::after{content:'+';font-size:16px;color:#767676;flex:0 0 auto;}
+.store-slideout-group[open] .store-slideout-state::after{content:'\2212';}
+.store-slideout-group-stores{display:flex;flex-direction:column;gap:10px;padding:0 0 10px;}
 /* Padding + negative margin (2026-09-11, mobile audit), same partial-tap-target
    convention as .sku-copy above — these are real conversion actions (call a store, open
    its map) that were plain 12px inline text with no hit-area padding at all. */
@@ -1029,6 +1052,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
   .sku-row{font-size:14px!important;}
   .dc-viewall-row{font-size:13px!important;}
   .install-cta-panel .install-tag{font-size:13.5px!important;}
-  .modal-head p{font-size:13px!important;}
+  .exdemo-slideout-head p{font-size:13px!important;}
   .exdemo-option .eo-note{font-size:13px!important;}
 }

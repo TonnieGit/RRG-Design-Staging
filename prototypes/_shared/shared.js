@@ -189,9 +189,17 @@ function revealResults(resultsId) {
 // same bug the Collect tab had already been fixed for). The "In stock and on display in N
 // stores — View all stores" line stays visible either way; only the named store rows are
 // gated. Delivery's `.dc-postcode-prompt` swaps places with its results the same way.
+//
+// Backlog item 13 (2026-09-11): a second `.dc-widget` now also lives at the top of the
+// Shipping Info tab on every template, so this function runs once per widget on the page
+// (root.querySelectorAll below). Committing a postcode in either one calls syncDcPostcode()
+// below, which mirrors the value into every other `.dc-widget` and re-runs their own
+// update() — "pre-filled if a postcode was entered anywhere else in the session" applies
+// live, in both directions, not just once at load. The postcode input is found via
+// `[data-dc-postcode]` (not an id) since a page can now carry more than one.
 function initDcPostcode(root = document) {
   root.querySelectorAll('.dc-widget').forEach(widget => {
-    const input = widget.querySelector('#dcPostcode, [data-dc-postcode]');
+    const input = widget.querySelector('[data-dc-postcode]');
     const btn = widget.querySelector('[data-dc-update]');
     const line = widget.querySelector('.dc-viewall-line');
     const collectResults = widget.querySelector('[data-dc-panel="collect"] .dc-results');
@@ -221,10 +229,46 @@ function initDcPostcode(root = document) {
       if (deliveryResults) deliveryResults.hidden = !val || !regionOk;
       if (deliveryPrompt) deliveryPrompt.hidden = !!val && regionOk;
     };
-    btn.addEventListener('click', update);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); update(); } });
+    input._dcUpdate = update;
+    const commit = () => syncDcPostcode(input.value.trim());
+    btn.addEventListener('click', commit);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
     update();
   });
+}
+
+// Mirrors a postcode typed into any one `.dc-widget` into every other one on the page (see
+// initDcPostcode() above) and, AU-only, re-renders the Store Slide-out's "Within 100km"
+// grouping (backlog item 14 — see renderStoreSlideoutBody()/postcodeToState() below) so it
+// reflects whatever postcode is currently live, without needing separate wiring.
+function syncDcPostcode(value) {
+  document.querySelectorAll('.dc-widget [data-dc-postcode]').forEach(input => {
+    input.value = value;
+    if (input._dcUpdate) input._dcUpdate();
+  });
+  renderStoreSlideoutBody(currentRegion === 'AU' ? postcodeToState(value) : null);
+}
+
+// Real AU postcode-digit ranges (Australia Post's own zoning, not a fabricated guess) — used
+// only to work out which state's stores to promote into the Store Slide-out's "Within 100km"
+// group (backlog item 14). This is genuine postal-district logic, not literal distance/
+// geocoding, which this prototype has never had (same flagged gap as the Showroom map's own
+// postcode search) — same "demo precision, real underlying relationship" convention as the
+// rest of this project's store data.
+function postcodeToState(postcode) {
+  const trimmed = String(postcode || '').trim();
+  if (!/^\d{4}$/.test(trimmed)) return null;
+  const n = parseInt(trimmed, 10);
+  if (n >= 2600 && n <= 2618) return 'Australian Capital Territory';
+  if (n >= 2900 && n <= 2920) return 'Australian Capital Territory';
+  if (n >= 1000 && n <= 2999) return 'New South Wales';
+  if ((n >= 3000 && n <= 3999) || (n >= 8000 && n <= 8999)) return 'Victoria';
+  if ((n >= 4000 && n <= 4999) || (n >= 9000 && n <= 9999)) return 'Queensland';
+  if (n >= 5000 && n <= 5999) return 'South Australia';
+  if (n >= 6000 && n <= 6999) return 'Western Australia';
+  if (n >= 7000 && n <= 7999) return 'Tasmania';
+  if (n >= 800 && n <= 999) return 'Northern Territory';
+  return null;
 }
 
 // Persistent decision bar — shows once the given sentinel element scrolls above the viewport.
@@ -300,7 +344,7 @@ document.addEventListener('DOMContentLoaded', initGalleryCarousels);
 // beyond one optional reapplySaleFlag() call pages with their own re-render loop should
 // make at the end of it (see config-variant / sibling-color).
 
-const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, fitGallery: true, vehicleFitNotes: false };
+const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, fitGallery: true, vehicleFitNotes: false };
 
 function detectInitialVideoState() {
   const pairedRow = document.querySelector('.install-media-row');
@@ -383,23 +427,61 @@ function syncSaleTag(block) {
   if (tag && wasEl) tag.hidden = wasEl.hidden;
 }
 
-// Keeps the Afterpay/PayPal/Zip amount text under the current price — Afterpay and
-// PayPal's "Pay in 4" split the price evenly across 4 instalments; Zip's badge advertises
-// a weekly rate (its real widget quotes "as low as $X/week" over a longer term than 4
-// payments), approximated here as price/10 rounded up to the dollar, floored at $10.
+// Payment-plan badge provider set, per region (backlog items 31/31a, 2026-09-11): AU keeps
+// Afterpay + PayPal ("Pay in 4" each) + Zip (weekly rate); NZ drops Zip entirely (not offered
+// there — array just has 2 entries, syncPaymentBadges() below hides whatever slot is left
+// over generically); UK swaps to a different 3-provider set — Clearpay (Afterpay's UK/EU
+// brand, same "Pay in 4" structure) + PayPal (same provider, but "Pay in 3" — ÷3 not ÷4) +
+// Klarna (a separate "Pay in 3" provider from PayPal's own, kept as its own badge rather than
+// merged/deduped, confirmed with Brenton). Zip's weekly-rate formula is unchanged from before
+// this rework: approximates its real "as low as $X/week" widget as price/10 rounded up to the
+// dollar, floored at $10.
+function paymentBadgeSet(region) {
+  const payIn4 = price => `4 payments of ${fmtAud(price / 4)}`;
+  const payIn3 = price => `3 payments of ${fmtAud(price / 3)}`;
+  const zipWeekly = price => `From ${regionCurrencySymbol()}${Math.max(10, Math.ceil(price / 10))} a week`;
+
+  if (region === 'UK') {
+    return [
+      { src: 'clearpay.svg', alt: 'Clearpay', text: payIn4 },
+      { src: 'paypal.svg', alt: 'PayPal', text: payIn3 },
+      { src: 'klarna.svg', alt: 'Klarna', text: payIn3 }
+    ];
+  }
+  if (region === 'NZ') {
+    return [
+      { src: 'afterpay.svg', alt: 'Afterpay', text: payIn4 },
+      { src: 'paypal.svg', alt: 'PayPal', text: payIn4 }
+    ];
+  }
+  return [
+    { src: 'afterpay.svg', alt: 'Afterpay', text: payIn4 },
+    { src: 'paypal.svg', alt: 'PayPal', text: payIn4 },
+    { src: 'zip.svg', alt: 'Zip', text: zipWeekly, height: '13px' }
+  ];
+}
+
+// Fills each of the 3 generic .payment-badge slots (logo + instalment text) from the current
+// region's provider set — runs on load and after every price-changing render (via
+// reapplySaleFlag()) and on every region switch (via applyRegion()), so it always reflects
+// both the current price and the current region's provider set. A region with fewer than 3
+// providers (NZ) just hides the leftover slot(s); the flex row re-centers on its own since
+// .payment-badge{flex:1} + a hidden 3rd child collapses out of the layout with no gap.
 function syncPaymentBadges(block) {
   const panel = block.closest('.decision-panel');
   const badges = panel && panel.querySelector('.payment-badges');
   if (!badges) return;
   const price = currentPagePrice(block);
-  const quarter = fmtAud(price / 4);
-  const weekly = Math.max(10, Math.ceil(price / 10));
-  const afterpayText = badges.querySelector('[data-pb-amount="afterpay"]');
-  const paypalText = badges.querySelector('[data-pb-amount="paypal"]');
-  const zipText = badges.querySelector('[data-pb-amount="zip"]');
-  if (afterpayText) afterpayText.textContent = `4 payments of ${quarter}`;
-  if (paypalText) paypalText.textContent = `4 payments of ${quarter}`;
-  if (zipText) zipText.textContent = `From ${regionCurrencySymbol()}${weekly} a week`;
+  const set = paymentBadgeSet(currentRegion);
+  badges.querySelectorAll('.payment-badge').forEach((el, i) => {
+    const entry = set[i];
+    el.hidden = !entry;
+    if (!entry) return;
+    const img = el.querySelector('.pb-logo');
+    const text = el.querySelector('.pb-text');
+    if (img) { img.src = `../_shared/payment-logos/${entry.src}`; img.alt = entry.alt; img.style.height = entry.height || ''; }
+    if (text) text.textContent = entry.text(price);
+  });
 }
 
 // Hides the real sale price/badge if the panel currently has "on sale" switched off, and
@@ -439,39 +521,52 @@ function setSaleFlag(on) {
   reapplySaleFlag();
 }
 
-// Three real stock states (was a plain in-stock/out-of-stock boolean) — the decision
+// Five real stock states (was a plain in-stock/out-of-stock boolean) — the decision
 // panel's .stock-status-line reflects whichever is selected in the demo admin panel's
 // "Stock status" radio group. Low Stock reads as a warning but doesn't block purchase;
-// Not in Stock blocks it the same way the old "out of stock" toggle did.
+// Not in Stock blocks it the same way the old "out of stock" toggle did. Special Order
+// used to be a separate checkbox layered on top of whichever status was showing (backlog
+// item 25 flagged this as contradictory, e.g. "✓ In Stock" plus an ordered-in banner at
+// the same time) — folded in as a 4th mutually-exclusive value instead, so it fully
+// replaces the label rather than sitting alongside it. Discontinued (backlog item 23,
+// 2026-09-11) is a 5th value on the same principle — a discontinued item can't also be
+// "In Stock," so it belongs in this same mutually-exclusive set rather than a separate
+// toggle layered on top. ctaLabel drives the generic [data-cta-label] disabled-button
+// text in applyStockStatus() below, so every blocksCta state can have its own wording
+// without a special-cased branch.
 const STOCK_STATUS = {
-  in_stock: { text: '✓ In Stock', cls: 'in-stock', blocksCta: false },
-  low_stock: { text: '⚠ Low Stock — order soon', cls: 'low-stock', blocksCta: false },
-  not_in_stock: { text: '✕ Not in Stock — Contact our team', cls: 'not-in-stock', blocksCta: true }
+  in_stock: { text: '✓ In Stock', cls: 'in-stock', blocksCta: false, specialOrder: false },
+  low_stock: { text: '⚠ Low Stock — order soon', cls: 'low-stock', blocksCta: false, specialOrder: false },
+  not_in_stock: { text: '✕ Not in Stock — Contact our team', cls: 'not-in-stock', blocksCta: true, specialOrder: false, ctaLabel: 'Out Of Stock' },
+  special_order: { text: '⏱ Special Order — Ships in 5-7 Days', cls: 'special-order', blocksCta: false, specialOrder: true },
+  discontinued: { text: '⛔ Discontinued — No Longer Available', cls: 'discontinued', blocksCta: true, specialOrder: false, discontinued: true, ctaLabel: 'Discontinued' }
 };
 
 // Renders a .stock-status-line's base text/class from the current stock state, then
 // appends the B-Stock/Ex-Demo suffix inline when that admin flag is on — e.g.
-// "In Stock — Ex-Demo/Factory Seconds from $1,495" with the price as a clickable link into
-// the existing ex-demo modal. Replaces the old standalone .exdemo-cta button (Graham
-// Sowerby meeting, 2026-09-10: this needed to read as part of the stock line, not its own
-// button-weight element).
+// "In Stock — Ex-Demo/Factory Seconds from $1,495" (UK: "In Stock — Graded from £1,495" —
+// see exdemoCopy() below) with the price as a clickable link into the ex-demo slide-in
+// drawer. Replaces the old standalone .exdemo-cta button (Graham Sowerby meeting,
+// 2026-09-10: this needed to read as part of the stock line, not its own button-weight
+// element). Re-run by applyRegion() too, so this text/wording flips live if the region
+// switches while the drawer's trigger is already visible.
 function renderStockLine(line) {
   const cfg = STOCK_STATUS[adminState.stockStatus] || STOCK_STATUS.in_stock;
   line.className = 'stock-status-line ' + cfg.cls;
   line.textContent = cfg.text;
-  if (!adminState.exdemo) return;
+  if (!adminState.exdemo || cfg.discontinued) return;
   const block = line.closest('.price-block');
   const basePrice = block ? currentPagePrice(block) : 0;
   const from = buildExdemoOptions(basePrice).reduce((min, o) => Math.min(min, o.price), Infinity);
   const link = document.createElement('a');
   link.href = '#';
   link.className = 'exdemo-inline-link';
-  link.textContent = `Ex-Demo/Factory Seconds from ${fmtAud(from)}`;
+  link.textContent = `${exdemoCopy().inline} from ${fmtAud(from)}`;
   link.addEventListener('click', e => {
     e.preventDefault();
     const titleEl = document.querySelector('h1');
     const imgEl = document.querySelector('#mainImg, .gallery-main img');
-    openExdemoModal(basePrice, titleEl ? titleEl.textContent : 'This product', imgEl ? imgEl.src : '');
+    openExdemoSlideout(basePrice, titleEl ? titleEl.textContent : 'This product', imgEl ? imgEl.src : '');
   });
   line.append(' — ', link);
 }
@@ -480,22 +575,47 @@ function applyStockStatus(status) {
   adminState.stockStatus = status;
   const cfg = STOCK_STATUS[status] || STOCK_STATUS.in_stock;
   document.querySelectorAll('.stock-status-line').forEach(renderStockLine);
+  document.querySelectorAll('.price-block').forEach(block => {
+    block.classList.toggle('discontinued', !!cfg.discontinued);
+  });
+  document.querySelectorAll('.discontinued-alternates').forEach(el => {
+    el.hidden = !cfg.discontinued;
+  });
   document.querySelectorAll('.cta-col').forEach(col => {
     const parent = col.parentNode;
     const banner = parent.querySelector(':scope > .stock-banner');
-    if (cfg.blocksCta && !banner) {
+    if (cfg.blocksCta && !cfg.discontinued && !banner) {
       const el = document.createElement('div');
       el.className = 'stock-banner';
       el.textContent = '✕ Currently out of stock';
       parent.insertBefore(el, col);
-    } else if (!cfg.blocksCta && banner) {
+    } else if ((!cfg.blocksCta || cfg.discontinued) && banner) {
       banner.remove();
     }
+    const specialBanner = parent.querySelector(':scope > .special-order-banner');
+    if (cfg.specialOrder && !specialBanner) {
+      const el = document.createElement('div');
+      el.className = 'special-order-banner';
+      el.innerHTML = '⏱ <strong>Note:</strong> This item is ordered in as required, please allow 5-7 business days before item is ready';
+      parent.insertBefore(el, col);
+    } else if (!cfg.specialOrder && specialBanner) {
+      specialBanner.remove();
+    }
+    const discBanner = parent.querySelector(':scope > .discontinued-banner');
+    if (cfg.discontinued && !discBanner) {
+      const el = document.createElement('div');
+      el.className = 'discontinued-banner';
+      el.innerHTML = '⛔ This product has been discontinued and is no longer available for purchase — see similar alternatives below.';
+      parent.insertBefore(el, col);
+    } else if (!cfg.discontinued && discBanner) {
+      discBanner.remove();
+    }
+    col.hidden = !!cfg.discontinued;
   });
   if (cfg.blocksCta) {
     document.querySelectorAll('[data-cta-label]').forEach(btn => {
       btn.disabled = true;
-      btn.textContent = 'Out Of Stock';
+      btn.textContent = cfg.ctaLabel || 'Out Of Stock';
       btn.classList.remove('btn-primary');
       btn.classList.add('btn-outline');
     });
@@ -557,27 +677,13 @@ function applyAvailabilityFlags(shipping, collect) {
   });
 }
 
-function applySpecialOrderFlag(on) {
-  adminState.specialOrder = on;
-  document.querySelectorAll('.cta-col').forEach(col => {
-    const parent = col.parentNode;
-    const banner = parent.querySelector(':scope > .special-order-banner');
-    if (on && !banner) {
-      const el = document.createElement('div');
-      el.className = 'special-order-banner';
-      el.innerHTML = '⏱ <strong>Note:</strong> This item is ordered in as required, please allow 5-7 business days before item is ready';
-      parent.insertBefore(el, col);
-    } else if (!on && banner) {
-      banner.remove();
-    }
-  });
-}
-
 // ---- Ex-Demo / Factory Seconds (B-Stock) ----
-// A CTA next to price that opens a modal with 2-3 placeholder ex-demo/factory-second/
-// sellable-return options, priced as a discount off whatever the page's real current price
-// is (read live from .price-now, so it tracks variant/colour switches automatically).
-const EXDEMO_STORES = ['Moorebank, NSW', 'Castle Hill, NSW', 'North Lakes, QLD', 'Smeaton Grange, NSW'];
+// A CTA next to price that opens a slide-in drawer (buildExdemoSlideout() below, backlog
+// item 4: converted 2026-09-11 from a centered modal to match the Store Slide-out pattern)
+// with 3 placeholder ex-demo/factory-second/sellable-return options, priced as a discount
+// off whatever the page's real current price is (read live from .price-now, so it tracks
+// variant/colour switches automatically). Each option's store name is region-aware —
+// exdemoStoreName() below — rather than the old standalone fabricated EXDEMO_STORES list.
 const EXDEMO_OPTION_SPECS = [
   { tag: 'Ex-Demo', cut: 0.30 },
   { tag: 'Sellable Return', cut: 0.22 },
@@ -594,11 +700,41 @@ function regionCurrencySymbol() { return currentRegion === 'UK' ? '£' : '$'; }
 
 function fmtAud(n) { return regionCurrencySymbol() + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+// UK (The Roof Box Company) calls this umbrella term "Graded" instead of "Ex-Demo/Factory
+// Seconds" — confirmed 2026-09-11, backlog item 4 follow-up. UK-only; AU/NZ keep the
+// original wording. The 3 individual option tags above (Ex-Demo/Sellable Return/Factory
+// Second) are specific conditions, not this umbrella term, so they're unaffected in every
+// region. Same safe-to-reference-currentRegion-here reasoning as regionCurrencySymbol().
+function exdemoCopy() {
+  return currentRegion === 'UK'
+    ? { heading: 'Graded Stock', inline: 'Graded' }
+    : { heading: 'Ex-Demo & Factory Seconds', inline: 'Ex-Demo/Factory Seconds' };
+}
+
+// Real store name per option, region-aware (RRG_STORE_NETWORK/REGION_SINGLE_STORES are both
+// declared further down this file — safe to reference here for the same hoisting reason as
+// regionCurrencySymbol() above). AU cycles through every real store (flattened + cached on
+// first use); NZ/UK only have one region store, so all 3 options show that same one.
+const STATE_ABBR = {
+  'New South Wales': 'NSW', 'Victoria': 'VIC', 'South Australia': 'SA', 'Tasmania': 'TAS',
+  'Queensland': 'QLD', 'Australian Capital Territory': 'ACT', 'Western Australia': 'WA'
+};
+let _exdemoAuStoreNames = null;
+function exdemoStoreName(i) {
+  if (currentRegion !== 'AU') return `${REGION_SINGLE_STORES[currentRegion].name}, ${currentRegion}`;
+  if (!_exdemoAuStoreNames) {
+    _exdemoAuStoreNames = RRG_STORE_NETWORK.flatMap(group =>
+      group.stores.map(s => `${s.name}, ${STATE_ABBR[group.state] || group.state}`)
+    );
+  }
+  return _exdemoAuStoreNames[i % _exdemoAuStoreNames.length];
+}
+
 function buildExdemoOptions(basePrice) {
   return EXDEMO_OPTION_SPECS.map((spec, i) => {
     const price = Math.max(5, Math.round((basePrice * (1 - spec.cut)) / 5) * 5);
     const collectOnly = basePrice > 500 && i === 0;
-    const store = EXDEMO_STORES[i % EXDEMO_STORES.length];
+    const store = exdemoStoreName(i);
     return {
       tag: spec.tag,
       price,
@@ -608,35 +744,38 @@ function buildExdemoOptions(basePrice) {
   });
 }
 
-function buildExdemoModal() {
-  if (document.getElementById('exdemoBackdrop')) return;
+// Right-edge slide-in drawer — same convention as buildStoreSlideout() below (one shared
+// backdrop/drawer built once per page, reused on every open).
+function buildExdemoSlideout() {
+  if (document.getElementById('exdemoSlideoutBackdrop')) return;
   const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop';
-  backdrop.id = 'exdemoBackdrop';
+  backdrop.className = 'exdemo-slideout-backdrop';
+  backdrop.id = 'exdemoSlideoutBackdrop';
   backdrop.innerHTML = `
-    <div class="modal-card">
-      <div class="modal-head">
-        <div><h3>Ex-Demo &amp; Factory Seconds</h3><p id="exdemoModalSub"></p></div>
-        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+    <div class="exdemo-slideout">
+      <div class="exdemo-slideout-head">
+        <div><h3 id="exdemoSlideoutTitle">Ex-Demo &amp; Factory Seconds</h3><p id="exdemoSlideoutSub"></p></div>
+        <button type="button" class="exdemo-slideout-close" aria-label="Close">&times;</button>
       </div>
-      <div class="modal-body" id="exdemoModalBody"></div>
+      <div class="exdemo-slideout-body" id="exdemoSlideoutBody"></div>
     </div>
   `;
   document.body.appendChild(backdrop);
-  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeExdemoModal(); });
-  backdrop.querySelector('.modal-close').addEventListener('click', closeExdemoModal);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeExdemoSlideout(); });
+  backdrop.querySelector('.exdemo-slideout-close').addEventListener('click', closeExdemoSlideout);
 }
 
-function closeExdemoModal() {
-  const backdrop = document.getElementById('exdemoBackdrop');
+function closeExdemoSlideout() {
+  const backdrop = document.getElementById('exdemoSlideoutBackdrop');
   if (backdrop) backdrop.classList.remove('open');
 }
 
-function openExdemoModal(basePrice, productTitle, imageSrc) {
-  const backdrop = document.getElementById('exdemoBackdrop');
+function openExdemoSlideout(basePrice, productTitle, imageSrc) {
+  const backdrop = document.getElementById('exdemoSlideoutBackdrop');
   if (!backdrop) return;
-  document.getElementById('exdemoModalSub').textContent = `${productTitle} — sold as-is, inspected and covered by our standard guarantee.`;
-  document.getElementById('exdemoModalBody').innerHTML = buildExdemoOptions(basePrice).map(o => `
+  document.getElementById('exdemoSlideoutTitle').textContent = exdemoCopy().heading;
+  document.getElementById('exdemoSlideoutSub').textContent = `${productTitle} — sold as-is, inspected and covered by our standard guarantee.`;
+  document.getElementById('exdemoSlideoutBody').innerHTML = buildExdemoOptions(basePrice).map(o => `
     <div class="exdemo-option">
       ${imageSrc ? `<img class="eo-img" src="${imageSrc}" alt="${productTitle}">` : ''}
       <div class="eo-info">
@@ -745,8 +884,8 @@ function rrgStorePillsHTML(name, status) {
 // ---- Store slide-out ("View all stores", Click & Collect + Showroom Finder widgets,
 // 2026-09-10) ----
 // Lists the full real store network (RRG_STORE_NETWORK above), grouped by state to match
-// the live site's own Store Inventory slide-out. Same modal-backdrop-as-once-per-page
-// convention as buildExdemoModal(), but as a slide-in drawer rather than a centered card.
+// the live site's own Store Inventory slide-out. Same once-per-page drawer convention as
+// buildExdemoSlideout() above (both are right-edge slide-ins, independent of each other).
 // Multiple triggers on one page (Click & Collect's link and, where present, the Showroom
 // Finder's) all open the same drawer.
 function buildStoreSlideout() {
@@ -765,22 +904,47 @@ function buildStoreSlideout() {
     </div>
   `;
   document.body.appendChild(backdrop);
-  document.getElementById('storeSlideoutBody').innerHTML = RRG_STORE_NETWORK.map(group => `
-    <h5 class="store-slideout-state">${group.state}</h5>
-    ${group.stores.map(s => `
-      <div class="dc-store">
-        <div>
-          <strong>${s.name}</strong>${rrgStorePillsHTML(s.name, 'in')}<br>
-          <span class="muted">${s.street}, ${s.city} ${s.postcode}</span><br>
-          <a class="store-phone" href="tel:${s.phone.replace(/[^0-9+]/g, '')}">${s.phone}</a>
-          <a class="store-map-link" href="${s.mapLink}" target="_blank" rel="noopener noreferrer">View on map</a>
-        </div>
-      </div>
-    `).join('')}
-  `).join('');
+  renderStoreSlideoutBody(null);
   backdrop.addEventListener('click', e => { if (e.target === backdrop) closeStoreSlideout(); });
   backdrop.querySelector('.store-slideout-close').addEventListener('click', closeStoreSlideout);
   triggers.forEach(trigger => trigger.addEventListener('click', e => { e.preventDefault(); openStoreSlideout(); }));
+}
+
+// Store slide-out body — split out from buildStoreSlideout() (2026-09-11, backlog item 14)
+// so it can be re-run any time the shared postcode changes (see syncDcPostcode() above), not
+// just once at page load. When `nearState` resolves (via postcodeToState()), that state's
+// real stores are promoted into a "Within 100km" group at the top, open by default, and left
+// out of the state list below so it isn't shown twice; every other state remains reachable
+// below as a closed accordion group. With no `nearState` (no postcode yet, or a non-AU
+// region), every state group renders open, matching this widget's original always-visible
+// flat order. Native `<details>/<summary>`, same no-JS accordion convention as the FAQ
+// section (`.faq-item` in shared.css).
+function renderStoreSlideoutBody(nearState) {
+  const body = document.getElementById('storeSlideoutBody');
+  if (!body) return;
+  const storeRowHTML = s => `
+    <div class="dc-store">
+      <div>
+        <strong>${s.name}</strong>${rrgStorePillsHTML(s.name, 'in')}<br>
+        <span class="muted">${s.street}, ${s.city} ${s.postcode}</span><br>
+        <a class="store-phone" href="tel:${s.phone.replace(/[^0-9+]/g, '')}">${s.phone}</a>
+        <a class="store-map-link" href="${s.mapLink}" target="_blank" rel="noopener noreferrer">View on map</a>
+      </div>
+    </div>
+  `;
+  const groupHTML = (label, stores, open) => `
+    <details class="store-slideout-group"${open ? ' open' : ''}>
+      <summary class="store-slideout-state">${label}</summary>
+      <div class="store-slideout-group-stores">${stores.map(storeRowHTML).join('')}</div>
+    </details>
+  `;
+  const nearGroup = nearState ? RRG_STORE_NETWORK.find(g => g.state === nearState) : null;
+  let html = nearGroup ? groupHTML('Within 100km', nearGroup.stores, true) : '';
+  RRG_STORE_NETWORK.forEach(group => {
+    if (nearGroup && group.state === nearGroup.state) return;
+    html += groupHTML(group.state, group.stores, !nearGroup);
+  });
+  body.innerHTML = html;
 }
 
 function openStoreSlideout() {
@@ -869,7 +1033,7 @@ function renderShowroomMapPins(region) {
     const s = REGION_SINGLE_STORES[region];
     if (!s) return;
     showroomPinLayer = L.marker([s.lat, s.lng], { icon: rrgPinIcon(true), rrgOnDisplay: true })
-      .bindPopup(`<strong>${s.name} Store</strong><br>${s.note}<br>On Display`)
+      .bindPopup(`<strong>${s.name} Store</strong><br>${s.address}<br>On Display`)
       .addTo(showroomLeafletMap);
     showroomLeafletMap.setView([s.lat, s.lng], 12);
   }
@@ -905,10 +1069,22 @@ function applyShowroomMapFlag(on) {
 // would look like on this page, not real business fact. Their address/copy below is
 // explicitly placeholder (flagged in DEVELOPER-BRIEF.md's Region-specific heading copy
 // note) — don't mistake it for real store data if this file is read out of context.
+// Real data, sourced 2026-09-11 (backlog items 29/30) — replaces the earlier fabricated
+// placeholders (NZ had no real address/phone, UK was wrongly labelled "London"; the real
+// store's own town is Bolton, even though the listing itself is titled "Manchester North
+// Store"). Changing UK's `name` here fixes both the Showroom Finder heading
+// (applyRegionShowroomHeading()) and the Click & Collect "On display at the ___ Store" line
+// (initDcPostcode()) at once, since both already read from this one field.
 const REGION_SINGLE_STORES = {
-  NZ: { name: 'Auckland', lat: -36.8485, lng: 174.7633, note: 'Address TBD — placeholder for prototype' },
-  UK: { name: 'London', lat: 51.5074, lng: -0.1278, note: 'Real UK store TBD — placeholder for prototype' }
+  NZ: { name: 'Auckland', address: '195A Wairau Road, Wairau Valley, Auckland, 0627', phone: '09 481 1910', lat: -36.7747, lng: 174.7381, note: 'Roof Racks Galore, Auckland — roofracksgalore.co.nz/contact-us' },
+  UK: { name: 'Bolton', address: 'Unit B9, Edge Fold Industrial Estate, Plodder Lane, Farnworth, Bolton, BL4 0LR', phone: '01204 899778', lat: 53.5503, lng: -2.3882, note: 'The Roof Box Company, Manchester North Store — roofbox.co.uk/locations/manchester-north.php' }
 };
+
+// Trust Row phone number (backlog item 28, 2026-09-11) — real numbers per region. Applied
+// separately from REGION_TRUST_COPY below since this item's markup nests a <a href="tel:">
+// inside its <p> (`<p>Contact us on: <a href="tel:...">...</a></p>`), which a plain
+// `p.textContent = ...` swap (as used for the other two trust items) would silently destroy.
+const REGION_PHONE = { AU: '1300 071 264', NZ: '09 481 1910', UK: '01204 899778' };
 
 const REGION_LABELS = { AU: 'Australia', NZ: 'New Zealand', UK: 'United Kingdom' };
 const REGION_FLAGS = { AU: '🇦🇺', NZ: '🇳🇿', UK: '🇬🇧' };
@@ -931,7 +1107,7 @@ const REGION_TRUST_COPY = {
   },
   UK: {
     founded: { h4: 'Trusted Since 1989', p: 'Now serving the United Kingdom' },
-    network: { h4: 'Visit In Person', p: 'Check it out at our London showroom' }
+    network: { h4: 'Visit In Person', p: 'Check it out at our Bolton showroom' }
   }
 };
 
@@ -946,6 +1122,18 @@ function applyRegionShowroomHeading(region, heading) {
   heading.textContent = region === 'AU'
     ? heading.dataset.auHeading
     : `See It In Person — On Display At the ${REGION_SINGLE_STORES[region].name} Store`;
+}
+
+// Utility bar "Your Nearest Store" (backlog item 32, 2026-09-11) — was hardcoded per-template
+// AU text ("North Lakes"), not wired into the region cascade at all. Same restore-on-AU
+// caching pattern as applyRegionShowroomHeading() above: cache the real per-page AU value the
+// first time this runs, NZ/UK reuse the same REGION_SINGLE_STORES name already driving the
+// Showroom heading and Click & Collect single-store copy (Auckland/Bolton for free).
+function applyRegionNearestStore(region) {
+  const link = document.querySelector('[data-region-nearest-store]');
+  if (!link) return;
+  if (!link.dataset.auStore) link.dataset.auStore = link.textContent;
+  link.textContent = region === 'AU' ? link.dataset.auStore : REGION_SINGLE_STORES[region].name;
 }
 
 function applyRegion(region) {
@@ -993,6 +1181,29 @@ function applyRegion(region) {
     if (h4) h4.textContent = c.h4;
     if (p) p.textContent = c.p;
   });
+
+  // Trust row phone number (backlog item 28) — real number per region, see REGION_PHONE
+  // above for why this is a separate pass from the founded/network copy loop.
+  const phone = REGION_PHONE[region];
+  document.querySelectorAll('[data-trust="phone"] a[href^="tel:"]').forEach(a => {
+    a.textContent = phone;
+    a.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
+  });
+
+  // Utility bar "Your Nearest Store" (backlog item 32, 2026-09-11) — same simple text-swap
+  // treatment as the phone number above.
+  applyRegionNearestStore(region);
+
+  // Ex-Demo/Factory Seconds inline link (backlog item 4 follow-up, 2026-09-11): re-render
+  // any stock line already showing the B-Stock link so its wording ("Graded" for UK) and
+  // store-derived price both flip live if the region switches while it's visible.
+  document.querySelectorAll('.stock-status-line').forEach(renderStockLine);
+
+  // Payment-plan badges (backlog items 31/31a, 2026-09-11) — provider set differs per region,
+  // not just the instalment amount, so it needs a full re-sync on every region switch, not
+  // just on price-changing renders. currentRegion is already updated above, so this is safe
+  // regardless of ordering against the currency sweep below.
+  document.querySelectorAll('.price-block').forEach(syncPaymentBadges);
 
   // Currency symbol (UK backlog ask, 2026-09-11) and UK brand skin — run last, after every
   // other region-driven re-render above, so both act on the final DOM state rather than
@@ -1383,7 +1594,7 @@ function initSearchClear() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  buildExdemoModal();
+  buildExdemoSlideout();
   buildStoreSlideout();
   initCopyButtons();
   initFitGalleryCarousel();
@@ -1432,7 +1643,7 @@ function buildAdminPanel() {
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
   const initialFitGallery = detectInitialFitGalleryState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, specialOrder: false, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false });
   // Interactive map is the locked default for the Showroom Finder widget, all 5
   // templates — no longer a Demo State Panel preview toggle. Layout (split-view,
   // revealing #showroomMap) still applies immediately so there's no shift once the map
@@ -1489,10 +1700,11 @@ function buildAdminPanel() {
           <label><input type="radio" name="stockStatus" value="in_stock" checked> In Stock</label>
           <label><input type="radio" name="stockStatus" value="low_stock"> Low Stock</label>
           <label><input type="radio" name="stockStatus" value="not_in_stock"> Not in Stock — contact our team</label>
+          <label><input type="radio" name="stockStatus" value="special_order"> Special Order</label>
+          <label><input type="radio" name="stockStatus" value="discontinued"> Discontinued</label>
         </div>
         <label class="admin-toggle"><span>Shipping available</span><input type="checkbox" data-admin-flag="shipping" ${initialShipping ? 'checked' : ''}></label>
         <label class="admin-toggle"><span>Click &amp; Collect available</span><input type="checkbox" data-admin-flag="collect" ${initialCollect ? 'checked' : ''}></label>
-        <label class="admin-toggle"><span>Special order item</span><input type="checkbox" data-admin-flag="specialOrder"></label>
         <label class="admin-toggle"><span>B-Stock / Ex-Demo available</span><input type="checkbox" data-admin-flag="exdemo"></label>
         ${hasShowroom ? `<label class="admin-toggle"><span>On display in-store (Showroom Finder)</span><input type="checkbox" data-admin-flag="showroom" checked></label>` : ''}
         ${hasFitGallery ? `<label class="admin-toggle"><span>Fitment Gallery exists for this product</span><input type="checkbox" data-admin-flag="fitGallery" ${initialFitGallery ? 'checked' : ''}></label>` : ''}
@@ -1558,7 +1770,6 @@ function buildAdminPanel() {
             panel.querySelector('[data-admin-flag="collect"]').checked
           );
           break;
-        case 'specialOrder': applySpecialOrderFlag(on); break;
         case 'exdemo': applyExdemoFlag(on); break;
         case 'showroom': applyShowroomFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;

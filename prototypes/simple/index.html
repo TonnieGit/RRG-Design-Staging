@@ -54,7 +54,7 @@
 <div class="rrg-utility-bar">
   <div class="wrap rrg-utility-inner">
     <div class="rrg-utility-left">
-      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#" data-admin-trigger>North Lakes</a></span>
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#" data-admin-trigger data-region-nearest-store>North Lakes</a></span>
       <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> <span class="u-item-label">Your Vehicle:</span> <a href="#">Toyota Hilux</a></span>
     </div>
     <div class="rrg-utility-right">
@@ -178,17 +178,17 @@
       <div class="cta-col">
         <button class="btn btn-primary btn-lg btn-block" data-cta-label>Add To Cart</button>
         <div class="payment-badges">
-          <div class="payment-badge pb-afterpay">
-            <img class="pb-logo" src="../_shared/payment-logos/afterpay.svg" alt="Afterpay">
-            <span class="pb-text" data-pb-amount="afterpay"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
-          <div class="payment-badge pb-paypal">
-            <img class="pb-logo" src="../_shared/payment-logos/paypal.svg" alt="PayPal">
-            <span class="pb-text" data-pb-amount="paypal"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
-          <div class="payment-badge pb-zip">
-            <img class="pb-logo" src="../_shared/payment-logos/zip.svg" alt="Zip">
-            <span class="pb-text" data-pb-amount="zip"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
         </div>
       </div>
@@ -199,7 +199,7 @@
           <button class="dc-tab active" data-dc-tab="collect"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Click &amp; Collect</button>
         </div>
         <div class="dc-postcode-row">
-          <input type="text" class="dc-input" id="dcPostcode" placeholder="Enter your postcode">
+          <input type="text" class="dc-input" data-dc-postcode placeholder="Enter your postcode">
           <button type="button" class="btn btn-outline" data-dc-update>Update</button>
         </div>
         <div class="dc-panel" data-dc-panel="delivery" hidden>
@@ -236,7 +236,7 @@
     <div class="item" data-trust="founded"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
     <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg><h4>Trained Professionals</h4><p>Over 200,000 roof racks fitted</p></div>
     <div class="item" data-trust="network"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><h4>Australia's Largest</h4><p>We're the only nationwide roof rack specialists</p></div>
-    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: <a href="tel:1300071264">1300 071 264</a></p></div>
+    <div class="item" data-trust="phone"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: <a href="tel:1300071264">1300 071 264</a></p></div>
   </div>
 
   <section id="showroom" style="margin:40px 0;">
@@ -262,6 +262,39 @@
       <!-- Interactive map — locked-in default for this widget, see applyShowroomMapFlag()
            in shared.js. -->
       <div class="showroom-map" id="showroomMap"></div>
+    </div>
+  </section>
+
+  <!-- Discontinued-state alternatives (backlog item 23) — hidden unless the Demo State
+       Panel's "Discontinued" stock status is selected, see applyStockStatus() in
+       shared.js. Real, currently-live water tank products, not fabricated. -->
+  <section class="discontinued-alternates" hidden>
+    <h3 class="related-heading">This product has been discontinued — similar alternatives</h3>
+    <div class="related-grid">
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/F/r/Front-Runner-WTAN007-4WD-Products._1_1.jpg" alt="Front Runner Upright Water Tank / Flat">
+        <div class="body">
+          <h5>Upright Water Tank / Flat — WTAN007</h5>
+          <div class="price">$346.00</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/F/r/Front-Runner-WTAN008-4WD-Products._1_1.jpg" alt="Front Runner Slanted Water Tank">
+        <div class="body">
+          <h5>Slanted Water Tank — WTAN008</h5>
+          <div class="price">$271.00</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/f/r/front-runner-water-tank-67l-wtan023.jpg" alt="Front Runner Water Tank 67L">
+        <div class="body">
+          <h5>Water Tank 67L — WTAN023</h5>
+          <div class="price">$295.00</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -340,6 +373,42 @@
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">
+          <div class="dc-widget" style="margin-bottom:22px;">
+            <div class="dc-tabs">
+              <button class="dc-tab" data-dc-tab="delivery"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="13" height="9"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg> Delivery</button>
+              <button class="dc-tab active" data-dc-tab="collect"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Click &amp; Collect</button>
+            </div>
+            <div class="dc-postcode-row">
+              <input type="text" class="dc-input" data-dc-postcode placeholder="Enter your postcode">
+              <button type="button" class="btn btn-outline" data-dc-update>Update</button>
+            </div>
+            <div class="dc-panel" data-dc-panel="delivery" hidden>
+              <div class="dc-postcode-prompt">Enter your postcode above to see delivery options.</div>
+              <div class="dc-results" hidden>
+                <div class="dc-option">
+                  <div><strong>Standard Freight</strong><br><span class="muted">2–4 business days to your postcode</span></div>
+                  <div class="dc-price">$14.00</div>
+                </div>
+                <div class="dc-option">
+                  <div><strong>Express Freight</strong><br><span class="muted">1–2 business days to your postcode</span></div>
+                  <div class="dc-price">$24.00</div>
+                </div>
+              </div>
+            </div>
+            <div class="dc-panel" data-dc-panel="collect">
+              <div class="dc-results">
+                <div class="dc-store">
+                  <div><strong>Moorebank</strong><span class="stock-chip in">In Stock</span><span class="stock-chip display">On Display</span><br><span class="muted">12 Centenary Ave, Moorebank 2170</span><br><a class="store-phone" href="tel:0290538621">(02) 9053 8621</a><a class="store-map-link" href="https://maps.app.goo.gl/371QHZWa4pDU4qzA7" target="_blank" rel="noopener noreferrer">View on map</a></div>
+                  <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+                </div>
+                <div class="dc-store">
+                  <div><strong>Silverwater</strong><span class="stock-chip in">In Stock</span><br><span class="muted">1/104 Wetherill St N, Silverwater 2128</span><br><a class="store-phone" href="tel:0280076155">(02) 8007 6155</a><a class="store-map-link" href="https://maps.app.goo.gl/NCofTPDD28BDfZRv5" target="_blank" rel="noopener noreferrer">View on map</a></div>
+                  <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+                </div>
+              </div>
+              <div class="dc-viewall-row"><span class="dc-viewall-line">In stock and on display in 35 stores — </span><a href="#" class="dc-viewall" data-store-slideout>View all stores</a></div>
+            </div>
+          </div>
           <p><strong>Shipping &amp; Delivery Information.</strong> At Roof Racks Galore, we are proud to be Australia's only nationwide roof rack specialists, with over 30 stores across all major Australian cities. Thanks to our extensive network of Distribution Centres located in key states — Queensland, Western Australia, Victoria, New South Wales, South Australia, and the Australian Capital Territory — we offer the fastest and most reliable delivery service in the industry.</p>
           <div class="details-sub">
             <h5>Why Choose Roof Racks Galore?</h5>
@@ -564,27 +633,6 @@
   <div class="info" style="flex:1;font-size:13px;font-weight:700;">$299.00 <span style="color:#8a8a8a;font-weight:400;text-decoration:line-through;font-size:11px;">$350.00</span></div>
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
-
-<section class="rationale">
-  <div class="wrap">
-    <h2>Design Rationale — Simple Template</h2>
-    <div class="grid">
-      <div class="card">
-        <h4>Decisions</h4>
-        <p>Deliberately the leanest of the four templates: no fitment messaging, no variant picker, no persistent scroll bar. Reuses the same decision-panel/gallery skeleton and component library established for the vehicle-specific template (trust icons, tabs, Delivery/Click &amp; Collect widget, related-products grid) for visual consistency, but strips out everything that doesn't apply to a single-SKU, universal-fit accessory. Showroom Finder was added 2026-09-10 (client ask: available on all products, not just vehicle-specific kits) — toggleable off per-SKU via the Demo State Panel for products that aren't on display anywhere.</p>
-      </div>
-      <div class="card">
-        <h4>Grounded in</h4>
-        <p>Section 1 table (Simple = "fast, low-friction path to cart... don't over-build the page" — this is the explicit design brief for this template, not just a default); the real scraped stock-scarcity message ("This item is limited — Whilst stocks last") is surfaced directly above Add to Cart, matching Baymard guidance that urgency messaging works best adjacent to the purchase action, not buried in a tab.</p>
-        <p class="cite">Baymard Institute; spec Section 1.1 (confirmed reference example, live site).</p>
-      </div>
-      <div class="card tradeoff">
-        <h4>Trade-off / open item</h4>
-        <p>No per-product review count was available in the scraped data for this SKU (the live site's star rating links to a sitewide review page, not a per-product score) — the 4.5+ figure shown here is the sitewide placeholder, not this product's own rating. Flag for the client: does Magento/the review platform carry a per-SKU rating we should pull instead? Also omitted Get It Installed here as a deliberate per-template choice (spec Section 5: "not all templates use all of them") — still worth confirming with the client whether a $299 accessory needs it the way a $1,900+ kit does. Showroom Finder's store count/postcode results here are fabricated demo data, same caveat as the other templates.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <script src="../_shared/shared.js"></script>
 <script type="application/ld+json">

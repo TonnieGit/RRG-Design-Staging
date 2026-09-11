@@ -10,6 +10,7 @@
 - Where a feature is a **plain copy-paste external integration** (a vendor script tag, a widget embed), this brief gives you the exact, current, working code block used in the prototype — drop it into the Magento template as-is, then adjust only the values called out as per-product (typically the SKU).
 - Where a feature is **custom-built** (no vendor code, hand-rolled against the prototype's own CSS/JS conventions), this brief explains the logic and gives you the source so you can port it into Magento's own JS/template structure rather than copy-pasting verbatim (the prototype's `shared.js`/`shared.css` aren't part of the Magento build).
 - Screenshots show **where** something sits on the page and **what it looks like in its real, current state** — not mockups. Where a feature currently shows an empty/placeholder-like state because of real data gaps (e.g. no reviews exist yet against a SKU), that's called out explicitly so it isn't mistaken for a bug.
+- **Screenshots are captured in one pass, at the very end, once every template is 100% complete and ready to hand over — not per section, and not once individual sections settle.** Confirmed 2026-09-11 (tightened same day from an earlier "per-section, once stable" version — see 0.1 rule 2). Reasoning: a screenshot of one finished widget can still have an unfinished widget sitting right next to it in frame, or the page around it can shift again before the whole template is done — so "this section is done" isn't actually a safe point to shoot from. **This applies retroactively too:** every screenshot currently in this document (Sections 2 and 3, both real captures) is provisional and will need to be redone in that final pass, even though nothing about those two sections themselves is expected to change — the point is a single consistent, final-state image set for Mark to work from, not a growing patchwork of "true when captured" snapshots from different points in the build.
 - For the full page-by-page component reference (every section/widget by name), see `PAGE-GLOSSARY.md`. For the project's business requirements and build history, see `spec.md`. This brief only covers pieces that are finalized enough to hand over — check `spec.md` Section 10 for what's still in progress.
 
 ### 0.1 Rules for every section in this document
@@ -17,7 +18,7 @@
 These rules apply to every widget/section written up in this brief from now on:
 
 1. **Write it simply.** Plain English, short sentences. No jargon, no assumed technical background — a junior developer or a non-technical stakeholder should be able to follow it.
-2. **Screenshots are mandatory, for every state.** Every widget/section needs a screenshot for each visual state/variant it can appear in (e.g. empty vs. populated, in stock vs. special order, hidden vs. shown). At least one of those screenshots must show the **whole page** with a **red arrow** pointing at the widget, so its location is obvious at a glance — not just a cropped close-up.
+2. **Screenshots are mandatory, for every state — but only captured once the entire page is complete, not per section.** Every widget/section still needs a screenshot for each visual state/variant it can appear in (e.g. empty vs. populated, in stock vs. special order, hidden vs. shown), with at least one showing the **whole page** with a **red arrow** pointing at the widget. **Added 2026-09-11, tightened later the same day:** the first version of this rule said "once that section's build is stable" — Brenton corrected that: a section can be individually finished while a widget right next to it in the same frame still isn't, so a per-section screenshot can still show unfinished neighbours or shift again before the page as a whole settles. **The real rule: hold every screenshot in this entire document until all 5 templates are 100% complete and ready to hand over, then capture the whole set in one final pass** — this applies even to sections whose own build finished earlier. Until then, use `dev-brief-assets/screenshot-pending.svg` in place of every real screenshot and say so plainly (see Section 4 for the pattern) — the written spec (tables, data, code) can and should still be filled in ahead of that, only the visual proof waits.
 3. **Every section covers at minimum three things, each its own labeled line:**
    - **Name** — what it's called (match `PAGE-GLOSSARY.md` naming where possible).
    - **Location** — where on the page it sits, in plain terms (e.g. "under the title, above the price").
@@ -55,6 +56,8 @@ Live prototype files (open directly, or via `prototypes/index.html` as a menu):
 ---
 
 ## 2. REVIEWS.io Integration
+
+> 📷 **Screenshots below are real captures from 2026-09-11 and still accurate** — but will be **recaptured anyway** in the single final screenshot pass once all 5 templates are 100% complete (see 0.1 rule 2). Nothing about this integration itself is expected to change; this is just so every image in the document comes from the same final pass, not a mix of dates.
 
 Two separate pieces, built 2026-09-11, both driven by RRG's real REVIEWS.io account (`store: 'roof-racks-galore'`) — no mock/fake review data anywhere in either piece. Both pull from the **same underlying data** (this specific product's reviews) but are visually and technically independent — the badge does not embed or depend on the tab widget.
 
@@ -326,6 +329,8 @@ Same SKU-list table as Section 2.1 applies here — use the identical `data-revi
 
 ## 3. Showroom Finder interactive map
 
+> 📷 **Screenshots below are real captures from 2026-09-11 and still accurate for AU** — but will be **recaptured anyway** in the single final screenshot pass once all 5 templates are 100% complete (see 0.1 rule 2), same as Section 2. Note the AU-only heading copy this section documents changes per region once Section 4's region work is built (see this section's own "Region-specific heading copy" note below) — worth re-checking against Section 4 at that final pass, not just re-shooting the same shot.
+
 **Name:** Showroom Finder map (`#showroomMap`)
 
 **Location:** inside the black "Showroom Finder" block, below the hero and Trust Row, on all 5 templates. The block splits into two columns on desktop (postcode search on the left, map on the right, roughly a third/two-thirds split) and stacks on mobile.
@@ -428,15 +433,7 @@ Pins and cluster bubbles use hand-drawn CSS shapes (`L.divIcon`), not image file
 
 #### Region-specific heading copy
 
-The black block's own heading (`<h3>` above the map, e.g. "See It In Person — On Display At 26 Stores Nationwide") is currently a static string per template, written for **AU only** — this prototype doesn't yet have the region selector from `spec.md` Section 10 item 21, so there's only one copy variant live today. When that region selector is built, this heading needs to change wording per region, not just re-run the same "N Stores Nationwide" phrasing everywhere — a single-store region reads oddly as "On Display At 1 Store Nationwide":
-
-| Region | Store count | Heading copy |
-|---|---|---|
-| AU (multi-store network) | 26+ stores | "See It In Person — On Display At N Stores Nationwide" |
-| NZ (single store) | 1 store | "See It In Person — On Display At the Auckland Store" |
-| UK (single store) | 1 store | "See It In Person — On Display At the [X] Store" (real UK store name TBD) |
-
-Build this as a small per-region copy lookup (same pattern as the rest of the region-selector cascade in `spec.md` item 21 — Click & Collect default tab, store count/map view, etc.), not a hardcoded string, so it stays in sync with whichever region the shopper has selected.
+The black block's own heading (`<h3>` above the map, e.g. "See It In Person — On Display At 26 Stores Nationwide") is per-template static markup for AU, and swaps automatically for NZ/UK once the Region Selector is used — **built, see Section 4**. Full detail (copy table, map behaviour, screenshots) now lives there; this note is kept here only as a pointer since it sits right next to the map code above.
 
 #### Before this leaves prototype stage
 
@@ -444,6 +441,265 @@ Build this as a small per-region copy lookup (same pattern as the rest of the re
 - The on-display flag per store is still a flat placeholder list, not driven by real per-product/per-store data — this is explicitly out of this project's scope (Brenton's own follow-up on the Rackety bin-location side); this widget just needs to read whatever boolean that work produces.
 - Real postcode-driven search (typing a postcode and having the map re-centre/filter to nearby stores) isn't implemented — the postcode field in the black block still just informs the "View all stores" copy, not the map itself.
 - Heading copy is AU-only today (see "Region-specific heading copy" above) — needs the NZ/UK variants once the region selector exists.
+
+---
+
+## 4. Region Selector & Multi-Region Support
+
+> ⚠️ **Build status: confirmed, in progress — not fully live in the prototype yet.** The dropdown mechanics (4.1) and the UK brand-skin colour/logo/currency swap (4.3) are built and working today. Everything in 4.2's cascade table, plus the store/contact data (4.4) and UK payment-provider differences (4.5), reflect **corrected, client-confirmed values that still need to be wired into the prototype** — see `spec.md` Section 10.D, items 27–34, for the live build checklist. Don't assume any specific detail below is already on the page without checking that list first.
+>
+> **Screenshots are placeholders for this whole section**, on purpose — see 4.6. Real screenshots for this section (and for the whole document — see 0.1 rule 2) are captured in one final pass once **all 5 templates are 100% complete and ready to hand over**, not once items 27–33 alone are done.
+
+**Name:** Region Selector
+
+**Location:** top-right of the header's Utility Bar (the blue/red band above the main header), next to "Call Us" — a flag + country name button (e.g. "🇦🇺 Australia"), on all 5 templates.
+
+**Purpose:** lets a reviewer preview how the page would look for RRG's other markets without needing separate page builds. Clicking a region live-swaps copy, currency, map/store data, and (for UK) the whole brand skin — no page reload. **This is a prototype-review tool that previews a future capability, not a finished customer-facing feature** — RRG doesn't currently sell in NZ/UK the way this control implies; see "Before this leaves prototype stage" below.
+
+**States:**
+- **Closed, default (AU)** — red arrow shows where to click:
+  ![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+- **Open, showing all 3 options:**
+  ![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+- **AU selected (default on load)** — whole page:
+  ![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+- **NZ selected** — RRG branding stays, Delivery becomes the default tab, Trust Row/Showroom Finder copy and contact details change — whole page:
+  ![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+- **UK selected** — full brand skin change on top of the NZ-style cascade, plus its own payment-provider set — whole page:
+  ![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+
+### 4.1 How the dropdown works
+
+Same open/close interaction pattern already used elsewhere on the page for the "Products" template-switcher menu: click the button to open a menu, click outside (or pick an option) to close it. No page reload — picking a region calls one JS function, `applyRegion(region)`, which re-renders everything listed in the cascade table below.
+
+```html
+<div class="region-switcher u-item">
+  <button type="button" class="region-switcher-toggle" aria-haspopup="true" aria-expanded="false">
+    <span class="flag-emoji" data-region-flag>🇦🇺</span> <span data-region-label>Australia</span>
+    <svg viewBox="0 0 24 24" ...><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="region-switcher-menu">
+    <span class="tsm-label">Region</span>
+    <a href="#" data-region="AU" class="current"><span class="flag-emoji">🇦🇺</span> Australia</a>
+    <a href="#" data-region="NZ"><span class="flag-emoji">🇳🇿</span> New Zealand</a>
+    <a href="#" data-region="UK"><span class="flag-emoji">🇬🇧</span> United Kingdom</a>
+  </div>
+</div>
+```
+
+**Important:** the page always starts on AU, every time it loads — the selected region is **not** saved anywhere (no cookie, no localStorage, no server session). This matches every other reviewer-toggle in this prototype (the Demo State Panel). A real Magento build would decide region a different way entirely (domain/subdomain, a real customer/session setting, geo-IP) — this dropdown is a prototype-only stand-in for whatever that real mechanism ends up being, not a pattern to port as-is.
+
+### 4.2 Per-widget region cascade
+
+One region change touches eleven separate things on the page. Each is independent — build them as small "does this widget care about region" hooks rather than one monolithic function, same as this prototype's `applyRegion()` does internally (see below for the actual function, provided for logic reference — it depends on this prototype's own DOM/helper functions, so port the *behaviour* below, not the code verbatim). **Rows 9–11 are new/corrected 2026-09-11 and are not built yet** (see the status banner above) — everything else in this table matches the prototype's real, already-working behaviour.
+
+| # | What changes | AU (default) | NZ | UK |
+|---|---|---|---|---|
+| 1 | Utility bar trigger (flag + label) | 🇦🇺 Australia | 🇳🇿 New Zealand | 🇬🇧 United Kingdom |
+| 2 | Delivery/Click & Collect widget — default active tab | Click & Collect | Delivery | Click & Collect |
+| 3 | Delivery/Click & Collect widget — "View all stores" link | Shown (real 35-store AU list) | Hidden (no real store list for this region) | Hidden |
+| 4 | Showroom Finder heading | Real per-product AU copy, e.g. "On Display At 26 Stores Nationwide" | "On Display At the Auckland Store" | "On Display At the **Bolton** Store" *(corrected — was "London," see 4.4)* |
+| 5 | Showroom Finder map | Zoomed-out clustered view of all 35 real AU stores (see Section 3) | Zoomed to one pin, Auckland (demo-precision coordinates) | Zoomed to one pin, **Bolton** *(corrected — was London, see 4.4)* |
+| 6 | Trust Row — "Trusted Since 1989" / "Australia's Largest" tiles | Real AU copy (unchanged) | "Trusted Since 1989" / "Visit In Person — Check it out at our Auckland showroom" | "Trusted Since 1989" / "Visit In Person — Check it out at our **Bolton** showroom" *(corrected — was London)* |
+| 7 | Currency symbol on every price on the page | $ | $ | £ (same numeric value — **symbol swap only, no FX conversion anywhere in this prototype**) |
+| 8 | Brand skin (logo, primary colour, Add to Cart colour) | RRG red/gold, RRG wordmark logo | Unchanged — NZ stays RRG-branded, no rebrand (real scraped copy already treats AU+NZ as one network under one brand) | **The Roof Box Company** navy/yellow branding, green Add to Cart — see 4.3 |
+| 9 | **Trust Row phone number** ("Need Help" tile) — **not built yet** | `1300 071 264` (unchanged) | `09 481 1910` | `01204 899778` |
+| 10 | **Payment badges under Add to Cart** — **not built yet**, see 4.5 | Afterpay + PayPal + Zip (Afterpay/PayPal "Pay in 4," Zip its own weekly copy) | Afterpay + PayPal only, "Pay in 4" (Zip dropped — not offered in NZ) | Full 3-provider swap, not a hide/show: **Clearpay** ("Pay in 4," same structure as Afterpay) + **PayPal** ("Pay in 3," not 4) + **Klarna** ("Pay in 3" over 3 months) |
+| 11 | **Header utility bar "Your Nearest Store"** — **not built yet**, currently hardcoded AU text regardless of region | North Lakes (unchanged) | Auckland | Bolton |
+
+Row 3's Showroom Finder equivalent (its own "View all stores" link) follows the same AU-only rule — both links use the identical real 35-store slide-out, which has no NZ/UK content to show.
+
+**UK header/CTA/price, close up** (rows 1, 2, 6 [truncated below fold], 7, 8, 9, 10, 11 together):
+![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+
+**UK Showroom Finder, close up** (rows 4–5):
+![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+
+**NZ header/DC-tab, close up** (rows 1–2, 7 unchanged — still RRG branding/$; rows 9–10 once built):
+![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+
+**NZ Showroom Finder, close up** (rows 4–5):
+![Screenshot pending](dev-brief-assets/screenshot-pending.svg)
+
+#### JavaScript — the cascade function (reference, not copy-paste)
+
+**The data values below are the corrected, client-confirmed ones (2026-09-11) — the live prototype's `shared.js` still has the old placeholder UK values (`London`, `51.5074, -0.1278`) and no `phone`/`address` fields at all.** Treat this block as the target to build toward, not a description of what's in the repo today.
+
+```js
+const REGION_LABELS = { AU: 'Australia', NZ: 'New Zealand', UK: 'United Kingdom' };
+const REGION_FLAGS = { AU: '🇦🇺', NZ: '🇳🇿', UK: '🇬🇧' };
+const REGION_DEFAULT_DC_TAB = { AU: 'collect', NZ: 'delivery', UK: 'collect' };
+
+// Corrected 2026-09-11 — real addresses/phone numbers sourced from each brand's own live
+// contact page (see 4.4). Coordinates are suburb/town-centre approximations, same
+// demo-precision convention as the rest of this prototype's store data — not geocoded to
+// the exact unit.
+const REGION_SINGLE_STORES = {
+  NZ: {
+    name: 'Auckland',
+    address: '195A Wairau Road, Wairau Valley, Auckland 0627',
+    phone: '09 481 1910',
+    lat: -36.7747, lng: 174.7381
+  },
+  UK: {
+    name: 'Bolton',
+    address: 'Unit B9, Edge Fold Industrial Estate, Plodder Lane, Farnworth, Bolton, BL4 0LR',
+    phone: '01204 899778',
+    lat: 53.5503, lng: -2.3882
+  }
+};
+
+// Trust Row phone number, by region — NOT wired up yet (item 28); currently one static AU
+// number (1300 071 264) regardless of selected region.
+const REGION_PHONE = { AU: '1300 071 264', NZ: '09 481 1910', UK: '01204 899778' };
+
+const REGION_TRUST_COPY = {
+  AU: { founded: { h4: 'Trusted Since 1989', p: 'Now with over 30 locations Australia wide' },
+        network: { h4: "Australia's Largest", p: "We're the only nationwide roof rack specialists" } },
+  NZ: { founded: { h4: 'Trusted Since 1989', p: 'Now serving New Zealand' },
+        network: { h4: 'Visit In Person', p: 'Check it out at our Auckland showroom' } },
+  UK: { founded: { h4: 'Trusted Since 1989', p: 'Now serving the United Kingdom' },
+        network: { h4: 'Visit In Person', p: 'Check it out at our Bolton showroom' } }
+};
+
+function applyRegion(region) {
+  // 1. Trigger label/flag + which menu item shows as "current"
+  // 2. Click the widget's own real tab button for REGION_DEFAULT_DC_TAB[region]
+  //    (re-uses the existing tab-switch logic rather than duplicating it), then hide/show
+  //    the "View all stores" link based on region === 'AU'
+  // 3. Update the Showroom Finder <h3> — cache the real AU string the first time this runs
+  //    (so switching back to AU restores the real per-product copy instead of a generic
+  //    string), else show `On Display At the ${REGION_SINGLE_STORES[region].name} Store`
+  // 4. Re-plot the map: AU = full 35-store clustered network; NZ/UK = a single marker at
+  //    REGION_SINGLE_STORES[region], map zoomed/centred on it
+  // 5. Swap Trust Row copy from REGION_TRUST_COPY[region]
+  // 6. NOT BUILT YET — swap the Trust Row phone number/tel: link from REGION_PHONE[region]
+  // 7. NOT BUILT YET — swap the header utility bar's "Your Nearest Store" text/link from
+  //    REGION_SINGLE_STORES[region].name (AU keeps its own real nearest-store logic)
+  // 8. NOT BUILT YET — swap the payment-badges provider set for UK (see 4.5); NZ's Zip
+  //    removal is a simple hide, UK's Clearpay/PayPal-pay-in-3/Klarna is a full re-render
+  // 9. Run the currency-symbol sweep (4.3)
+  // 10. Run the brand-skin swap (4.3)
+}
+```
+
+### 4.3 UK Brand Skin & Currency
+
+RRG trades in the UK as a real sister brand, **The Roof Box Company** (`roofbox.co.uk`) — this isn't a fictional rebrand, it's a real business the prototype is previewing. Scope was deliberately limited: **logo + core colour only** — typography (Barlow Condensed/Lato) stays the same as the rest of the prototype, this is not a full re-skin.
+
+#### Colour — CSS custom-property override (copy-paste)
+
+Every component already built against the shared `--rrg-red`/`--rrg-red-dark` tokens (utility bar, links, tab underline, sale badges, map pins, etc.) recolours automatically — no per-component CSS needed. Add to Cart needed its own override since it's a separate locked-in gold default, not on the red token.
+
+```css
+body.region-uk{--rrg-red:#2E41AE;--rrg-red-dark:#1F2E82;}
+body.region-uk [data-cta-label].btn-primary{background:#26B226;color:#fff;}
+body.region-uk [data-cta-label].btn-primary:hover{background:#1e8f1e;}
+```
+
+```js
+document.body.classList.toggle('region-uk', region === 'UK');
+```
+
+Colour values were read directly off the real live `roofbox.co.uk` site: navy (`#2E41AE`) and yellow (`#FFFF19`) from their logo SVG's own fill values, green (`#26B226`) from their live "Click Here To Order" button.
+
+#### Logo
+
+Straight `src`/`alt` swap on every `.rrg-logo img` on the page — the same markup pattern is reused for the main header and the sticky/condensed mobile header, so one swap covers both:
+
+```js
+const RRG_LOGO = { src: '../_shared/headerlogo.png', alt: 'Roof Racks Galore' };
+const UK_LOGO = { src: '../_shared/brand-roofbox-uk-logo.svg', alt: 'The Roof Box Company' };
+document.querySelectorAll('.rrg-logo img').forEach(img => {
+  img.src = logo.src; // logo = region === 'UK' ? UK_LOGO : RRG_LOGO
+  img.alt = logo.alt;
+});
+```
+
+Real logo file: `prototypes/_shared/brand-roofbox-uk-logo.svg` (downloaded from `roofbox.co.uk/images/trbc_logo.svg`).
+
+**Why the logo needs its own CSS, not just a swapped `<img src>`:** The Roof Box Company's real logo is a tall vertical rectangle (roughly square, ~0.82:1) where RRG's is a wide horizontal wordmark (~6.2:1) — dropped in at the same size/position as RRG's logo, it would look tiny and cramped. Client direction (from a supplied reference screenshot, `UK header example.png`, project root) was for the UK logo to visually **span both header bars** — bottom flush with the base of the white Main Header, top reaching roughly halfway up through the navy Utility Bar above it — on desktop, mobile, and the sticky/scrolled header alike. This needed real CSS positioning work (the logo is pulled out of normal layout flow and absolutely positioned against fixed pixel offsets specific to this prototype's own header heights), so **don't copy the CSS verbatim** — it's in `prototypes/_shared/shared.css` around line 265–310 (search `body.region-uk .rrg-logo`) as a worked reference for the *effect* to reproduce against Magento's own header markup/heights, not a drop-in rule. Two non-obvious things worth knowing if this gets re-built from scratch:
+- An absolutely-positioned-only child collapses its parent's box to zero size — anchor the parent with `align-self:flex-start` (or the grid/flex equivalent), not `center`, or the logo silently sits in the wrong place.
+- If the parent's width also collapses to 0, this project's own global `img{max-width:100%}` reset will clamp the image's own explicit width down to 0 too (100% of a 0-width container) — give the parent an explicit width matching the image's, not just the image itself.
+
+#### Currency — symbol swap, no FX conversion
+
+```js
+function regionCurrencySymbol(region) { return region === 'UK' ? '£' : '$'; }
+```
+
+Every price-rendering function in the prototype (`fmtAud()` in shared.js, plus the 3 per-template `fmtMoney()` duplicates) calls this to pick the symbol on its next render. A second pass, `applyRegionCurrency(region)`, fixes whatever's *already* sitting in the DOM at the moment of switching (static per-SKU markup, Related Products price tags, payment-badge instalment text) by walking text nodes and swapping the symbol directly:
+
+```js
+function applyRegionCurrency(region) {
+  const symbol = region === 'UK' ? '£' : '$';
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!/[$£]\d/.test(node.nodeValue)) return NodeFilter.FILTER_SKIP;
+      return node.parentElement && node.parentElement.closest('script, style, .admin-panel')
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node => { node.nodeValue = node.nodeValue.replace(/[$£](?=\d)/g, symbol); });
+}
+```
+
+**This is a symbol swap only — the numbers themselves never change.** A £299.00 UK price is the same demo figure as the $299.00 AU price, not a real currency-converted one. A real Magento build needs real UK pricing (and, if the UK ever sells in GBP for real, a real FX/pricing strategy) behind this — the symbol-swap trick is prototype-only.
+
+### 4.4 Region-specific store & contact data — not built yet
+
+Three separate places on the page show a phone number and/or store name that should change with the selected region. None of this is wired into `applyRegion()` in the live prototype today — all three currently show fixed AU content (or, for the UK store, the wrong placeholder name) regardless of which region is selected.
+
+| Where | AU (real, unchanged) | NZ | UK |
+|---|---|---|---|
+| Trust Row "Need Help" tile phone number | `1300 071 264` | `09 481 1910` | `01204 899778` |
+| Header utility bar "Your Nearest Store" | North Lakes | Auckland | Bolton |
+| Showroom Finder heading + Click & Collect "on display" line (both read the same underlying store name) | Real per-product AU store count | Auckland | **Bolton** — corrected 2026-09-11, was showing a placeholder "London" |
+
+**Real NZ contact details** (Roof Racks Galore, Auckland — sourced 2026-09-11 from [roofracksgalore.co.nz/contact-us](https://roofracksgalore.co.nz/contact-us)):
+- Address: 195A Wairau Road, Wairau Valley, Auckland 0627
+- Phone: `09 481 1910`
+
+**Real UK contact details** (The Roof Box Company, Manchester North Store — sourced 2026-09-11 from [roofbox.co.uk/locations/manchester-north.php](https://www.roofbox.co.uk/locations/manchester-north.php)):
+- Address: Unit B9, Edge Fold Industrial Estate, Plodder Lane, Farnworth, Bolton, BL4 0LR
+- Phone: `01204 899778`
+- **The store's town is Bolton, not London** — the earlier placeholder ("London") was a fabricated guess made before this research was done. The listing itself is titled "Manchester North Store," but the actual town/postcode is Bolton — use "Bolton" as the region label shown to shoppers (matches items 4–6 in the cascade table), not "Manchester" or "Manchester North."
+
+Both sets of coordinates in the code block above (4.2) are suburb/town-centre approximations for map-pin placement — same demo-precision convention as the rest of this prototype's store data, not geocoded to the exact street address.
+
+### 4.5 UK payment provider differences — not built yet
+
+The UK doesn't just hide/show a payment badge the way NZ does (NZ simply drops Zip, keeping Afterpay + PayPal as-is) — **the UK payment-badges row needs a full 3-provider swap**, confirmed 2026-09-11:
+
+| Badge slot | AU / NZ | UK |
+|---|---|---|
+| 1st badge | Afterpay — "4 payments of $X" | **Clearpay** — same company as Afterpay (their UK/EU brand), same "Pay in 4" structure/copy, only the logo and label change: "4 payments of £X" |
+| 2nd badge | PayPal — "4 payments of $X" | PayPal (same logo, unchanged) — but the UK product is **"Pay in 3,"** not "Pay in 4": copy changes to "3 payments of £X" (divide price by 3, not 4) |
+| 3rd badge | Zip — weekly copy (AU only; dropped entirely for NZ, see 4.2 row 10) | **Klarna** — UK's "Pay in 3," spread over 3 months. This is a **different provider** from PayPal's own Pay in 3 above; both happen to land on 3 instalments, but keep them as two separate badges with their own logo/copy, don't merge or dedupe them |
+
+**Real logo files, staged but not yet referenced by any template:**
+- `prototypes/_shared/payment-logos/clearpay.svg` — official black wordmark, downloaded 2026-09-11 from Clearpay's own retailer marketing-resources page ([clearpay.co.uk/en-GB/for-retailers/resources/marketing/logos](https://www.clearpay.co.uk/en-GB/for-retailers/resources/marketing/logos) → wordmark package, Adobe Illustrator-exported SVG)
+- `prototypes/_shared/payment-logos/klarna.svg` — official black wordmark, downloaded 2026-09-11 from Wikimedia Commons ([File:Klarna Logo black.svg](https://commons.wikimedia.org/wiki/File:Klarna_Logo_black.svg)) — Klarna doesn't have a self-serve brand-asset portal as directly scrapable as Clearpay's, so Commons was used instead; same general trademark-use caveat as any brand logo
+- Existing `afterpay.svg`/`paypal.svg`/`zip.svg` in the same folder are unaffected and stay as-is for AU/NZ
+
+When this gets built, follow the existing `.payment-badge`/`.pb-logo`/`.pb-text` markup pattern already in every template (see the existing 3-badge row in any template's HTML) — swap which 3 badges render based on `region`, rather than trying to reuse one fixed set of 3 DOM slots with conditional `src` swaps, since AU/NZ and UK don't share the same instalment-count math (÷4 vs ÷3) for their shared PayPal badge.
+
+### 4.6 Why every image in this section is a placeholder
+
+Every screenshot in this section is the generic "Screenshot pending" graphic, not a real capture — a deliberate choice, not an oversight. A real screenshot pass was done for this section on 2026-09-11, but Brenton caught real problems in it during review (an internal "Design Rationale" scratchpad section was visible at the bottom of every shot — see `spec.md` §10.D item 27 — and the UK store data baked into the screenshots was a fabricated placeholder, corrected in 4.4 above) before this section, or the wider set of outstanding PDP changes, had settled.
+
+**The rule this led to (0.1 rule 2) is stricter than "wait for this section to be done":** screenshots for the *entire* document are held until **all 5 templates are 100% complete and ready to hand over**, then captured in one final pass — not per section, even once a given section's own build is finished. A section being individually done doesn't mean the frame around it in a screenshot is done — a neighbouring widget can still be mid-change, or the page can shift again before the whole template settles — so "this section is stable" was never actually a safe point to shoot from. The written spec (tables, data, code references) can and should still be filled in ahead of that final pass, as this section does — only the visual proof waits, for every section, until the very end.
+
+### 4.7 Before this leaves prototype stage
+
+- **NZ and UK are not real RRG store networks — this whole feature previews a hypothetical future, not a shipped capability.** RRG doesn't currently sell into NZ/UK as separate regions the way this dropdown implies (NZ is served as part of the AU network today; the UK sister brand, The Roof Box Company, trades independently and isn't integrated with RRG's systems). Confirm with the business whether/when a real region-aware storefront (real domain or session-based region detection, real UK pricing/stock, real per-region logistics) is actually wanted before treating this as a build spec rather than a design preview.
+- **Trust Row NZ/UK copy is placeholder wording** ("Now serving New Zealand" etc.) — needs real client-approved copy, same caution as the rest of this project's placeholder content.
+- **No real FX conversion exists anywhere** — if the UK ever needs real GBP pricing, that's a separate pricing/data feed decision, not something to build off the symbol-swap code in 4.3.
+- Region selection resets on every page load by design (see 4.1) — don't add persistence without checking this is still wanted; it was a deliberate choice to match every other reviewer toggle in this prototype.
+- The single-store coordinates for NZ/UK (4.2, 4.4) are town/suburb-centre approximations, not geocoded to the exact street address — same caveat as the rest of this project's store data.
 
 ---
 

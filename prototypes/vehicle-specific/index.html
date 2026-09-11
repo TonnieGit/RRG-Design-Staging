@@ -77,7 +77,7 @@
 <div class="rrg-utility-bar">
   <div class="wrap rrg-utility-inner">
     <div class="rrg-utility-left">
-      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#" data-admin-trigger>North Lakes</a></span>
+      <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s7-7.58 7-13A7 7 0 1 0 5 9c0 5.42 7 13 7 13zm0-9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg> <span class="u-item-label">Your Nearest Store:</span> <a href="#" data-admin-trigger data-region-nearest-store>North Lakes</a></span>
       <span class="u-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> <span class="u-item-label">Your Vehicle:</span> <a href="#">Toyota Hilux</a></span>
     </div>
     <div class="rrg-utility-right">
@@ -225,17 +225,17 @@
       <div class="cta-col">
         <button class="btn btn-primary btn-lg btn-block" data-cta-label>Add To Cart</button>
         <div class="payment-badges">
-          <div class="payment-badge pb-afterpay">
-            <img class="pb-logo" src="../_shared/payment-logos/afterpay.svg" alt="Afterpay">
-            <span class="pb-text" data-pb-amount="afterpay"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
-          <div class="payment-badge pb-paypal">
-            <img class="pb-logo" src="../_shared/payment-logos/paypal.svg" alt="PayPal">
-            <span class="pb-text" data-pb-amount="paypal"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
-          <div class="payment-badge pb-zip">
-            <img class="pb-logo" src="../_shared/payment-logos/zip.svg" alt="Zip">
-            <span class="pb-text" data-pb-amount="zip"></span>
+          <div class="payment-badge">
+            <img class="pb-logo" alt="">
+            <span class="pb-text"></span>
           </div>
         </div>
       </div>
@@ -246,7 +246,7 @@
           <button class="dc-tab active" data-dc-tab="collect"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Click &amp; Collect</button>
         </div>
         <div class="dc-postcode-row">
-          <input type="text" class="dc-input" id="dcPostcode" placeholder="Enter your postcode">
+          <input type="text" class="dc-input" data-dc-postcode placeholder="Enter your postcode">
           <button type="button" class="btn btn-outline" data-dc-update>Update</button>
         </div>
         <div class="dc-panel" data-dc-panel="delivery" hidden>
@@ -281,17 +281,17 @@
         <h5>What's Included</h5>
         <div class="package-item">
           <span class="pi-qty">1x</span>
-          <span class="pi-name">Rhino-Rack 6 Series Pioneer Platform</span>
+          <a href="#" class="pi-name">Rhino-Rack 6 Series Pioneer Platform</a>
           <span class="pi-sku sku-copy" data-copy="RH62100" role="button" title="Click to copy SKU">RH62100</span>
         </div>
         <div class="package-item">
           <span class="pi-qty">1x</span>
-          <span class="pi-name">Rhino Rack Platform Backbone</span>
+          <a href="#" class="pi-name">Rhino Rack Platform Backbone</a>
           <span class="pi-sku sku-copy" data-copy="RTHB1" role="button" title="Click to copy SKU">RTHB1</span>
         </div>
         <div class="package-item">
           <span class="pi-qty">1x</span>
-          <span class="pi-name">Rhino Rack Tracks — Hilux Double Cab</span>
+          <a href="#" class="pi-name">Rhino Rack Tracks — Hilux Double Cab</a>
           <span class="pi-sku sku-copy" data-copy="RTS556" role="button" title="Click to copy SKU">RTS556</span>
         </div>
       </div>
@@ -339,7 +339,7 @@
     <div class="item" data-trust="founded"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
     <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg><h4>Trained Professionals</h4><p>Over 200,000 roof racks fitted</p></div>
     <div class="item" data-trust="network"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><h4>Australia's Largest</h4><p>We're the only nationwide roof rack specialists</p></div>
-    <div class="item"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: <a href="tel:1300071264">1300 071 264</a></p></div>
+    <div class="item" data-trust="phone"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg><h4>Need Help</h4><p>Contact us on: <a href="tel:1300071264">1300 071 264</a></p></div>
   </div>
 
   <section id="showroom" style="margin:40px 0;">
@@ -366,6 +366,41 @@
            2026-09-10), no longer a Demo State Panel toggle. See applyShowroomMapFlag() in
            shared.js. -->
       <div class="showroom-map" id="showroomMap"></div>
+    </div>
+  </section>
+
+  <!-- Discontinued-state alternatives (backlog item 23) — hidden unless the Demo State
+       Panel's "Discontinued" stock status is selected, see applyStockStatus() in
+       shared.js. Real, currently-live roof rack kits genuinely fitted to a Hilux N80
+       (per the backlog's "prioritise vehicle-fit matches where applicable" instruction),
+       not fabricated. -->
+  <section class="discontinued-alternates" hidden>
+    <h3 class="related-heading">This product has been discontinued — similar alternatives</h3>
+    <div class="related-grid">
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/F/r/Front-Runner-KRTH011T_1.jpg" alt="Front Runner Slimline II Rack Kit for Toyota Hilux N80">
+        <div class="body">
+          <h5>Slimline II Rack Kit — Fits Hilux N80 — KRTH011T</h5>
+          <div class="price">$409.00</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/y/a/yakima-v2-small-platform-ruggedline1_2XTEFE_1.jpg" alt="Yakima LockNLoad Platform for Toyota Hilux N80">
+        <div class="body">
+          <h5>LockNLoad Platform 1390x1250mm — Fits Hilux N80</h5>
+          <div class="price">$236.55</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-card">
+        <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/W/C/WC-THDC16-1412_Thumbnail_X7RDIA_1.jpg" alt="Wedgetail Core Platform Roof Rack for Toyota Hilux N80">
+        <div class="body">
+          <h5>Wedgetail Core Platform Roof Rack — Fits Hilux N80 — WC-THDC16-1412</h5>
+          <div class="price">$1,400.00</div>
+          <button class="btn btn-outline btn-block">Add to Cart</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -481,6 +516,42 @@
         </div>
         <input type="radio" name="tabs" id="t4"><label for="t4">Shipping Info</label>
         <div class="content">
+          <div class="dc-widget" style="margin-bottom:22px;">
+            <div class="dc-tabs">
+              <button class="dc-tab" data-dc-tab="delivery"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="13" height="9"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg> Delivery</button>
+              <button class="dc-tab active" data-dc-tab="collect"><svg class="dc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Click &amp; Collect</button>
+            </div>
+            <div class="dc-postcode-row">
+              <input type="text" class="dc-input" data-dc-postcode placeholder="Enter your postcode">
+              <button type="button" class="btn btn-outline" data-dc-update>Update</button>
+            </div>
+            <div class="dc-panel" data-dc-panel="delivery" hidden>
+              <div class="dc-postcode-prompt">Enter your postcode above to see delivery options.</div>
+              <div class="dc-results" hidden>
+                <div class="dc-option">
+                  <div><strong>Standard Freight</strong><br><span class="muted">3–5 business days to your postcode</span></div>
+                  <div class="dc-price">$49.00</div>
+                </div>
+                <div class="dc-option">
+                  <div><strong>Express Freight</strong><br><span class="muted">1–2 business days to your postcode</span></div>
+                  <div class="dc-price">$89.00</div>
+                </div>
+              </div>
+            </div>
+            <div class="dc-panel" data-dc-panel="collect">
+              <div class="dc-results">
+                <div class="dc-store">
+                  <div><strong>Moorebank</strong><span class="stock-chip in">In Stock</span><span class="stock-chip display">On Display</span><br><span class="muted">12 Centenary Ave, Moorebank 2170</span><br><a class="store-phone" href="tel:0290538621">(02) 9053 8621</a><a class="store-map-link" href="https://maps.app.goo.gl/371QHZWa4pDU4qzA7" target="_blank" rel="noopener noreferrer">View on map</a></div>
+                  <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+                </div>
+                <div class="dc-store">
+                  <div><strong>Smeaton Grange</strong><span class="stock-chip order">Order In — 1-2 Days</span><br><span class="muted">3/18 Exchange Parade, Smeaton Grange 2567</span><br><a class="store-phone" href="tel:0282157092">(02) 8215 7092</a><a class="store-map-link" href="https://maps.app.goo.gl/Khp5w9LoxReciEho7" target="_blank" rel="noopener noreferrer">View on map</a></div>
+                  <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Select Store</button>
+                </div>
+              </div>
+              <div class="dc-viewall-row"><span class="dc-viewall-line">In stock and on display in 35 stores — </span><a href="#" class="dc-viewall" data-store-slideout>View all stores</a></div>
+            </div>
+          </div>
           <p><strong>Shipping &amp; Delivery Information.</strong> At Roof Racks Galore, we are proud to be Australia's only nationwide roof rack specialists, with over 30 stores across all major Australian cities. Thanks to our extensive network of Distribution Centres located in key states — Queensland, Western Australia, Victoria, New South Wales, South Australia, and the Australian Capital Territory — we offer the fastest and most reliable delivery service in the industry.</p>
           <div class="details-sub">
             <h5>Why Choose Roof Racks Galore?</h5>
@@ -719,32 +790,11 @@
   </div>
 </div>
 
-<section class="rationale">
-  <div class="wrap">
-    <h2>Design Rationale — Fitment Confidence Command Center</h2>
-    <div class="grid">
-      <div class="card">
-        <h4>Decisions</h4>
-        <p>Fitment status is the first thing under the title in a "decision panel," directly followed by the Build Option variant picker, then price, total-cost note, and Add to Cart — resolving spec Section 4 item 1 (a vehicle-specific kit can carry a config-variant alongside fitment logic, not either/or). The picker reuses config-variant's comparison-card pattern rather than introducing a new UI convention, and it live-updates SKU, price, specifications and the Fitting Instructions link the same way. Once the initial panel scrolls out of view, a condensed persistent bar (fitment + price + Add to Cart) pins to the top of the page for the rest of the scroll. Delivery/Click &amp; Collect is now a full-width tabbed widget (not a small button), and Showroom Finder is a standalone high-contrast CTA block that leads with "on display at N stores nationwide" rather than a plain link.</p>
-      </div>
-      <div class="card">
-        <h4>Grounded in</h4>
-        <p>Section 0.1.5 (fitment beside price/CTA, non-negotiable — now true at every scroll depth, not just above the fold); 0.1.3 (reviews visual weight); 0.1.4 (total-cost/shipping visibility, and the Delivery/Click &amp; Collect widget now actually surfaces Standard vs Express cost and per-store stock rather than hiding it behind a click); 0.1.7 (3-second confidence rule). Showroom Finder's stronger framing is a direct response to stakeholder feedback that it should function as its own trust-building CTA, not a passive utility link.</p>
-        <p class="cite">Baymard Institute; Spiegel Research Center; Blend Commerce PerTronix case study.</p>
-      </div>
-      <div class="card tradeoff">
-        <h4>Trade-off</h4>
-        <p>The gallery still only gets ~55% of the hero width on desktop — that trade-off stands. The two new full-width sections (Delivery/Click &amp; Collect, Showroom Finder) add meaningful page length before the Fitment Gallery; worth watching whether that pushes the Fitment Gallery too far down for lower-intent visitors, versus the trust/logistics payoff for higher-intent ones. The Flat Pack SKU, price and assembly-time figures in the new Build Option picker are fabricated demo data (no real Flat Pack listing exists for this exact Hilux kit yet) — modelled on the real Assembled/Flat Pack pricing ratio seen on the Pioneer 6 Platform pair (RH62112/RH62112F). Needs a real SKU and price from the client before this leaves prototype stage, same caution as the plank-count and package-item SKU flags elsewhere in this project.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <script src="../_shared/shared.js"></script>
 <script>
 // Build-option variant model for this kit, combined with the fitment object shared.js
 // already defines (PRODUCT_FITMENT) — spec Section 4 item 1: fitment + variants[] on one
-// record. Flat Pack SKU/price are demo placeholders (flagged in the rationale below).
+// record. Flat Pack SKU/price are demo placeholders (no real Flat Pack listing exists yet).
 const VEHICLE_PRODUCT = {
   shared: {
     specifications_shared: {

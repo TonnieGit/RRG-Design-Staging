@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#F5F5F4" />
+  <rect x="16" y="16" width="1168" height="643" rx="10" fill="none" stroke="#BDBDBD" stroke-width="3" stroke-dasharray="14 10" />
+  <g transform="translate(600,270)" fill="none" stroke="#9A9A9A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-70" y="-40" width="140" height="100" rx="10" />
+    <path d="M-30,-40 L-18,-60 L18,-60 L30,-40" />
+    <circle cx="0" cy="12" r="30" />
+    <circle cx="0" cy="12" r="12" />
+  </g>
+  <text x="600" y="410" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#4A4A4A">Screenshot pending</text>
+  <text x="600" y="450" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#6B6B6B">Will be captured once this section's build is finished and stable —</text>
+  <text x="600" y="478" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#6B6B6B">see spec.md for current status. Not a bug — this page section is real, just not yet photographed.</text>
+</svg>
