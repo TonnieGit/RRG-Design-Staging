@@ -634,7 +634,27 @@
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
+<!-- Persistent decision bar (desktop): fitment-free version of Vehicle-Specific's bar
+     (spec.md §12 item 1, 2026-09-12) — thumbnail+name+price+CTA, no fitment/Rack Fit
+     Guarantee badge since this template has no vehicle-fitment concept. -->
+<div class="persistent-bar" id="persistentBar">
+  <div class="wrap persistent-inner">
+    <div class="persistent-product">
+      <img class="persistent-thumb" src="https://www.roofracksgalore.com.au/pub/media/catalog/product/F/r/Front-Runner-WTAN063-Platforms--Trays---Accessories._1_1.jpg" alt="">
+      <span class="persistent-name">Front Runner Pro Water Tank With Strap 42L</span>
+    </div>
+    <div class="price-row">
+      <span class="price-now">$299.00</span>
+      <span class="price-was">$350.00</span>
+    </div>
+    <button class="btn btn-primary" data-cta-label>Add To Cart</button>
+  </div>
+</div>
+
 <script src="../_shared/shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => initPersistentBar('.decision-panel', '#persistentBar'));
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",
@@ -651,6 +671,34 @@
     "availability": "https://schema.org/InStock",
     "url": "https://www.roofracksgalore.com.au/front-runner-pro-water-tank-with-strap-42l-wtan063"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Will this fit on any roof rack platform?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — the mounting strap system is designed to work with most flat platform trays and crossbar setups. Check your rack's load rating against the tank's filled weight (42kg at full 42L capacity) before fitting." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the tank food-grade and safe for drinking water?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — it's made from food-grade, BPA-free polyethylene, the same material used in standard drinking-water containers." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I remove the tank to use at the campsite?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — it's designed to unclip from the mounting system so you can carry it to ground level for use away from the vehicle." }
+    },
+    {
+      "@type": "Question",
+      "name": "What's covered if something isn't right with my order?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Every purchase is covered by our 90-day exchange policy — see the Gold Guarantee tab above for full details." }
+    }
+  ]
 }
 </script>
 </body>

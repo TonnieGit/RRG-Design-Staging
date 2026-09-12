@@ -614,6 +614,25 @@
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
+<!-- Persistent decision bar (desktop): fitment-free version of Vehicle-Specific's bar
+     (spec.md §12 item 1, 2026-09-12) — thumbnail+name+price+CTA, no fitment/Rack Fit
+     Guarantee badge since this template has no vehicle-fitment concept. Thumbnail/price
+     are id-targeted (not just classed) so renderGallery()/renderPrice() below keep them
+     in sync with the selected colour, same as #mobilePrice already does. -->
+<div class="persistent-bar" id="persistentBar">
+  <div class="wrap persistent-inner">
+    <div class="persistent-product">
+      <img class="persistent-thumb" id="persistentThumb" src="" alt="">
+      <span class="persistent-name">MAXTRAX MKII Recovery Boards</span>
+    </div>
+    <div class="price-row">
+      <span class="price-now" id="persistentPriceNow"></span>
+      <span class="price-was" id="persistentPriceWas" hidden></span>
+    </div>
+    <button class="btn btn-primary" data-cta-label>Add To Cart</button>
+  </div>
+</div>
+
 <script src="../_shared/shared.js"></script>
 <script>
 const MAXTRAX_FAMILY = {
@@ -673,6 +692,8 @@ function renderSwatches() {
 function renderGallery(color) {
   const mainImg = document.getElementById('mainImg');
   mainImg.src = color.images[0];
+  const persistentThumb = document.getElementById('persistentThumb');
+  if (persistentThumb) persistentThumb.src = color.images[0];
   const thumbs = document.getElementById('galleryThumbs');
   thumbs.innerHTML = color.images.map((src, i) => `<img class="${i===0?'active':''}" src="${src}" onclick="document.getElementById('mainImg').src=this.src; document.querySelectorAll('#galleryThumbs img').forEach(im=>im.classList.remove('active')); this.classList.add('active');">`).join('');
 }
@@ -692,6 +713,17 @@ function renderPrice(color) {
     saveBadge.hidden = true;
   }
   document.getElementById('mobilePrice').innerHTML = `${fmtMoney(color.price_now)}` + (color.price_now < color.price_was ? ` <span style="color:#8a8a8a;font-weight:400;text-decoration:line-through;font-size:11px;">${fmtMoney(color.price_was)}</span>` : '');
+  const persistentPriceNow = document.getElementById('persistentPriceNow');
+  const persistentPriceWas = document.getElementById('persistentPriceWas');
+  if (persistentPriceNow) persistentPriceNow.textContent = fmtMoney(color.price_now);
+  if (persistentPriceWas) {
+    if (color.price_now < color.price_was) {
+      persistentPriceWas.textContent = fmtMoney(color.price_was);
+      persistentPriceWas.hidden = false;
+    } else {
+      persistentPriceWas.hidden = true;
+    }
+  }
 }
 
 function renderStock(color) {
@@ -731,7 +763,38 @@ function renderAll() {
   if (typeof reapplySaleFlag === 'function') reapplySaleFlag();
 }
 
-document.addEventListener('DOMContentLoaded', renderAll);
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+  initPersistentBar('.decision-panel', '#persistentBar');
+});
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does colour affect strength or recovery capacity?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No — every colour in the range shares the same construction, tread pattern and load rating. Colour is purely a personal preference/visibility choice." }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need mounting brackets to carry these on my roof rack?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — a compatible mounting bracket is sold separately and is required to carry these securely on most roof rack platforms. Check the Related Products below for options that suit this model." }
+    },
+    {
+      "@type": "Question",
+      "name": "Will all colours always be in stock?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Stock varies by colour and store — check the stock status above or use Click & Collect to confirm availability at your nearest store before visiting." }
+    },
+    {
+      "@type": "Question",
+      "name": "What's your returns policy if I choose the wrong colour?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Unused items in original packaging are covered by our 90-day exchange policy — see the Gold Guarantee tab above for full details." }
+    }
+  ]
+}
 </script>
 </body>
 </html>

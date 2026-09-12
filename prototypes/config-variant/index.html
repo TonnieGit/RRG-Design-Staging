@@ -617,6 +617,25 @@
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
+<!-- Persistent decision bar (desktop): fitment-free version of Vehicle-Specific's bar
+     (spec.md §12 item 1, 2026-09-12) — thumbnail+name+price+CTA, no fitment/Rack Fit
+     Guarantee badge since this template has no vehicle-fitment concept. Thumbnail/price
+     are id-targeted (not just classed) so renderGallery()/renderPrice() below keep them
+     in sync with the selected variant, same as #mobilePrice already does. -->
+<div class="persistent-bar" id="persistentBar">
+  <div class="wrap persistent-inner">
+    <div class="persistent-product">
+      <img class="persistent-thumb" id="persistentThumb" src="" alt="">
+      <span class="persistent-name">Rhino Rack 6 Series Pioneer Platform 900 x 1430mm</span>
+    </div>
+    <div class="price-row">
+      <span class="price-now" id="persistentPriceNow"></span>
+      <span class="price-was" id="persistentPriceWas"></span>
+    </div>
+    <button class="btn btn-primary" data-cta-label>Add To Cart</button>
+  </div>
+</div>
+
 <script src="../_shared/shared.js"></script>
 <script>
 const MERGED_PRODUCT = {
@@ -738,6 +757,8 @@ function renderVariantPicker() {
 function renderGallery(variant) {
   const mainImg = document.getElementById('mainImg');
   mainImg.src = variant.images[0];
+  const persistentThumb = document.getElementById('persistentThumb');
+  if (persistentThumb) persistentThumb.src = variant.images[0];
   const thumbs = document.getElementById('galleryThumbs');
   thumbs.innerHTML = variant.images.map((src, i) => `<img class="${i===0?'active':''}" src="${src}" onclick="document.getElementById('mainImg').src=this.src; document.querySelectorAll('#galleryThumbs img').forEach(im=>im.classList.remove('active')); this.classList.add('active');">`).join('');
 }
@@ -749,6 +770,10 @@ function renderPrice(variant) {
   document.getElementById('saveBadge').textContent = `Save ${variant.discount_pct}%`;
   document.getElementById('saveBadge').hidden = false;
   document.getElementById('mobilePrice').innerHTML = `${fmtMoney(variant.price_now)} <span style="color:#8a8a8a;font-weight:400;text-decoration:line-through;font-size:11px;">${fmtMoney(variant.price_was)}</span>`;
+  const persistentPriceNow = document.getElementById('persistentPriceNow');
+  const persistentPriceWas = document.getElementById('persistentPriceWas');
+  if (persistentPriceNow) persistentPriceNow.textContent = fmtMoney(variant.price_now);
+  if (persistentPriceWas) persistentPriceWas.textContent = fmtMoney(variant.price_was);
 }
 
 function renderSpecs(variant) {
@@ -771,7 +796,38 @@ function renderAll() {
   if (typeof reapplyFittedOption === 'function') reapplyFittedOption();
 }
 
-document.addEventListener('DOMContentLoaded', renderAll);
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+  initPersistentBar('.decision-panel', '#persistentBar');
+});
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What's the actual difference between Assembled and Flat Pack?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The platform and hardware are identical — Assembled arrives pre-built and ready to bolt straight to your crossbars, Flat Pack arrives disassembled at a lower price and takes roughly 30–45 minutes to build using the included instructions." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the plank count really differ between the two options?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Our current data shows a difference in plank count between the two builds — see the Specifications tab for the exact count on your selected option. We're confirming with the manufacturer whether this is intentional." }
+    },
+    {
+      "@type": "Question",
+      "name": "What weight can the platform carry?",
+      "acceptedAnswer": { "@type": "Answer", "text": "See the Specifications tab for this SKU's rated load capacity — this varies by vehicle roof-load rating as well as the platform itself, so always check your vehicle's own limit too." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get this professionally fitted?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — select the \"Get It Fitted\" option where shown, or book fitting in-store after purchase. See the Gold Guarantee tab for what's covered when we fit it for you." }
+    }
+  ]
+}
 </script>
 </body>
 </html>

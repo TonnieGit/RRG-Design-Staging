@@ -667,7 +667,27 @@
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
+<!-- Persistent decision bar (desktop): fitment-free version of Vehicle-Specific's bar
+     (spec.md §12 item 1, 2026-09-12) — thumbnail+name+price+CTA, no fitment/Rack Fit
+     Guarantee badge since this template has no vehicle-fitment concept. -->
+<div class="persistent-bar" id="persistentBar">
+  <div class="wrap persistent-inner">
+    <div class="persistent-product">
+      <img class="persistent-thumb" src="https://www.roofracksgalore.com.au/pub/media/catalog/product/y/a/yakima-8004109-camping_1.jpg" alt="">
+      <span class="persistent-name">Yakima RoadShower 15L Complete Shower &amp; Hose Bundle</span>
+    </div>
+    <div class="price-row">
+      <span class="price-now">$449.00</span>
+      <span class="price-was">$846.00</span>
+    </div>
+    <button class="btn btn-primary" data-cta-label>Add To Cart</button>
+  </div>
+</div>
+
 <script src="../_shared/shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => initPersistentBar('.decision-panel', '#persistentBar'));
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",
@@ -684,6 +704,34 @@
     "availability": "https://schema.org/InStock",
     "url": "https://www.roofracksgalore.com.au/yakima-roadshower-15l-complete-shower-hose-bundle-8004109promo"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What exactly is included in this bundle?",
+      "acceptedAnswer": { "@type": "Answer", "text": "See the What's Included list above for the full component breakdown with individual SKUs — everything shown ships together as one order." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I buy the individual components separately instead?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Some components may be available individually — click through on the What's Included list above to check each component's own product page." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this bundle need to be professionally fitted?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No — this bundle is designed for straightforward DIY mounting. Fitting instructions are included in the box and available in the Fitting Instructions tab where provided." }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens at checkout if I only want part of the bundle?",
+      "acceptedAnswer": { "@type": "Answer", "text": "This bundle is sold as one fixed set at the bundle price — if you only need individual components, check whether they're listed separately on the site." }
+    }
+  ]
 }
 </script>
 </body>

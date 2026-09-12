@@ -113,7 +113,6 @@ function applyFitmentState(state, vehicle) {
   });
   document.querySelectorAll('[data-cta-label]').forEach(btn => {
     btn.textContent = c.cta;
-    btn.disabled = state === 'no_fit';
     btn.classList.toggle('btn-outline', state !== 'fits');
     btn.classList.toggle('btn-primary', state === 'fits');
   });
@@ -217,7 +216,10 @@ function initDcPostcode(root = document) {
         if (currentRegion !== 'AU') {
           // No trailing " — " here (unlike the AU branch below) since the "View all
           // stores" link that dash used to lead into is hidden for single-store regions.
-          line.firstChild.textContent = `On display at the ${REGION_SINGLE_STORES[currentRegion].name} Store`;
+          const singleStore = REGION_SINGLE_STORES[currentRegion];
+          line.firstChild.textContent = singleStore.onDisplay
+            ? `On display at the ${singleStore.name} Store`
+            : `In stock at the ${singleStore.name} Store`;
         } else {
           line.firstChild.textContent = val
             ? `Showing stores within 100km of ${val} — `
@@ -573,9 +575,15 @@ const STOCK_STATUS = {
 // switches while the drawer's trigger is already visible.
 function renderStockLine(line) {
   const cfg = STOCK_STATUS[adminState.stockStatus] || STOCK_STATUS.in_stock;
+  // Discontinued (2026-09-12, spec.md §12 item 35): the .discontinued-banner already
+  // states the product is discontinued, so this line is hidden entirely instead of
+  // duplicating that message — every other state clears `hidden` so it doesn't stay
+  // stuck hidden after toggling back off Discontinued.
+  line.hidden = !!cfg.discontinued;
+  if (cfg.discontinued) return;
   line.className = 'stock-status-line ' + cfg.cls;
   line.textContent = cfg.text;
-  if (!adminState.exdemo || cfg.discontinued) return;
+  if (!adminState.exdemo) return;
   const block = line.closest('.price-block');
   const basePrice = block ? currentPagePrice(block) : 0;
   const from = buildExdemoOptions(basePrice).reduce((min, o) => Math.min(min, o.price), Infinity);
@@ -1085,8 +1093,8 @@ function renderShowroomMapPins(region) {
   } else {
     const s = REGION_SINGLE_STORES[region];
     if (!s) return;
-    showroomPinLayer = L.marker([s.lat, s.lng], { icon: rrgPinIcon(true), rrgOnDisplay: true })
-      .bindPopup(`<strong>${s.name} Store</strong><br>${s.address}<br>On Display`)
+    showroomPinLayer = L.marker([s.lat, s.lng], { icon: rrgPinIcon(s.onDisplay), rrgOnDisplay: s.onDisplay })
+      .bindPopup(`<strong>${s.name} Store</strong><br>${s.address}<br>${s.onDisplay ? 'On Display' : 'In-store stock varies'}`)
       .addTo(showroomLeafletMap);
     showroomLeafletMap.setView([s.lat, s.lng], 12);
   }
@@ -1128,9 +1136,14 @@ function applyShowroomMapFlag(on) {
 // Store"). Changing UK's `name` here fixes both the Showroom Finder heading
 // (applyRegionShowroomHeading()) and the Click & Collect "On display at the ___ Store" line
 // (initDcPostcode()) at once, since both already read from this one field.
+// onDisplay (2026-09-12, spec.md §12 item 22): same real/placeholder on-display concept
+// as AU's ON_DISPLAY_STORES set — both single-store regions default to true here (demo
+// state, same as the rest of this file's data), but the flag now actually gates the
+// Click & Collect "On display" line and the Showroom map's single-pin popup instead of
+// both being hardcoded to assert it unconditionally.
 const REGION_SINGLE_STORES = {
-  NZ: { name: 'Auckland', address: '195A Wairau Road, Wairau Valley, Auckland, 0627', phone: '09 481 1910', lat: -36.7747, lng: 174.7381, note: 'Roof Racks Galore, Auckland — roofracksgalore.co.nz/contact-us' },
-  UK: { name: 'Bolton', address: 'Unit B9, Edge Fold Industrial Estate, Plodder Lane, Farnworth, Bolton, BL4 0LR', phone: '01204 899778', lat: 53.5503, lng: -2.3882, note: 'The Roof Box Company, Manchester North Store — roofbox.co.uk/locations/manchester-north.php' }
+  NZ: { name: 'Auckland', address: '195A Wairau Road, Wairau Valley, Auckland, 0627', phone: '09 481 1910', lat: -36.7747, lng: 174.7381, onDisplay: true, note: 'Roof Racks Galore, Auckland — roofracksgalore.co.nz/contact-us' },
+  UK: { name: 'Bolton', address: 'Unit B9, Edge Fold Industrial Estate, Plodder Lane, Farnworth, Bolton, BL4 0LR', phone: '01204 899778', lat: 53.5503, lng: -2.3882, onDisplay: true, note: 'The Roof Box Company, Manchester North Store — roofbox.co.uk/locations/manchester-north.php' }
 };
 
 // Trust Row phone number (backlog item 28, 2026-09-11) — real numbers per region. Applied
@@ -1143,7 +1156,7 @@ const REGION_LABELS = { AU: 'Australia', NZ: 'New Zealand', UK: 'United Kingdom'
 const REGION_FLAGS = { AU: '🇦🇺', NZ: '🇳🇿', UK: '🇬🇧' };
 
 // AU/UK default to the Click & Collect tab, NZ defaults to Delivery — per spec.md item 21.
-const REGION_DEFAULT_DC_TAB = { AU: 'collect', NZ: 'delivery', UK: 'collect' };
+const REGION_DEFAULT_DC_TAB = { AU: 'collect', NZ: 'delivery', UK: 'delivery' };
 
 // Trust row's founded/network claims are real facts about the current AU-only business —
 // swapped to honest regional placeholders rather than a literal "Australia's Largest" claim

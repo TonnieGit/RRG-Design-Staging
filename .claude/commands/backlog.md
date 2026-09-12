@@ -6,11 +6,11 @@ This command can start a brand-new chat with no other context loaded — assume 
 
 ## Step 1 — Surface what's outstanding
 
-Read `spec.md` Section 10 in full ("Next backlog — 2026-09-11" and its subsections A/B/C/D). Build a numbered list of every item still marked **⬜** (skip anything ✅ or otherwise marked done) — keep each item's own existing number from spec.md, don't renumber. For each, give a one-line plain-English summary (what it is, not the full spec.md wording).
+Read `spec.md` in full, not just Section 10 — outstanding backlog items live in more than one section (e.g. Section 10's own A/B/C/D subsections, and later backlogs such as Section 12's dev-brief review list; treat every numbered/lettered backlog-style list in the file as in scope, not just the first one found). Build a numbered list of every item still marked **⬜** (skip anything ✅ or otherwise marked done, and skip 🤔/💬-flagged items that are explicitly "needs a separate discussion, not scoped yet" rather than pickable work — list those separately if present, don't fold them into the numbered pick-list). Keep each item's own existing number from spec.md, don't renumber — if two sections both use small numbers (e.g. two "item 3"s), prefix with the section so the list stays unambiguous (e.g. "10.A-3", "12-3"). For each, give a one-line plain-English summary (what it is, not the full spec.md wording).
 
-Present that list to Brenton and ask which number he wants to pick up this session. If the list is short enough (≤4 items), you may offer it via `AskUserQuestion`; otherwise just list it in text and ask directly which number.
+Present that list to Brenton and ask which item he wants to pick up this session. If the combined list is short enough (≤4 items), you may offer it via `AskUserQuestion`; otherwise just list it in text and ask directly which one.
 
-Don't include anything outside Section 10 unless Brenton explicitly asks for it (e.g. Section 7's data gaps are a different kind of outstanding item, not part of "the backlog").
+Don't include anything outside spec.md's own backlog-style lists unless Brenton explicitly asks for it (e.g. Section 7's data gaps are a different kind of outstanding item, not part of "the backlog," unless a section elsewhere explicitly numbers them as backlog items).
 
 ## Step 2 — Re-ground yourself in that specific item
 

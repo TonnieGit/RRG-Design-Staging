@@ -194,7 +194,7 @@
 
       <div class="fitment-wrap">
         <div class="fitment fits" data-fitment-slot></div>
-        <img class="rack-fit-badge" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
+        <img class="rack-fit-badge" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee" data-jump-tab="t3">
       </div>
 
       <!-- Product Notes (renamed 2026-09-11 from "Important Vehicle Fit Notes" — same
@@ -775,7 +775,7 @@
     <span class="persistent-name">Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</span>
   </div>
   <div class="info fitment fits" data-fitment-slot data-fitment-copyable="icon-only" style="padding:8px;border-radius:8px;font-size:11px;"></div>
-  <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
+  <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee" data-jump-tab="t3">
   <button class="btn btn-primary" data-cta-label style="padding:12px 18px;font-size:13px;">Add To Cart</button>
 </div>
 
@@ -789,7 +789,7 @@
       <span class="persistent-name">Rhino Rack Pioneer 6 Platform Kit — Toyota Hilux N80 (2015–2026), Bare Roof</span>
     </div>
     <div class="fitment fits" data-fitment-slot data-fitment-copyable="compact"></div>
-    <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee">
+    <img class="rack-fit-badge-icon" src="../_shared/fitgaurantee.svg" alt="Rack Fit Guarantee" title="Peace of mind with our FREE Nationwide Rack Guarantee" data-jump-tab="t3">
     <div class="price-row">
       <span class="price-now">$1,893.09</span>
       <span class="price-was">$2,137.00</span>
@@ -894,6 +894,34 @@ document.addEventListener('DOMContentLoaded', () => {
   renderVehicleAll();
   initPersistentBar('.decision-panel', '#persistentBar');
 });
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Will this fit my Hilux if it's a different year to N80?",
+      "acceptedAnswer": { "@type": "Answer", "text": "This kit is matched to the Toyota Hilux N80 generation shown in the fitment status above. Confirm your exact vehicle using the vehicle selector — a different generation may need a different kit." }
+    },
+    {
+      "@type": "Question",
+      "name": "What if my saved vehicle shows \"Confirm your vehicle\" instead of a fit?",
+      "acceptedAnswer": { "@type": "Answer", "text": "That means we need a couple more details (body style or roof type) to confirm fitment precisely — use \"Find The Right Fit\" beside the fitment status to resolve it before ordering." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the Rack Fit Guarantee cost extra?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No — it's included automatically whenever your saved vehicle is a confirmed match. See the badge next to the fitment status for details." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get this professionally fitted, and does it cost extra?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — select the \"Get It Fitted\" option where shown. Fitting charges apply and are confirmed in-store before installation; see the Gold Guarantee tab for what's covered." }
+    }
+  ]
+}
 </script>
 </body>
 </html>

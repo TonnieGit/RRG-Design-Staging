@@ -352,8 +352,8 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    icon-only version with a title tooltip since there's no room for the caption there. */
 .fitment-wrap{position:relative;}
 .fitment-wrap .fitment{padding-right:50px;}
-.rack-fit-badge{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:32px;height:auto;}
-.rack-fit-badge-icon{width:20px;height:auto;flex:0 0 auto;}
+.rack-fit-badge{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:32px;height:auto;cursor:pointer;}
+.rack-fit-badge-icon{width:20px;height:auto;flex:0 0 auto;cursor:pointer;}
 
 /* Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — vehicle-specific only,
    model-specific fitment caveats. Distinct amber/warning accent so it doesn't read as
@@ -716,7 +716,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Discontinued banner — sits above Add to Cart in place of the button/payment-badges
    (which are hidden via .cta-col[hidden] while this state is active), demo admin panel
    "Discontinued" stock-status option, backlog item 23, 2026-09-11. */
-.discontinued-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--rrg-nofit);background:var(--rrg-nofit-bg);border:1px solid var(--rrg-nofit);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+.discontinued-banner{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#000;background:var(--rrg-nofit-bg);border:1px solid var(--rrg-nofit);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
 
 /* Brand logo — required on every product page, sits at the top of the decision panel.
    Fixed height/auto width made MAXTRAX (and Front Runner, same source aspect ratio)
@@ -813,7 +813,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .exdemo-option{border:1px solid var(--rrg-line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
 .exdemo-option .eo-img{width:64px;height:64px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:6px;flex:0 0 auto;}
 .exdemo-option .eo-info{flex:1;min-width:0;}
-.exdemo-option .eo-tag{display:inline-block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
+.exdemo-option .eo-tag{display:inline-block;white-space:nowrap;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
 .exdemo-option .eo-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
 .exdemo-option .eo-was{font-size:12px;color:#8a8a8a;text-decoration:line-through;margin-left:6px;}
 .exdemo-option .eo-note{font-size:12px;color:#666;margin-top:2px;}
