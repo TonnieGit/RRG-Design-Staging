@@ -1001,7 +1001,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 
 /* Fitted Photos Gallery slide-out — right-edge drawer, "View All In-store Fitments" from
    the Fitted Photos Gallery panel (vehicle-specific only). Same backdrop/drawer/transition
-   convention as .store-slideout*/.exdemo-slideout* above (independent instance), but wider
+   convention as .store-slideout / .exdemo-slideout above (independent instance), but wider
    since it holds a photo grid rather than a text list. */
 .fit-gallery-slideout-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s ease;}
 .fit-gallery-slideout-backdrop.open{opacity:1;pointer-events:auto;}
