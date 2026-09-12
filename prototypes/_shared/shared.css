@@ -354,6 +354,11 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .fitment-wrap .fitment{padding-right:50px;}
 .rack-fit-badge{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:32px;height:auto;cursor:pointer;}
 .rack-fit-badge-icon{width:20px;height:auto;flex:0 0 auto;cursor:pointer;}
+/* Recolourable placeholder icon (2026-09-12, spec.md Section 12 item 12) — replaces the
+   old fitgaurantee.svg (confirmed to be a baked-in raster image wrapped in an <svg>, not
+   a real vector, so it couldn't be recoloured at all). Tied directly to --rrg-fits since
+   the badge only ever shows in the "Fits your vehicle" state — no dedicated token needed. */
+.rack-fit-badge,.rack-fit-badge-icon{color:var(--rrg-fits);}
 
 /* Important Vehicle Fit Notes (2026-09-10, Graham Sowerby meeting) — vehicle-specific only,
    model-specific fitment caveats. Distinct amber/warning accent so it doesn't read as
