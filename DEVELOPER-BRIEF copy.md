@@ -1,14 +1,58 @@
 # Developer Brief — PDP Rebuild Handover
 
+**Audience:** the internal developer building the real Magento 2 product page templates.
+**Source design:** the static HTML/CSS/JS prototypes in `prototypes/` (this repo). This brief is the bridge between "what the prototype does" and "what to build in Magento" — it explains *why* each piece works the way it does, not just what it looks like, so implementation decisions in Magento can stay consistent with the intent even where the exact code can't be lifted verbatim.
 
+## 0. How to use this document
 
+- This is a **living document**, not a one-time export. It gets a new section (or an update to an existing one) whenever a feature is finalized in the prototype and ready to hand over — not necessarily every prototype change, only ones relevant to the real build.
+- Every time this file changes, that change is also noted in `spec.md` (see its "Developer Brief" section) so anyone reading the project history knows this document moved.
+- Where a feature is a **plain copy-paste external integration** (a vendor script tag, a widget embed), this brief gives you the exact, current, working code block used in the prototype — drop it into the Magento template as-is, then adjust only the values called out as per-product (typically the SKU).
+- Where a feature is **custom-built** (no vendor code, hand-rolled against the prototype's own CSS/JS conventions), this brief explains the logic and gives you the source so you can port it into Magento's own JS/template structure rather than copy-pasting verbatim (the prototype's `shared.js`/`shared.css` aren't part of the Magento build).
+- Screenshots show **where** something sits on the page and **what it looks like in its real, current state** — not mockups. Where a feature currently shows an empty/placeholder-like state because of real data gaps (e.g. no reviews exist yet against a SKU), that's called out explicitly so it isn't mistaken for a bug.
+- **Screenshots are captured in one pass, at the very end, once every template is 100% complete and ready to hand over — not per section, and not once individual sections settle.** Confirmed 2026-09-11 (tightened same day from an earlier "per-section, once stable" version — see 0.1 rule 2). Reasoning: a screenshot of one finished widget can still have an unfinished widget sitting right next to it in frame, or the page around it can shift again before the whole template is done — so "this section is done" isn't actually a safe point to shoot from. **This applies retroactively too:** every screenshot in this document was recaptured (or added fresh) in that final pass, and again in follow-up re-sync passes as features kept landing after it — see each entry's own history for exact dates.
+- For the full page-by-page component reference (every section/widget by name), see `PAGE-GLOSSARY.md`. For the project's business requirements and build history, see `spec.md`. This brief only covers pieces that are finalized enough to hand over — check `spec.md` Section 10 for what's still in progress.
+- **Component Library entries (Section 4) are ordered top-to-bottom by where they actually sit on the page** (reordered 2026-09-12, at Brenton's request — previously ordered by build history). Two things don't have one fixed on-page position and sit as bookends instead: the **Region Selector** (4.1, first) — its dropdown lives in the header, out of scope in detail, but it's the one control whose effects cascade across everything else in this section, so it's documented first; and the **Demo State Panel** (4.36, last) — reviewer-only tooling, not part of the shipped page at all.
+
+### 0.1 Rules for every section in this document
+
+These rules apply to every widget/section written up in this brief from now on:
+
+1. **Write it simply.** Plain English, short sentences. No jargon, no assumed technical background — a junior developer or a non-technical stakeholder should be able to follow it.
+2. **Screenshots are mandatory, for every state — but only captured once the entire page is complete, not per section.** Every widget/section still needs a screenshot for each visual state/variant it can appear in (e.g. empty vs. populated, in stock vs. special order, hidden vs. shown), with at least one showing the **whole page** with a **red arrow** pointing at the widget. A section can look individually finished while a widget right next to it in the same frame still isn't, so a per-section screenshot can still show unfinished neighbours or shift again before the page as a whole settles — **the rule: hold every screenshot in this entire document until all 5 templates are 100% complete and ready to hand over, then capture the whole set in one final pass**, even for sections whose own build finished earlier. Until then, use `dev-brief-assets/screenshot-pending.svg` in place of every real screenshot and say so plainly — the written spec (tables, data, code) can and should still be filled in ahead of that, only the visual proof waits. Before that final pass, also check every existing screenshot in the document for the Demo State Panel/admin FAB appearing in frame — it must never be visible in a captured image.
+3. **Every section covers at minimum three things, each its own labeled line:**
+   - **Name** — what it's called (match `PAGE-GLOSSARY.md` naming where possible).
+   - **Location** — where on the page it sits, in plain terms (e.g. "under the title, above the price").
+   - **Purpose** — why it's there / what problem it solves, in one or two plain sentences.
+
+Use this as the section template going forward:
+
+```
+### N. [Widget/Section Name]
+
+**Location:** [where it sits on the page, plain English]
+
+**Purpose:** [why it exists, one or two plain sentences]
+
+**States:**
+- [State 1 name] — [screenshot with red arrow showing location]
+- [State 2 name] — [screenshot]
+...
+
+[Code / implementation notes, if any]
+```
 
 ## 1. Project context
 
-**Audience:** Designed to provide Marc with detailed information regarding the individual layouts, sections, and widgets scross the new PDP page designs.
-**design:** This brief is the bridge between "what the prototype does" and "what to build in Magento" — it trys to explains *why* each piece works the way it does, not just what it looks like, so implementation decisions in Magento can stay consistent with the intent even where the exact code can't be lifted verbatim.
-
 RRG's current live PDP is being rebuilt from scratch for conversion (not a re-skin) across four product-type templates: Simple, Config-Variant, Sibling/Color, Vehicle-Specific, plus a fifth Grouped/Bundle variant. Full rationale is in `spec.md` Section 0. The prototypes are plain HTML/CSS/JS specifically so they're fast to iterate on visually before committing to the real Magento 2 template work — they are **not** the production codebase, but every visual/behavioral decision in them is final unless `spec.md` flags it as still open.
+
+Live prototype files (open directly, or via `prototypes/index.html` as a menu):
+- `prototypes/simple/index.html`
+- `prototypes/config-variant/index.html`
+- `prototypes/sibling-color/index.html`
+- `prototypes/vehicle-specific/index.html`
+- `prototypes/grouped-bundle/index.html`
+- `prototypes/_shared/shared.css` + `shared.js` — the component library all five import
 
 ---
 
@@ -1370,7 +1414,7 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 ### 4.36 Demo State Panel
 
-**Not part of the actual design — used to demo different states across the page only, do not build this in Magento.** A floating "Demo State" button (bottom-right, hidden on mobile) expanding into a panel that lets a reviewer preview every simulated product state (video/sale/stock/shipping/collect/special order/ex-demo/showroom/fitted-option/gallery-placement/session-vehicle/cart-contents) without needing real data for each. Every screenshot in this document was captured with this panel closed — see Section "Screenshot capture process" convention. Mentioned here only so a developer who notices it in the prototype's source knows to leave it out of the production build.
+**Not part of the shipped design — reviewer/QA tooling only, do not build this in Magento.** A floating "Demo State" button (bottom-right, hidden on mobile) expanding into a panel that lets a reviewer preview every simulated product state (video/sale/stock/shipping/collect/special order/ex-demo/showroom/fitted-option/gallery-placement/session-vehicle/cart-contents) without needing real data for each. Every screenshot in this document was captured with this panel closed — see Section "Screenshot capture process" convention. Mentioned here only so a developer who notices it in the prototype's source knows to leave it out of the production build.
 
 ---
 
@@ -1388,3 +1432,4 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 6. **`Product` schema's `priceCurrency` — region-specific, flag to whoever builds the Region Selector (4.1).** Every prototype template hardcodes `"priceCurrency": "AUD"` inline in its own `Product`/`Offer` JSON-LD block. The Region Selector's `applyRegionCurrency()` function (`shared.js`) only swaps the visible `$`/`£` symbol in on-page text — it doesn't touch these `<script>` blocks, so a UK/NZ page would still assert AUD pricing to search engines and AI shopping agents. In the real build, `priceCurrency` needs to follow the actual region/currency the page is served in.
 7. **`AggregateRating`/`Review` schema — not blocked on missing data.** No `aggregateRating` or `Review` schema exists yet in the `Product` block on any template, but the real data to populate it already exists: the Decision Panel star-rating badge (4.9) already calls `api.reviews.io/timeline/data` live per SKU and gets back `average_rating`/`review_count`. Once a SKU has real reviews, that same response can drive `aggregateRating` — this is a straightforward addition once building in Magento, not something waiting on new data the way the FAQ content behind the `FAQPage` schema is (4.32).
 
+**Before this leaves prototype stage:** none of the above is built in `prototypes/` — this section is scope/documentation only as of 2026-09-12, written up for the Magento build rather than prototyped first.
