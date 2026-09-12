@@ -502,15 +502,17 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    (this slot, under the title) and a second unclamped .short-desc paragraph lower on the page
    duplicating the Details tab's opening line. .value-prop was never a real Rackit field;
    .short-desc is, so the real content moved up here and the class name went with it).
-   "Read more" is now the link's LAST CHILD inside .short-desc itself (not a sibling row below
-   it) so it can sit inline at the end of the visible text — CSS line-clamp can't guarantee
-   that on its own (it clips straight through an inline child that doesn't fit on the
-   truncated line), so layoutShortDesc() in shared.js measures the real rendered height and
-   trims the text word-by-word until "<text>… Read more" fits within exactly 2 lines, re-run
-   on resize since available width changes how much fits per line. Base font-size/color
-   declared per-template. The link itself still jumps to the Details tab via
-   initTabJumpLinks() below, since the tabs accordion is pure CSS (radio + label + sibling
-   selector, no JS) and a plain anchor jump wouldn't check the tab's radio input. */
+   "Read more" is the link's LAST CHILD inside .short-desc itself (not a sibling row below it)
+   so it can sit inline at the end of the visible text — CSS line-clamp can't guarantee that on
+   its own (it clips straight through an inline child that doesn't fit on the truncated line),
+   so layoutShortDesc() in shared.js measures the real rendered height and trims the text
+   word-by-word until "<text>… Read more" fits within exactly 2 lines, re-run on resize since
+   available width changes how much fits per line. Base font-size/color declared per-template.
+   **Changed 2026-09-12 (Section 12 item 40):** "Read more" no longer jumps to the Details tab
+   — it expands the full text in place, with a "See less" link to re-collapse, animated via the
+   max-height transition below (toggleShortDesc() in shared.js drives .expanded on/off; the
+   markup's old data-jump-tab attribute was removed so initTabJumpLinks() no longer binds it). */
+.short-desc{overflow:hidden;transition:max-height .3s ease;}
 .short-desc-readmore{margin-left:4px;font-size:12.5px;font-weight:700;color:var(--rrg-red);text-decoration:none;cursor:pointer;white-space:nowrap;}
 .short-desc-readmore:hover{text-decoration:underline;}
 

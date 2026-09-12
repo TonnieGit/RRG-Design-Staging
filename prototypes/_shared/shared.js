@@ -46,7 +46,7 @@ const FITMENT_COPY = {
   },
   unknown: {
     label: "Confirm your vehicle",
-    detail: `This product suits ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.vehicle_years}). Set your vehicle to confirm an exact fit before ordering.`,
+    detail: `This product suits ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.body_style}, ${PRODUCT_FITMENT.roof_type}). Set your vehicle to confirm an exact fit before ordering.`,
     actions: ["Select your vehicle"]
   },
   no_fit: {
@@ -1729,6 +1729,60 @@ function initReviewSummary(root = document) {
 // naturally inline with whatever text precedes it — this only ever shortens that text.
 // Stores the untouched original text in a data attribute so repeat calls (resize) always
 // trim from the real full text, not an already-trimmed one.
+function shortDescCollapsedHeight(el) {
+  const cs = getComputedStyle(el);
+  const lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.4;
+  return lineHeight * 2 + 1;
+}
+
+// Renders the trimmed, 2-line "<text>… Read more" state (unchanged algorithm from before
+// item 40) — factored out so both layoutShortDesc() and toggleShortDesc()'s collapse path
+// can call it.
+function renderShortDescCollapsed(el, link) {
+  const fullText = el.dataset.fullText;
+  const maxHeight = shortDescCollapsedHeight(el);
+  const words = fullText.split(' ');
+  const render = n => {
+    const truncated = n < words.length;
+    el.textContent = words.slice(0, n).join(' ') + (truncated ? '… ' : ' ');
+    link.textContent = 'Read more';
+    el.appendChild(link);
+  };
+  let n = words.length;
+  render(n);
+  while (n > 0 && el.scrollHeight > maxHeight) {
+    n--;
+    render(n);
+  }
+}
+
+// Expand/collapse (2026-09-12, Section 12 item 40) — replaces the old tab-jump behaviour.
+// Expanding swaps in the full text and animates the container open to its real scrollHeight;
+// collapsing animates the still-full content closed first, then swaps the DOM text back to
+// the trimmed version once the transition ends, so the text swap itself never causes a jump.
+function toggleShortDesc(el) {
+  const link = el.querySelector('.short-desc-readmore');
+  if (!link) return;
+  if (!el.classList.contains('expanded')) {
+    el.classList.add('expanded');
+    el.textContent = el.dataset.fullText + ' ';
+    link.textContent = 'See less';
+    el.appendChild(link);
+    const target = el.scrollHeight;
+    requestAnimationFrame(() => { el.style.maxHeight = target + 'px'; });
+  } else {
+    const collapsedHeight = shortDescCollapsedHeight(el);
+    el.style.maxHeight = el.scrollHeight + 'px';
+    el.classList.remove('expanded');
+    requestAnimationFrame(() => { el.style.maxHeight = collapsedHeight + 'px'; });
+    el.addEventListener('transitionend', function onEnd(e) {
+      if (e.propertyName !== 'max-height') return;
+      el.removeEventListener('transitionend', onEnd);
+      renderShortDescCollapsed(el, link);
+    });
+  }
+}
+
 function layoutShortDesc(root = document) {
   root.querySelectorAll('.short-desc').forEach(el => {
     const link = el.querySelector('.short-desc-readmore');
@@ -1740,25 +1794,19 @@ function layoutShortDesc(root = document) {
       const clone = el.cloneNode(true);
       clone.querySelector('.short-desc-readmore')?.remove();
       el.dataset.fullText = clone.textContent.trim();
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        toggleShortDesc(el);
+      });
     }
-    const fullText = el.dataset.fullText;
-    const cs = getComputedStyle(el);
-    const lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.4;
-    const maxHeight = lineHeight * 2 + 1;
-
-    const words = fullText.split(' ');
-    const render = n => {
-      const truncated = n < words.length;
-      el.textContent = words.slice(0, n).join(' ') + (truncated ? '… ' : ' ');
-      el.appendChild(link);
-    };
-
-    let n = words.length;
-    render(n);
-    while (n > 0 && el.scrollHeight > maxHeight) {
-      n--;
-      render(n);
+    if (el.classList.contains('expanded')) {
+      // Already showing full text (e.g. a resize while expanded) — just re-measure, don't
+      // re-truncate it back down.
+      el.style.maxHeight = el.scrollHeight + 'px';
+      return;
     }
+    renderShortDescCollapsed(el, link);
+    el.style.maxHeight = shortDescCollapsedHeight(el) + 'px';
   });
 }
 
