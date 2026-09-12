@@ -1378,6 +1378,44 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 ---
 
+### 7.31 Trust Row
+
+**Location:** full-width 4-column strip directly below the Hero, above the Showroom Finder section — all 5 templates. 2-column grid on mobile (≤900px).
+
+**Purpose:** quick-scan trust signals (tenure, expertise, network size, contact) right below the fold, reinforcing credibility before the shopper scrolls further.
+
+**Typography:** 26px icon (`--rrg-red`); label is `h4`, 15px bold; body copy 12.5px, `#666` (bumped to 14px on mobile). The "Need Help" tile's phone number is bold red, not the default grey.
+
+**Region differences:** 2 of the 4 tiles are region-aware, swapped by `applyRegion()` via `REGION_TRUST_COPY`: "Trusted Since 1989" (`[data-trust="founded"]`) and "Australia's Largest" (`[data-trust="network"]`) — NZ/UK show placeholder region-appropriate wording (e.g. NZ: "Visit In Person" / "Check it out at our Auckland showroom"), flagged as needing real client-approved copy before production. The "Need Help" tile's phone number + `tel:` link is separately region-aware via `REGION_PHONE` (AU `1300 071 264` / NZ `09 481 1910` / UK `01204 899778`) — handled as its own pass since it nests a link inside the `<p>`, unlike the other two tiles' plain-text swap. "Trained Professionals" is not region-aware — identical copy everywhere.
+
+**Links:** only the "Need Help" tile's phone number is a real link (`tel:`); the other 3 tiles are plain text, no links.
+
+**States:** single static layout, content varies by region only (see Section 4 for the full AU/NZ/UK region screenshots): ![Trust Row — AU default](dev-brief-assets/trust-row-desktop.png)
+
+---
+
+### 7.32 Breadcrumbs
+
+**Location:** above the Hero, the first thing on the page below the header (excluded from this brief per its own scope) — all 5 templates.
+
+**Purpose:** quick category navigation trail, and confirms where the current product sits in the catalogue hierarchy.
+
+**Typography:** 12px, `#767676`; links underline on hover; bumped to 13px on mobile.
+
+**Region differences:** none — driven by the product's own category, not region.
+
+**Links:** "Home" and each category level are real anchors, currently `href="#"` placeholders — in production these resolve to their real Magento category/home pages. The final crumb (current product name) is plain text, not a link.
+
+**Data Source:** Magento — category structure/template-level, not a Rackit field.
+
+**States:**
+- 3 levels, Home → Category → Product (Simple, Config-Variant, Sibling-Color, Grouped-Bundle): ![Breadcrumbs — 3 level](dev-brief-assets/breadcrumbs-3level.png)
+- 4 levels, Home → Vehicle → Category → Product (Vehicle-Specific only): ![Breadcrumbs — 4 level](dev-brief-assets/breadcrumbs-4level.png)
+
+**Note:** the class is `.rrg-crumbs`, not a class containing the literal word "breadcrumb" — a past session grepped for that word, found nothing, and wrongly concluded breadcrumbs didn't exist on the page. Search for `.rrg-crumbs` instead.
+
+---
+
 ## 8. SEO & Structured Data
 
 **Location:** the page `<head>` and inline `<script type="application/ld+json">` blocks — not a visible widget, so it doesn't follow the Name/Location/Purpose/screenshot template used elsewhere in this document. Applies to all 5 templates.
