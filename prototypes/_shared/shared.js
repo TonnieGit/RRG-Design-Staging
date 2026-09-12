@@ -42,13 +42,11 @@ const FITMENT_COPY = {
   fits: {
     label: "Fits your vehicle",
     detail: `Confirmed for your ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.body_style}, ${PRODUCT_FITMENT.roof_type}).`,
-    cta: "Add To Cart",
     actions: []
   },
   unknown: {
     label: "Confirm your vehicle",
     detail: `This product suits ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} (${PRODUCT_FITMENT.vehicle_years}). Set your vehicle to confirm an exact fit before ordering.`,
-    cta: "Select Your Vehicle",
     actions: ["Select your vehicle"]
   },
   no_fit: {
@@ -57,7 +55,6 @@ const FITMENT_COPY = {
     // customer's full saved vehicle spec (body style, roof type, year), not just its name,
     // since two vehicles can share a make/model/generation but differ by roof/rail type.
     detail: (vehicle) => `This product is built for ${PRODUCT_FITMENT.vehicle_make} ${PRODUCT_FITMENT.vehicle_model} ${PRODUCT_FITMENT.vehicle_generation} — not your ${vehicle.make} ${vehicle.model} ${vehicle.generation} (${vehicle.body_style}, ${vehicle.roof_type}, ${vehicle.year}).`,
-    cta: "Find The Right Fit",
     actions: ["Change vehicle", "Find the right fit"]
   }
 };
@@ -99,7 +96,6 @@ function renderFitmentHTML(state, vehicle, mode) {
 }
 
 function applyFitmentState(state, vehicle) {
-  const c = FITMENT_COPY[state];
   document.querySelectorAll('[data-fitment-slot]').forEach(el => {
     el.className = el.className.replace(/\b(fits|unknown|no_fit)\b/g, '').trim();
     el.classList.add(state);
@@ -111,10 +107,15 @@ function applyFitmentState(state, vehicle) {
       badge.hidden = state !== 'fits';
     }
   });
+  // Add to Cart stays plain "Add To Cart" / primary style in every fitment state
+  // (2026-09-12, spec.md §12 item 9 follow-up) — purchase should never look any
+  // different depending on fitment status, only the fitment card itself (rendered
+  // above via renderFitmentHTML(), which does its own FITMENT_COPY lookup) communicates
+  // the verdict and its own "Select your vehicle"/"Find the right fit" actions.
   document.querySelectorAll('[data-cta-label]').forEach(btn => {
-    btn.textContent = c.cta;
-    btn.classList.toggle('btn-outline', state !== 'fits');
-    btn.classList.toggle('btn-primary', state === 'fits');
+    btn.textContent = 'Add To Cart';
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-primary');
   });
   initVehicleIdCopy();
 }

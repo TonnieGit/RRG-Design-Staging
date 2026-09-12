@@ -877,6 +877,8 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 
 **Links:** none directly, but its "doesn't fit" copy names the customer's saved vehicle in full (make/model/generation, body style, roof type, year) rather than a generic message.
 
+**Add to Cart must stay identical in every fitment state** — same "Add To Cart" text, same primary button style, always enabled/clickable — regardless of whether the fitment verdict is Fits, Doesn't Fit, or Confirm Your Vehicle. Purchase must never hard-stop or visually change based on fitment status; only the fitment card itself (and the Rack Fit Guarantee badge, 7.3) communicates the verdict. This applies to the main Decision Panel button and both condensed instances (Sticky Mobile Bar, Persistent Bar).
+
 **States** (driven by the Demo State Panel's Session Vehicle picker — in Magento this would be the customer's real saved vehicle):
 - Location (full page, red arrow): ![Fitment Status — location](dev-brief-assets/fitment-status-location.png)
 - **Fits your vehicle** (green) — confirmed match, Rack Fit Guarantee badge visible (see 7.3): ![Fitment Status — fits](dev-brief-assets/fitment-status-fits.png)

@@ -951,7 +951,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 }
 
 /* Persistent decision bar — appears once the primary decision panel scrolls out of view */
-.persistent-bar{position:fixed;left:0;right:0;background:#fff;border-bottom:1px solid var(--rrg-line);box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:35;transform:translateY(-120%);transition:transform .25s ease;}
+.persistent-bar{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:1px solid var(--rrg-line);box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:35;transform:translateY(-120%);transition:transform .25s ease;}
 .persistent-bar .persistent-inner{display:flex;align-items:center;gap:20px;padding:10px 24px;}
 .persistent-bar.visible{transform:translateY(0);}
 /* Fitment box now shares the row with .persistent-product instead of taking the whole
