@@ -35,7 +35,7 @@
      to resolve spec Section 4 item 1: a vehicle-specific kit can carry a config-variant
      (Assembled/Flat Pack) alongside fitment logic, not either/or. */
   .variant-label-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
-  .variant-label-row h4{font-size:13px;color:#767676;text-transform:uppercase;letter-spacing:.03em;margin:0;}
+  .variant-label-row h3{font-size:13px;color:#767676;text-transform:uppercase;letter-spacing:.03em;margin:0;}
   .variant-help{font-size:11.5px;color:#999;}
   .variant-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
   .variant-option{border:1.5px solid var(--rrg-line);border-radius:10px;padding:14px;text-align:left;background:#fff;cursor:pointer;position:relative;transition:border-color .15s, box-shadow .15s;}
@@ -63,12 +63,11 @@
        not below it (2026-09-10, Graham Sowerby meeting). .gallery-col's own children
        become direct .hero grid items via display:contents so each can be ordered
        independently: gallery images/thumbs (order 1) → decision panel (order 2) →
-       video/install row + Fitted Photos Gallery nested slot (order 3). */
+       video/install row (order 3). */
     .gallery-col{display:contents;}
     .gallery-col > *{order:1;}
     .decision-panel{order:2;margin-top:28px;}
     .install-media-row{order:3;margin-top:22px;}
-    #fitGalleryNestedSlot{order:3;}
   }
 </style>
 </head>
@@ -177,10 +176,6 @@
         </div>
       </div>
 
-      <!-- Fitted Photos Gallery placement A/B preview (2026-09-10 client ask) — Demo State
-           Panel's "Fitted Photos Gallery Placement" toggle moves #fitGallerySection here
-           when set to Nested; see applyFitGalleryPlacement() in shared.js. -->
-      <div id="fitGalleryNestedSlot"></div>
     </div>
 
     <div class="decision-panel">
@@ -209,7 +204,7 @@
       </div>
 
       <div class="variant-label-row">
-        <h4>Build Option</h4>
+        <h3>Build Option</h3>
         <span class="variant-help">Price and specs update below</span>
       </div>
       <div class="variant-picker" id="variantPicker"></div>
@@ -280,7 +275,7 @@
       </div>
 
       <div class="package-items">
-        <h5>What's Included</h5>
+        <h3>What's Included</h3>
         <div class="package-item">
           <span class="pi-qty">1x</span>
           <a href="#" class="pi-name">Rhino-Rack 6 Series Pioneer Platform</a>
@@ -300,10 +295,10 @@
     </div>
   </section>
 
-  <!-- Fitted Photos Gallery home slot — default (full-width) parent for #fitGallerySection.
-       Demo State Panel's "Fitted Photos Gallery Placement" toggle moves the section back
-       here when set to Full width; see applyFitGalleryPlacement() in shared.js. -->
-  <div id="fitGalleryHomeSlot">
+  <!-- Fitted Photos Gallery — final design (2026-09-12): full-width above the Trust Row,
+       non-red background. Photos rendered from FIT_GALLERY_PHOTOS (below) into both the
+       carousel track here and the "View All" slide-out (buildFitGallerySlideout() in
+       shared.js), so there's one source for the real scraped photo set. -->
   <section class="fit-gallery-section" id="fitGallerySection" data-count="283">
     <div class="fit-gallery-panel" id="fitGalleryPanel">
       <div class="fit-gallery-head">
@@ -313,29 +308,16 @@
           </span>
           <h2>Fitment Gallery</h2>
         </div>
-        <a href="#" class="fit-gallery-viewall">View All In-store Fitments (283)</a>
+        <a href="#" class="fit-gallery-viewall" data-fit-gallery-slideout>View All In-store Fitments (283)</a>
       </div>
       <div class="fit-gallery-carousel">
         <button type="button" class="fit-gallery-nav prev" aria-label="Previous photos">‹</button>
-        <div class="fit-gallery-track" id="fitGalleryTrack">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_FhlLK_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_P7ZoC_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_jQonU_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_2750_YaaKX_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_4122_UYR7R_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/1/7/17791433691174490956170860620194_cDO9c_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/P/_/P_20260511_142833_afuMl_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_aNE06_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/1/7/1777955625720802347718023618055_GHZgB_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_J6mwc_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-          <img src="https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_9n7yh_1.jpg" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">
-        </div>
+        <div class="fit-gallery-track" id="fitGalleryTrack"></div>
         <button type="button" class="fit-gallery-nav next" aria-label="Next photos">›</button>
       </div>
       <div class="fit-gallery-dots" id="fitGalleryDots"></div>
     </div>
   </section>
-  </div>
 
   <div class="trust-row">
     <div class="item" data-trust="founded"><svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><h4>Trusted Since 1989</h4><p>Now with over 30 locations Australia wide</p></div>
@@ -345,7 +327,7 @@
   </div>
 
   <section id="showroom" style="margin:40px 0;">
-    <h3 class="showroom-heading">Showroom Finder</h3>
+    <h2 class="showroom-heading">Showroom Finder</h2>
     <div class="showroom-widget split-view">
       <div id="showroomDefaultView">
         <h3>See It In Person — On Display At 14 Stores Nationwide</h3>
@@ -377,12 +359,12 @@
        (per the backlog's "prioritise vehicle-fit matches where applicable" instruction),
        not fabricated. -->
   <section class="discontinued-alternates" hidden>
-    <h3 class="related-heading">This product has been discontinued — similar alternatives</h3>
+    <h2 class="related-heading">This product has been discontinued — similar alternatives</h2>
     <div class="related-grid">
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/F/r/Front-Runner-KRTH011T_1.jpg" alt="Front Runner Slimline II Rack Kit for Toyota Hilux N80">
         <div class="body">
-          <h5>Slimline II Rack Kit — Fits Hilux N80 — KRTH011T</h5>
+          <h3>Slimline II Rack Kit — Fits Hilux N80 — KRTH011T</h3>
           <div class="price">$409.00</div>
           <button class="btn btn-outline btn-block">Add to Cart</button>
         </div>
@@ -390,7 +372,7 @@
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/y/a/yakima-v2-small-platform-ruggedline1_2XTEFE_1.jpg" alt="Yakima LockNLoad Platform for Toyota Hilux N80">
         <div class="body">
-          <h5>LockNLoad Platform 1390x1250mm — Fits Hilux N80</h5>
+          <h3>LockNLoad Platform 1390x1250mm — Fits Hilux N80</h3>
           <div class="price">$236.55</div>
           <button class="btn btn-outline btn-block">Add to Cart</button>
         </div>
@@ -398,7 +380,7 @@
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/W/C/WC-THDC16-1412_Thumbnail_X7RDIA_1.jpg" alt="Wedgetail Core Platform Roof Rack for Toyota Hilux N80">
         <div class="body">
-          <h5>Wedgetail Core Platform Roof Rack — Fits Hilux N80 — WC-THDC16-1412</h5>
+          <h3>Wedgetail Core Platform Roof Rack — Fits Hilux N80 — WC-THDC16-1412</h3>
           <div class="price">$1,400.00</div>
           <button class="btn btn-outline btn-block">Add to Cart</button>
         </div>
@@ -414,18 +396,18 @@
 
   <section class="body-cols">
     <div>
-      <h3 class="tabs-heading">Product Information</h3>
+      <h2 class="tabs-heading">Product Information</h2>
       <div class="tabs">
         <input type="radio" name="tabs" id="t1" checked><label for="t1">Details</label>
         <div class="content">
           <p>This Rhino Rack rack package includes everything you need to fit securely to your Toyota Hilux N80 4dr Ute (2015 to 2026) with Bare Roof.</p>
           <div class="details-sub">
-            <h5>Rhino Rack 62100 Platform</h5>
+            <h3>Rhino Rack 62100 Platform</h3>
             <p>The Rhino-Rack 6 Series Pioneer Platform delivers a strong, lightweight, and highly versatile roof cargo solution designed for touring, work, and everyday transport. Built to maximise carrying capability without compromising vehicle performance, this platform provides a stable base for mounting accessories, luggage, and outdoor equipment with confidence.</p>
             <p>Engineered using advanced materials and an aerodynamic design, the Rhino Rack 62100 Platform helps reduce wind drag and noise vs other roof rack options while maintaining exceptional durability and strength. The refined configuration offers increased usable surface area and more mounting channels, making it easier to attach awnings, recovery gear, bike carriers, roof boxes, and camping equipment.</p>
             <p>The low-profile design keeps the load close to the roofline for improved stability and vehicle handling. Integrated wiring capabilities allow clean installation of lighting and electrical accessories, while the corrosion-resistant finish ensures long-term performance in harsh conditions.</p>
             <p>Suitable for a wide range of vehicles when paired with the correct fitting system, the Pioneer platform is ideal for overland travel, trade applications, and family adventures. Its modular design supports a huge range of compatible accessories, allowing the setup to evolve as requirements change.</p>
-            <h5>Key Features and Benefits</h5>
+            <h3>Key Features and Benefits</h3>
             <ul>
               <li>Lightweight yet heavy-duty construction for reliable load carrying</li>
               <li>Aerodynamic design reduces drag, wind noise, and fuel impact</li>
@@ -436,7 +418,7 @@
               <li>Low-profile fit for improved vehicle stability and clearance</li>
               <li>Compatible with a wide range of Rhino-Rack accessories</li>
             </ul>
-            <h5>Typical Applications</h5>
+            <h3>Typical Applications</h3>
             <ul>
               <li>Touring and overland setups</li>
               <li>Trade and commercial equipment transport</li>
@@ -446,7 +428,7 @@
               <li>General luggage and bulky cargo</li>
             </ul>
             <p>To see if there's a 6 series platform suitable for your vehicle please try out our online vehicle fitment tool to find a complete roof rack setup.</p>
-            <h5>Rhino Rack RTHB1 Platform Backbone</h5>
+            <h3>Rhino Rack RTHB1 Platform Backbone</h3>
             <ul>
               <li>Stylishly designed to suit rugged off-road conditions</li>
               <li>Made from non-corrosive Stainless Steel allowing maximum carrying capacity</li>
@@ -457,7 +439,7 @@
               <li>System weight: 23.7kg / 52.2lbs (RTHB1 &amp; 52100)</li>
               <li>1-hour installation time</li>
             </ul>
-            <h5>Rhino Rack RTS556 Tracks</h5>
+            <h3>Rhino Rack RTS556 Tracks</h3>
             <p>The Rhino-Rack RTS556 Tracks are designed specifically for the Toyota Hilux Double Cab (2015-Current), providing a secure and reliable base for mounting roof rack systems.</p>
             <p>Manufactured from high-grade aluminium with a durable powder-coated finish, these rivet-in tracks replace the factory roof trim and allow flexible bar or platform positioning along the track length. Ideal for both work and adventure applications, the RTS556 system delivers maximum strength and corrosion resistance to withstand tough Australian conditions.</p>
             <p>Supplied as a pair with all required hardware and end caps, these tracks are compatible with Rhino-Rack Pioneer Platforms and Vortex or Heavy Duty bar systems. Once installed, they create a low-profile, factory-style fitment that supports a wide range of accessories for carrying tools, gear, or recreational equipment.</p>
@@ -469,7 +451,7 @@
               <li>Includes hardware and end caps for a complete fitment</li>
               <li>Tested to industry standards for load and safety performance</li>
             </ul>
-            <h5>About Rhino-Rack</h5>
+            <h3>About Rhino-Rack</h3>
             <ul>
               <li>Founded in 1992, Rhino-Rack is an Australian brand specialising in rugged and versatile roof racks, platforms, and outdoor accessories</li>
               <li>Renowned for strength, durability, and off-road capability, Rhino-Rack products are built to handle Australia's toughest conditions</li>
@@ -492,19 +474,19 @@
           <p><strong>Standard Rack Guarantee — Fit confidence, always free.</strong> Our Standard Rack Guarantee comes automatically with every roof rack purchase. It ensures your rack fits your vehicle and performs as it should — giving you confidence from day one.</p>
           <p><strong>Gold Rack Guarantee — Book fitting, get total confidence.</strong> When you book your roof racks to be professionally fitted at Roof Racks Galore, you're automatically covered by our Gold Rack Guarantee — the most comprehensive protection for your gear and your journey.</p>
           <div class="details-sub">
-            <h5>Gold Rack Guarantee includes:</h5>
-            <h5>Professional Installation</h5>
+            <h3>Gold Rack Guarantee includes:</h3>
+            <h3>Professional Installation</h3>
             <p>Enjoy complete confidence with a professional fit by our experienced Fit Technicians. With over 30 stores across Australia and New Zealand, we ensure your setup is correct, secure and safe for the long haul — whether you're carrying bikes, boxes, awnings or kayaks.</p>
-            <h5>Rack Check — Yearly Peace of Mind</h5>
+            <h3>Rack Check — Yearly Peace of Mind</h3>
             <p>We don't just fit it and forget it. With the Gold Rack Guarantee, you'll receive:</p>
             <ul>
               <li>A full safety check at time of install</li>
               <li>Annual Rack Health Checks in Year 2 and Year 3</li>
             </ul>
             <p>So you can travel with peace of mind, year after year.</p>
-            <h5>Key Cover — 3 Years of Nationwide Support</h5>
+            <h3>Key Cover — 3 Years of Nationwide Support</h3>
             <p>Lost your rack keys on the road? No problem. Your Gold Guarantee includes Key Cover for 3 years, with up to 2 replacement keys per year. With stores across Australia and New Zealand, help is never far away.</p>
-            <h5>Free Basic Accessory Fitting</h5>
+            <h3>Free Basic Accessory Fitting</h3>
             <p>When your racks are fitted by us, we'll also fit your eligible accessories for free — giving you the reassurance that everything is compatible and fitted safely, no matter the brand. Eligible accessories include:</p>
             <ul>
               <li>Roof boxes</li>
@@ -516,7 +498,7 @@
               <li>Platform accessories (eye bolts, load stops, shovel holders, jerry can holders)</li>
             </ul>
             <p><em>* Please note: Rooftop tents, awnings, ladder slide systems and other technical accessories are excluded. All items must be on the same invoice and fitted at the same time as the roof racks.</em></p>
-            <h5>90-Day Exchanges and Hassle-Free Returns</h5>
+            <h3>90-Day Exchanges and Hassle-Free Returns</h3>
             <p>Not quite right? Changed your mind? With the Gold Rack Guarantee, you're covered for up to 90 days to exchange your racks if they're not the perfect fit for your needs. Returns are simple and supported at any of our locations across Australia and New Zealand.</p>
           </div>
           <p><strong>Nationwide Support. Expert Advice.</strong> With over 30 stores across Australia and New Zealand, our team is here to help you get the right gear, the right fit and the right support — every step of the way.</p>
@@ -562,7 +544,7 @@
           </div>
           <p><strong>Shipping &amp; Delivery Information.</strong> At Roof Racks Galore, we are proud to be Australia's only nationwide roof rack specialists, with over 30 stores across all major Australian cities. Thanks to our extensive network of Distribution Centres located in key states — Queensland, Western Australia, Victoria, New South Wales, South Australia, and the Australian Capital Territory — we offer the fastest and most reliable delivery service in the industry.</p>
           <div class="details-sub">
-            <h5>Why Choose Roof Racks Galore?</h5>
+            <h3>Why Choose Roof Racks Galore?</h3>
             <ul>
               <li><strong>Unmatched Nationwide Coverage:</strong> Our investment in local Distribution Centres means we can rapidly move stock across Australia, ensuring the best availability of products.</li>
               <li><strong>Fast &amp; Reliable Delivery:</strong> We deliver efficiently both through our store network for Click &amp; Collect / Click &amp; Fit and to couriers for home deliveries. Many metro-area orders arrive next business day.</li>
@@ -570,9 +552,9 @@
               <li><strong>Dedicated Delivery Fleet:</strong> We have invested in our own fleet of vehicles that move stock from our Distribution Centres to all our stores every day.</li>
               <li><strong>Exceptional Customer Service:</strong> Our dedicated national customer service team will help and update you every step of the way to ensure that you are happy. If we run into any supply issues, they will work with you to find a solution or alternative option.</li>
             </ul>
-            <h5>Shipping Cost Rules</h5>
+            <h3>Shipping Cost Rules</h3>
             <p>Use our shipping estimator on the product page or during checkout to determine applicable freight costs. For the fastest and most efficient deliveries, we recommend shipping to a business address.</p>
-            <h5>Estimated Delivery Times</h5>
+            <h3>Estimated Delivery Times</h3>
             <table class="specs-table">
               <tr><th scope="row">Metro QLD, NSW, VIC, SA, WA</th><td>Next Business Day – 3 Business Days</td></tr>
               <tr><th scope="row">Regional QLD, NSW, VIC, WA and All of TAS</th><td>3 – 5 Business Days</td></tr>
@@ -581,7 +563,7 @@
             </table>
             <p><em>Delivery time estimates are provided by our couriers and delays may occur due to a number of other factors. There are no deliveries made on Saturdays, Sundays or public holidays by our couriers. Typically, we will despatch orders the next working day. Orders placed on Friday will generally be despatched the following working day (Monday), or the next working day. Orders placed 1 day prior to or on the same day as a public holiday will be despatched the next working day.</em></p>
             <p>No retailer or courier company can ever "guarantee" a next working day delivery. All courier companies occasionally have the same transport problems that can happen to everyone, including but not limited to: snow blocked roads, closed roads, traffic jams, mechanical breakdown, or an inability to find the delivery address or gain access to it. We work with some of the best couriers in the business, and overall they provide an outstanding service. We cannot be held responsible for the consequences of any delay caused by the failure of our contracted couriers to fulfil their obligations, although we will always do all that is reasonable to provide the goods by the time required. Please note that the percentage of delayed deliveries is very small, and the percentage of items lost in transit is all but non-existent.</p>
-            <h5>Contact Us</h5>
+            <h3>Contact Us</h3>
             <p>For any questions regarding your delivery, please contact us:<br>Email: <a href="mailto:help@roofracksgalore.com.au">help@roofracksgalore.com.au</a><br>Phone: 1300 071 264<br>Visit Us: Nearest Store Locator</p>
           </div>
         </div>
@@ -725,7 +707,7 @@
   </section>
 
   <section class="faq-section">
-    <h3 class="faq-heading">Frequently Asked Questions</h3>
+    <h2 class="faq-heading">Frequently Asked Questions</h2>
     <div class="faq-list">
       <details class="faq-item">
         <summary>Will this fit my Hilux if it's a different year to N80?</summary>
@@ -747,23 +729,23 @@
   </section>
 
   <section style="margin:48px 0;">
-    <h3 class="related-heading">Related Products</h3>
+    <h2 class="related-heading">Related Products</h2>
     <div class="related-grid">
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/cache/7523b1877f1a63c7cb82ba8541af57bb/K/S/KS0054_4_1_1.jpg" alt="Kaon Universal Awning Bracket to suit Rhino-Rack Pioneer Platform">
-        <div class="body"><h5>Kaon Universal Awning Bracket — suits Pioneer Platform (2pk)</h5><div class="price">$80.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+        <div class="body"><h3>Kaon Universal Awning Bracket — suits Pioneer Platform (2pk)</h3><div class="price">$80.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
       </div>
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/cache/7523b1877f1a63c7cb82ba8541af57bb/4/3/43259_90BAB2_1.jpg" alt="Rhino Rack Batwing Awning Bracket">
-        <div class="body"><h5>Rhino Rack Batwing Awning Bracket — 43259</h5><div class="price">$79.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+        <div class="body"><h3>Rhino Rack Batwing Awning Bracket — 43259</h3><div class="price">$79.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
       </div>
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/cache/7523b1877f1a63c7cb82ba8541af57bb/m/a/maxtrax-recovery-boards-orange-2-pair-combo-mtx02so.jpg" alt="Maxtrax Recovery Boards Orange 2 Pair Combo">
-        <div class="body"><h5>MAXTRAX Recovery Boards — Orange, 2 Pair Combo</h5><div class="price">$638.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+        <div class="body"><h3>MAXTRAX Recovery Boards — Orange, 2 Pair Combo</h3><div class="price">$638.00</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
       </div>
       <div class="product-card">
         <img src="https://www.roofracksgalore.com.au/pub/media/catalog/product/cache/7523b1877f1a63c7cb82ba8541af57bb/K/a/Kaon-KS0139-Platforms--Trays---Accessories._1.jpg" alt="Kaon M8 Stainless Steel Eye Bolt Tie Down Kit for Rhino Pioneer Platform">
-        <div class="body"><h5>Kaon M8 Eye Bolt Tie Down Kit — Rhino Pioneer Platform</h5><div class="price">$19.50</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
+        <div class="body"><h3>Kaon M8 Eye Bolt Tie Down Kit — Rhino Pioneer Platform</h3><div class="price">$19.50</div><button class="btn btn-outline btn-block">Add to Cart</button></div>
       </div>
     </div>
   </section>
@@ -837,6 +819,43 @@ const VEHICLE_PRODUCT = {
     }
   ]
 };
+
+// Real scraped fitment photos (data/raw/GP01M1TZZ.json — 16 of the site's real 283 fitment
+// photos were captured for layout work; see spec.md Section 7 for the 16-vs-283 data gap).
+// Single source for the in-page carousel, the "View All" slide-out grid, and the slide-out's
+// detail view. `id` is each photo's own real Rackit `product_id` from the scrape (used as the
+// detail view's "Fit #") — a real identifier, not a fabricated one, even though the photo
+// itself gets reused/cycled once the grid goes past these 16 real entries.
+const FIT_GALLERY_PHOTOS = [
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_FhlLK_1.jpg", id: 166874 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_P7ZoC_1.jpg", id: 166832 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_jQonU_1.jpg", id: 166830 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_2750_YaaKX_1.jpg", id: 166829 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_4122_UYR7R_1.jpg", id: 166814 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/1/7/17791433691174490956170860620194_cDO9c_1.jpg", id: 166786 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/P/_/P_20260511_142833_afuMl_1.jpg", id: 166139 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_aNE06_1.jpg", id: 165847 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/1/7/1777955625720802347718023618055_GHZgB_1.jpg", id: 165841 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_J6mwc_1.jpg", id: 165781 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/i/m/image_9n7yh_1.jpg", id: 165779 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/2/0/20260420_151706_B6naw_1.jpg", id: 165689 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/2/0/20260427_111136_PjcDx_1.jpg", id: 165515 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_0621_9m6aU_1.jpg", id: 165492 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/I/M/IMG_0365_ZEGC1_1.jpg", id: 165368 },
+  { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/r/a/rackit-fitment-1-9994-1_1.jpg", id: 164886 }
+];
+
+function renderFitGalleryTrack() {
+  const track = document.getElementById('fitGalleryTrack');
+  if (!track) return;
+  track.innerHTML = FIT_GALLERY_PHOTOS.map(p =>
+    `<img src="${p.thumb}" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">`
+  ).join('');
+}
+// Runs synchronously (not on DOMContentLoaded) — #fitGalleryTrack already exists above this
+// script tag, and shared.js's own DOMContentLoaded listener calls initFitGalleryCarousel()
+// before this page's listener would otherwise fire, so the track must be populated now.
+renderFitGalleryTrack();
 
 let selectedVehicleVariantIndex = 0;
 

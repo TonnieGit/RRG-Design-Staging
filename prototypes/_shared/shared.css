@@ -616,23 +616,17 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 [data-admin-video]{margin-top:10px;}
 
 /* Fitted Photos Gallery — "Gallery" panel widget (2026-09-10, matched to a live-site
-   Figma reference). Vehicle-specific only. Colours are driven entirely by --fg-* custom
-   properties on .fit-gallery-panel so the red/non-red admin toggle (.red modifier) and
-   both placements (default = full width above tabs; .fit-gallery-section.nested = inside
-   the gallery column, see applyFitGalleryPlacement() in shared.js) share one set of rules. */
+   Figma reference; final design locked in 2026-09-12, spec.md Section 12 item 5: full
+   width above the Trust Row, non-red, permanently — the placement/red-background Demo
+   State Panel toggles that previously existed to help decide this have been removed).
+   Vehicle-specific only. Colours still run through --fg-* custom properties rather than
+   being inlined directly, in case a future design pass needs to vary them again. */
 .fit-gallery-panel{
   --fg-bg:#fff; --fg-fg:var(--rrg-black); --fg-link:var(--rrg-red);
   --fg-btn-bg:var(--rrg-black); --fg-btn-fg:#fff;
   --fg-dot:rgba(0,0,0,.18); --fg-dot-active:var(--rrg-black);
   --fg-nav-bg:rgba(255,255,255,.9); --fg-nav-fg:var(--rrg-black); --fg-nav-border:var(--rrg-line);
   background:var(--fg-bg);color:var(--fg-fg);border:1px solid var(--rrg-line);border-radius:var(--radius);padding:22px 24px 24px;
-}
-.fit-gallery-panel.red{
-  --fg-bg:var(--rrg-red); --fg-fg:#fff; --fg-link:#fff;
-  --fg-btn-bg:#fff; --fg-btn-fg:var(--rrg-black);
-  --fg-dot:rgba(255,255,255,.35); --fg-dot-active:#fff;
-  --fg-nav-bg:rgba(0,0,0,.35); --fg-nav-fg:#fff; --fg-nav-border:transparent;
-  border-color:transparent;
 }
 .fit-gallery-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
 .fit-gallery-title{display:flex;align-items:center;gap:10px;}
@@ -644,7 +638,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .fit-gallery-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .fit-gallery-track::-webkit-scrollbar{display:none;}
 .fit-gallery-track img{flex:0 0 calc((100% - 60px)/7);aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#eee;scroll-snap-align:start;}
-.fit-gallery-section.nested .fit-gallery-track img{flex:0 0 calc((100% - 30px)/4);}
 .fit-gallery-nav{display:none;position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--fg-nav-bg);color:var(--fg-nav-fg);border:1px solid var(--fg-nav-border);align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;z-index:2;}
 .fit-gallery-nav:disabled{opacity:.3;cursor:default;}
 .fit-gallery-nav.prev{left:-4px;}
@@ -744,11 +737,18 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Package contents (vehicle-specific kits) — each included item with its own SKU + copy
    button, so instore staff can copy individual part numbers without hunting through specs */
 .package-items{margin:16px 0;border:1px solid var(--rrg-line);border-radius:10px;overflow:hidden;}
-.package-items h5{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#767676;padding:10px 12px;margin:0;background:#f7f7f7;border-bottom:1px solid var(--rrg-line);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
+.package-items h3{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#767676;padding:10px 12px;margin:0;background:#f7f7f7;border-bottom:1px solid var(--rrg-line);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
 .package-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:12.5px;border-top:1px solid var(--rrg-line);}
 .package-item:first-of-type{border-top:none;}
 .package-item .pi-name{flex:1;color:#333;text-decoration:none;}
 .package-item .pi-name:hover{text-decoration:underline;}
+/* Tab-panel sub-headings (Details/Gold Guarantee/Shipping Info content) were plain <h5>
+   with no rule of their own, relying entirely on the browser's UA-default h5 styling
+   (not the shared h1-h4 Barlow Condensed/uppercase rule above). Promoted to <h3> for a
+   correct heading outline (spec.md backlog item 12-6) — this reproduces that exact
+   UA-default look (relative sizing/margin, not the shared heading treatment) so nothing
+   visually changes. */
+.details-sub h3{font-family:'Lato',Arial,Helvetica,sans-serif;font-weight:700;font-size:.83em;text-transform:none;letter-spacing:normal;margin:1.67em 0;color:inherit;}
 /* Quantity per row (2026-09-10, Graham Sowerby meeting) — so a customer adding what looks
    like one product isn't confused when a multi-part kit arrives with no visible reason
    why. Real per-component quantities aren't confirmed by the client yet — see spec.md §7. */
@@ -790,12 +790,6 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .admin-radio-row{display:flex;flex-direction:column;gap:6px;margin:8px 0 0;padding-top:8px;border-top:1px dashed #eee;}
 .admin-radio-row label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#333;cursor:pointer;}
 
-/* Fitted Photos Gallery — nested layout (2026-09-10 client ask): when #fitGallerySection
-   sits inside the gallery column (under the main gallery/thumbs/install row) instead of its
-   default full-width position above the tabs. Photo-count/track sizing lives with the rest
-   of the .fit-gallery-panel rules above; this is just outer spacing. */
-.fit-gallery-section.nested{margin:16px 0 0;}
-
 /* Ex-Demo slide-out — right-edge drawer, backlog item 4 (2026-09-11: replaces the previous
    centered modal to match the Store Slide-out pattern below). Structurally identical to
    .store-slideout* — same backdrop/drawer/transition/close-button rules, just its own
@@ -806,7 +800,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .exdemo-slideout{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
 .exdemo-slideout-backdrop.open .exdemo-slideout{transform:translateX(0);}
 .exdemo-slideout-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
-.exdemo-slideout-head h3{font-size:19px;margin:0 0 4px;}
+.exdemo-slideout-head h2{font-size:19px;margin:0 0 4px;}
 .exdemo-slideout-head p{font-size:12.5px;color:#666;margin:0;}
 .exdemo-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;flex:0 0 auto;color:#333;}
 .exdemo-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;flex:1 1 auto;}
@@ -868,7 +862,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .store-slideout{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
 .store-slideout-backdrop.open .store-slideout{transform:translateX(0);}
 .store-slideout-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
-.store-slideout-head h3{font-size:19px;margin:0;}
+.store-slideout-head h2{font-size:19px;margin:0;}
 .store-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;color:#333;flex:0 0 auto;}
 .store-slideout-body{padding:16px 22px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;flex:1 1 auto;}
 /* Groups (2026-09-11, backlog item 14): native <details>/<summary>, same no-JS accordion
@@ -888,6 +882,57 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .dc-store .store-phone,.dc-store .store-map-link{display:inline-block;font-size:12px;font-weight:700;text-decoration:underline;padding:8px 0;margin:-8px 12px -8px 0;}
 .dc-store .store-phone{color:var(--rrg-black);}
 .dc-store .store-map-link{color:#1A56DB;}
+
+/* Fitted Photos Gallery slide-out — right-edge drawer, "View All In-store Fitments" from
+   the Fitted Photos Gallery panel (vehicle-specific only). Same backdrop/drawer/transition
+   convention as .store-slideout*/.exdemo-slideout* above (independent instance), but wider
+   since it holds a photo grid rather than a text list. */
+.fit-gallery-slideout-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.fit-gallery-slideout-backdrop.open{opacity:1;pointer-events:auto;}
+.fit-gallery-slideout{position:fixed;top:0;right:0;bottom:0;width:600px;max-width:90vw;background:#fff;box-shadow:-16px 0 40px rgba(0,0,0,.25);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
+.fit-gallery-slideout-backdrop.open .fit-gallery-slideout{transform:translateX(0);}
+.fit-gallery-slideout-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--rrg-line);flex:0 0 auto;}
+.fit-gallery-slideout-head h2{font-size:19px;margin:0;}
+.fit-gallery-slideout-close{background:#f2f2f2;border:none;border-radius:50%;width:48px;height:48px;font-size:16px;color:#333;flex:0 0 auto;}
+.fit-gallery-slideout-body{padding:16px 22px 22px;overflow-y:auto;flex:1 1 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-content:start;}
+.fit-gallery-slideout-body img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#eee;}
+.fit-gallery-slideout-body img[data-fgs-open-index]{cursor:pointer;transition:opacity .15s ease;}
+.fit-gallery-slideout-body img[data-fgs-open-index]:hover{opacity:.8;}
+
+/* "Back to Grid View" link — swaps into the slide-out head in place of the title (both
+   toggled via [hidden]) once a fitment detail is open, see renderFitGallerySlideoutDetail()/
+   renderFitGallerySlideoutGrid() in shared.js. */
+.fgs-back-link{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--rrg-red);font-weight:700;font-size:14px;cursor:pointer;padding:0;}
+.fgs-back-link svg{width:15px;height:15px;flex:0 0 auto;}
+
+/* Fitment detail view — one photo's "Browse Fitment" popup, matching the live site's own
+   reference. Body switches to a simple flex column (overriding the grid display above via
+   the extra .fgs-detail-body class) since it's a single-column detail layout, not a grid. */
+.fgs-detail-body{display:flex;flex-direction:column;gap:16px;}
+.fgs-browse-bar{display:flex;align-items:center;justify-content:space-between;background:#f4f4f4;border-radius:8px;padding:10px 14px;font-size:13px;color:#555;}
+.fgs-browse-bar strong{color:var(--rrg-black);}
+.fgs-fit-id{font-weight:700;color:var(--rrg-black);}
+.fgs-nav-row{display:flex;gap:10px;}
+.fgs-nav-row .btn{flex:1 1 0;padding:10px;font-size:13px;}
+.fgs-nav-row .btn:disabled{opacity:.35;cursor:default;}
+.fgs-main-image img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:#eee;}
+.fgs-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.fgs-thumbs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:#eee;}
+.fgs-product-title{margin:0;font-size:17px;line-height:1.3;}
+.fgs-vehicle-line{display:flex;align-items:center;gap:8px;color:#555;font-size:13.5px;}
+.fgs-vehicle-line svg{width:16px;height:16px;flex:0 0 auto;color:#888;}
+.fgs-components{border-top:1px solid var(--rrg-line);padding-top:12px;}
+.fgs-components h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#767676;}
+.fgs-component-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13.5px;}
+.fgs-component-row:last-child{border-bottom:none;}
+.fgs-c-qty{background:var(--rrg-black);color:#fff;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;flex:0 0 auto;}
+.fgs-note{font-size:12px;color:#888;line-height:1.5;margin:0;}
+.fgs-back-to-product{width:100%;}
+
+/* Brief highlight when "Back to Product" returns focus to the Decision Panel, so the jump
+   reads as intentional rather than a silent scroll. Timed to match the setTimeout in
+   closeFitGallerySlideoutAndReturn() (shared.js). */
+.decision-panel.fgs-highlight{outline:2px solid var(--rrg-gold);outline-offset:4px;transition:outline-color .3s ease;}
 
 /* Showroom Finder — prominent trust CTA, not a plain widget */
 .showroom-widget{background:var(--rrg-black);color:#fff;border-radius:var(--radius);padding:26px 28px;margin-top:20px;}
@@ -1017,7 +1062,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .product-card{border:1px solid var(--rrg-line);border-radius:var(--radius);overflow:hidden;background:#fff;display:flex;flex-direction:column;}
 .product-card img{aspect-ratio:1/1;object-fit:contain;background:#f7f7f7;padding:12px;}
 .product-card .body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;}
-.product-card h5{font-family:'Lato',sans-serif;text-transform:none;font-weight:700;font-size:13.5px;margin:0 0 6px;flex:1;letter-spacing:0;}
+.product-card h3{font-family:'Lato',sans-serif;text-transform:none;font-weight:700;font-size:13.5px;margin:0 0 6px;flex:1;letter-spacing:0;color:#232323;}
 .product-card .price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-bottom:8px;}
 .product-card .btn{padding:9px 12px;font-size:12px;}
 
@@ -1092,7 +1137,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
   .usp-item p{font-size:16px!important;}
   .vehicle-fit-notes{font-size:15px!important;}
   .dc-option,.dc-store{font-size:15px!important;}
-  .product-card h5{font-size:14.5px!important;}
+  .product-card h3{font-size:14.5px!important;}
   /* Inputs specifically need >=16px on iOS Safari, or focusing one auto-zooms the whole
      page in — a real, well-known mobile bug, not just a readability nicety here. */
   .dc-input{font-size:16px!important;}

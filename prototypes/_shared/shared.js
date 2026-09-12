@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', initGalleryCarousels);
 // beyond one optional reapplySaleFlag() call pages with their own re-render loop should
 // make at the end of it (see config-variant / sibling-color).
 
-const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, fitGallery: true, vehicleFitNotes: false };
+const adminState = { video: true, sale: true, stock: true, shipping: true, collect: true, exdemo: false, fittedOption: false, fittedMode: 'card', fitGallery: true, vehicleFitNotes: false };
 
 function detectInitialVideoState() {
   const pairedRow = document.querySelector('.install-media-row');
@@ -816,7 +816,7 @@ function buildExdemoSlideout() {
   backdrop.innerHTML = `
     <div class="exdemo-slideout">
       <div class="exdemo-slideout-head">
-        <div><h3 id="exdemoSlideoutTitle">Ex-Demo &amp; Factory Seconds</h3><p id="exdemoSlideoutSub"></p></div>
+        <div><h2 id="exdemoSlideoutTitle">Ex-Demo &amp; Factory Seconds</h2><p id="exdemoSlideoutSub"></p></div>
         <button type="button" class="exdemo-slideout-close" aria-label="Close">&times;</button>
       </div>
       <div class="exdemo-slideout-body" id="exdemoSlideoutBody"></div>
@@ -959,7 +959,7 @@ function buildStoreSlideout() {
   backdrop.innerHTML = `
     <div class="store-slideout">
       <div class="store-slideout-head">
-        <h3>All Stores</h3>
+        <h2>All Stores</h2>
         <button type="button" class="store-slideout-close" aria-label="Close">&times;</button>
       </div>
       <div class="store-slideout-body" id="storeSlideoutBody"></div>
@@ -1413,35 +1413,153 @@ function setFittedOptionMode(mode) {
   reapplyFittedOption();
 }
 
-// ---- Fitted Photos Gallery placement A/B preview (2026-09-10 client ask, corrected 2026-09-10) ----
-// Moves the real installation-photos section (#fitGallerySection — "See it fitted to a
-// [vehicle] just like yours", vehicle-specific only) between its full-width home spot
-// (#fitGalleryHomeSlot, above the tabs) and a slot nested in the gallery column, under the
-// main product gallery/thumbs/install row (#fitGalleryNestedSlot). This does NOT move the
-// Main Product Gallery itself — an earlier version of this toggle did that by mistake.
-function applyFitGalleryPlacement(mode) {
-  const section = document.getElementById('fitGallerySection');
-  const homeSlot = document.getElementById('fitGalleryHomeSlot');
-  const nestedSlot = document.getElementById('fitGalleryNestedSlot');
-  if (!section || !homeSlot || !nestedSlot) return;
-  adminState.fitGalleryPlacement = mode;
-  section.classList.toggle('nested', mode === 'nested');
-  if (mode === 'nested') {
-    nestedSlot.appendChild(section);
-  } else {
-    homeSlot.appendChild(section);
-  }
+// ---- Fitted Photos Gallery — "View All In-store Fitments" slide-out (2026-09-12, reworked
+// same day per Brenton's live-site screenshot) ----
+// Final placement/colour locked in 2026-09-12 (spec.md Section 12 item 5): full-width above
+// the Trust Row, non-red background, permanently — the placement/red-background Demo State
+// Panel toggles that previously existed to help decide this have been removed. Right-edge
+// slide-in drawer, same backdrop/drawer convention as buildStoreSlideout()/buildExdemoSlideout()
+// above (independent instance), but with two views: a photo grid (default) and a per-fitment
+// detail view (opened by clicking a grid photo), matching the live site's own "Browse Fitment"
+// popup. Brenton's calls on the data gaps here (no per-photo vehicle/component/multi-angle data
+// exists for our 16 real scraped photos): every fitment shows the same real vehicle/components
+// (this page's own data, not fabricated), and the detail view's 3 "other angle" thumbnails reuse
+// other real photos from the same 16 rather than inventing new ones — flagged in spec.md Section
+// 7 alongside the existing 16-vs-283 count gap. "Fit #" uses each photo's own real Rackit
+// `product_id` (FIT_GALLERY_PHOTOS[].id), not a fabricated number.
+let fitGallerySlideoutIndex = 0;
+
+function buildFitGallerySlideout() {
+  const triggers = document.querySelectorAll('[data-fit-gallery-slideout]');
+  if (!triggers.length || document.getElementById('fitGallerySlideoutBackdrop')) return;
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fit-gallery-slideout-backdrop';
+  backdrop.id = 'fitGallerySlideoutBackdrop';
+  backdrop.innerHTML = `
+    <div class="fit-gallery-slideout">
+      <div class="fit-gallery-slideout-head">
+        <h2 id="fitGallerySlideoutTitle">In-store Fitments</h2>
+        <button type="button" class="fgs-back-link" id="fgsBackLink" hidden>
+          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.3"/><rect x="14" y="3" width="7" height="7" rx="1.3"/><rect x="3" y="14" width="7" height="7" rx="1.3"/><rect x="14" y="14" width="7" height="7" rx="1.3"/></svg>
+          Back to Grid View
+        </button>
+        <button type="button" class="fit-gallery-slideout-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="fit-gallery-slideout-body" id="fitGallerySlideoutBody"></div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeFitGallerySlideout(); });
+  backdrop.querySelector('.fit-gallery-slideout-close').addEventListener('click', closeFitGallerySlideout);
+  backdrop.querySelector('#fgsBackLink').addEventListener('click', renderFitGallerySlideoutGrid);
+  // Delegated on the body container (not bound per-photo/per-button) since both views replace
+  // this container's innerHTML wholesale on every render.
+  backdrop.querySelector('#fitGallerySlideoutBody').addEventListener('click', e => {
+    const photo = e.target.closest('[data-fgs-open-index]');
+    if (photo) { renderFitGallerySlideoutDetail(Number(photo.dataset.fgsOpenIndex)); return; }
+    const prev = e.target.closest('.fgs-prev');
+    if (prev && !prev.disabled) { renderFitGallerySlideoutDetail(fitGallerySlideoutIndex - 1); return; }
+    const next = e.target.closest('.fgs-next');
+    if (next && !next.disabled) { renderFitGallerySlideoutDetail(fitGallerySlideoutIndex + 1); return; }
+    if (e.target.closest('.fgs-back-to-product')) closeFitGallerySlideoutAndReturn();
+  });
+  triggers.forEach(trigger => trigger.addEventListener('click', e => { e.preventDefault(); openFitGallerySlideout(); }));
 }
 
-// Red background toggle for the Fitted Photos Gallery panel (2026-09-10 client ask) —
-// the live site currently ships this panel on a red background; the new design defaults
-// to a neutral panel instead, with this toggle available to preview the red version for
-// stakeholder comparison. Independent of the placement toggle above.
-function applyFitGalleryRedFlag(on) {
-  const panel = document.getElementById('fitGalleryPanel');
+// Real count comes from #fitGallerySection's data-count (283 by default, or whatever the Demo
+// State Panel's "Fitment count" input is set to); rendered tiles are capped at 100 so the DOM
+// doesn't balloon on a very large count, cycling the 16 real photos to fill it.
+function fitGalleryTileCount() {
+  const section = document.getElementById('fitGallerySection');
+  const realCount = parseInt((section && section.dataset.count) || FIT_GALLERY_PHOTOS.length, 10) || FIT_GALLERY_PHOTOS.length;
+  return { realCount, tileCount: Math.min(100, realCount) };
+}
+
+function openFitGallerySlideout() {
+  const backdrop = document.getElementById('fitGallerySlideoutBackdrop');
+  if (!backdrop || typeof FIT_GALLERY_PHOTOS === 'undefined' || !FIT_GALLERY_PHOTOS.length) return;
+  renderFitGallerySlideoutGrid();
+  backdrop.classList.add('open');
+}
+
+function renderFitGallerySlideoutGrid() {
+  const { realCount, tileCount } = fitGalleryTileCount();
+  document.getElementById('fitGallerySlideoutTitle').hidden = false;
+  document.getElementById('fitGallerySlideoutTitle').textContent = `In-store Fitments (${realCount})`;
+  document.getElementById('fgsBackLink').hidden = true;
+  const body = document.getElementById('fitGallerySlideoutBody');
+  body.className = 'fit-gallery-slideout-body';
+  let html = '';
+  for (let i = 0; i < tileCount; i++) {
+    html += `<img src="${FIT_GALLERY_PHOTOS[i % FIT_GALLERY_PHOTOS.length].thumb}" data-fgs-open-index="${i}" role="button" tabindex="0" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80 — view fitment detail">`;
+  }
+  body.innerHTML = html;
+}
+
+// Reuses the page's own real What's Included rows (Platform/Backbone/Tracks) rather than a
+// second hardcoded copy, so the two lists can't drift out of sync with each other.
+function rackComponentsFromPage() {
+  return Array.from(document.querySelectorAll('.package-items .package-item')).map(row => ({
+    qty: row.querySelector('.pi-qty') ? row.querySelector('.pi-qty').textContent : '1x',
+    name: row.querySelector('.pi-name') ? row.querySelector('.pi-name').textContent : ''
+  }));
+}
+
+function renderFitGallerySlideoutDetail(index) {
+  const { realCount, tileCount } = fitGalleryTileCount();
+  const clamped = Math.max(0, Math.min(tileCount - 1, index));
+  fitGallerySlideoutIndex = clamped;
+  const photo = FIT_GALLERY_PHOTOS[clamped % FIT_GALLERY_PHOTOS.length];
+  const others = FIT_GALLERY_PHOTOS.filter((_, i) => i !== (clamped % FIT_GALLERY_PHOTOS.length)).slice(0, 3);
+  const vehicleLine = (typeof VEHICLE_PRODUCT !== 'undefined' && VEHICLE_PRODUCT.shared.specifications_shared['Vehicle']) || '';
+  const productTitle = document.querySelector('h1') ? document.querySelector('h1').textContent : '';
+  const components = rackComponentsFromPage();
+
+  document.getElementById('fitGallerySlideoutTitle').hidden = true;
+  document.getElementById('fgsBackLink').hidden = false;
+
+  const body = document.getElementById('fitGallerySlideoutBody');
+  body.className = 'fit-gallery-slideout-body fgs-detail-body';
+  body.innerHTML = `
+    <div class="fgs-browse-bar">
+      <span>Browse Fitment <strong>${clamped + 1}</strong> of ${realCount}</span>
+      <span class="fgs-fit-id">Fit #${photo.id}</span>
+    </div>
+    <div class="fgs-nav-row">
+      <button type="button" class="btn btn-outline fgs-prev" ${clamped === 0 ? 'disabled' : ''}>&lsaquo; Prev</button>
+      <button type="button" class="btn btn-outline fgs-next" ${clamped === tileCount - 1 ? 'disabled' : ''}>Next &rsaquo;</button>
+    </div>
+    <div class="fgs-main-image"><img src="${photo.thumb}" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80"></div>
+    <div class="fgs-thumbs">${[photo, ...others].map(p => `<img src="${p.thumb}" alt="">`).join('')}</div>
+    <h3 class="fgs-product-title">${productTitle}</h3>
+    <div class="fgs-vehicle-line">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.1-4l-1.2 4h12.2l-1.2-4a1 1 0 0 0-.9-.5H8a1 1 0 0 0-.9.5zM7 15.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+      ${vehicleLine}
+    </div>
+    <div class="fgs-components">
+      <h4>Rack Components</h4>
+      ${components.map(c => `<div class="fgs-component-row"><span class="fgs-c-name">${c.name}</span><span class="fgs-c-qty">${c.qty}</span></div>`).join('')}
+    </div>
+    <p class="fgs-note">Note: fitment images may contain additional accessories or hardware that are not included in the rack system. <strong>Only items listed above are included.</strong></p>
+    <button type="button" class="btn btn-outline fgs-back-to-product">Back to Product</button>
+  `;
+}
+
+// "Back to Product" (Brenton's call, replacing the live site's "View Rack & Buy" — this page
+// already IS that product, so "buy" doesn't apply the same way): close the drawer and return
+// focus to the decision panel rather than navigate anywhere.
+function closeFitGallerySlideoutAndReturn() {
+  closeFitGallerySlideout();
+  const panel = document.querySelector('.decision-panel');
   if (!panel) return;
-  adminState.fitGalleryRed = on;
-  panel.classList.toggle('red', on);
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  panel.classList.add('fgs-highlight');
+  setTimeout(() => panel.classList.remove('fgs-highlight'), 1200);
+}
+
+function closeFitGallerySlideout() {
+  const backdrop = document.getElementById('fitGallerySlideoutBackdrop');
+  if (backdrop) backdrop.classList.remove('open');
 }
 
 // Fitted Photos Gallery carousel — horizontal scroll-snap track with prev/next nav and
@@ -1706,6 +1824,7 @@ function initSearchClear() {
 document.addEventListener('DOMContentLoaded', () => {
   buildExdemoSlideout();
   buildStoreSlideout();
+  buildFitGallerySlideout();
   initCopyButtons();
   initFitGalleryCarousel();
   initTemplateSwitcher();
@@ -1749,7 +1868,6 @@ function initStickyCta() {
 function buildAdminPanel() {
   const needsVehicleDemo = !!document.querySelector('[data-fitment-slot]');
   const hasVariantPicker = !!document.querySelector('.variant-picker');
-  const hasFitGalleryPlacementToggle = !!document.getElementById('fitGallerySection') && !!document.getElementById('fitGalleryNestedSlot');
   const hasFitGallery = !!document.getElementById('fitGallerySection');
   const hasVehicleFitNotes = !!document.getElementById('vehicleFitNotes');
   const hasShowroom = !!document.getElementById('showroom');
@@ -1758,7 +1876,7 @@ function buildAdminPanel() {
   const initialShipping = detectInitialShippingState();
   const initialCollect = detectInitialCollectState();
   const initialFitGallery = detectInitialFitGalleryState();
-  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, exdemo: false, fittedOption: false, fittedMode: 'card', fitGalleryPlacement: 'full', fitGalleryRed: false, showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false, cartConflict: 'none' });
+  Object.assign(adminState, { video: initialVideo, sale: initialSale, stockStatus: 'in_stock', stockOverride: false, shipping: initialShipping, collect: initialCollect, exdemo: false, fittedOption: false, fittedMode: 'card', showroom: true, fitGallery: initialFitGallery, vehicleFitNotes: false, cartConflict: 'none' });
   // Interactive map is the locked default for the Showroom Finder widget, all 5
   // templates — no longer a Demo State Panel preview toggle. Layout (split-view,
   // revealing #showroomMap) still applies immediately so there's no shift once the map
@@ -1841,15 +1959,6 @@ function buildAdminPanel() {
           <label><input type="radio" name="fittedMode" value="checkbox"> Mode 2 — upsell checkbox</label>
         </div>
       </div>` : ''}
-      ${hasFitGalleryPlacementToggle ? `
-      <div class="admin-section">
-        <h5>Fitted Photos Gallery <span class="admin-note">(layout preview)</span></h5>
-        <label class="admin-toggle"><span>Red background (live-site style)</span><input type="checkbox" data-admin-flag="fitGalleryRed"></label>
-        <div class="admin-radio-row">
-          <label><input type="radio" name="fitGalleryPlacement" value="full" checked> Full width — above tabs</label>
-          <label><input type="radio" name="fitGalleryPlacement" value="nested"> Nested — under main gallery</label>
-        </div>
-      </div>` : ''}
     </div>
   `;
 
@@ -1895,7 +2004,6 @@ function buildAdminPanel() {
         case 'exdemo': applyExdemoFlag(on); break;
         case 'showroom': applyShowroomFlag(on); break;
         case 'fittedOption': setFittedOptionFlag(on); break;
-        case 'fitGalleryRed': applyFitGalleryRedFlag(on); break;
         case 'fitGallery': applyFitGalleryFlag(on); break;
         case 'vehicleFitNotes': applyVehicleFitNotesFlag(on); break;
       }
@@ -1929,10 +2037,6 @@ function buildAdminPanel() {
 
   panel.querySelectorAll('input[name="fittedMode"]').forEach(input => {
     input.addEventListener('change', () => { if (input.checked) setFittedOptionMode(input.value); });
-  });
-
-  panel.querySelectorAll('input[name="fitGalleryPlacement"]').forEach(input => {
-    input.addEventListener('change', () => { if (input.checked) applyFitGalleryPlacement(input.value); });
   });
 
   if (needsVehicleDemo) initFitmentDemo('match');
