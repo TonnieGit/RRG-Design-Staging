@@ -38,7 +38,7 @@ Top-to-bottom structural blocks. Not every section appears on every template —
 | **Body Tabs section** | Full-width area containing the Tabs widget (Details/Specifications/Gold Guarantee/Shipping/Fitting Instructions) — `.body-cols` |
 | **Related Products section** | "Related Products" heading + grid of cross-sell product cards — `.related-heading` / `.related-grid` |
 | **Design Rationale section** | Bottom-of-page internal/reviewer section explaining build decisions and trade-offs — not part of the shipped design — `.rationale` |
-| **Sticky Mobile Bar** | Condensed price + Add to Cart bar fixed to the bottom of the screen, mobile only — `.sticky-cta-mobile` |
+| **Sticky Mobile Bar** | Condensed product name + price + Add to Cart bar fixed to the bottom of the screen, mobile only — `.sticky-cta-mobile`. Vehicle-Specific carries a thumbnail + name (`.persistent-product`, added 2026-09-11 alongside its fitment box); the other 4 templates carry name only, no thumbnail (`.persistent-name`, added 2026-09-12 — Brenton's explicit choice over matching Vehicle-Specific's thumbnail treatment). |
 | **Persistent Bar** | Condensed fitment/price + Add to Cart bar fixed to the top of the screen on desktop, fades in once the Decision Panel scrolls out of view — `.persistent-bar` |
 
 ---

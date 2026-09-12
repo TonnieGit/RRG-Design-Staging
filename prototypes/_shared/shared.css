@@ -993,7 +993,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    it later — previously only the second case worked, since the bar used to be
    unconditionally visible at mobile widths regardless of scroll position. */
 .sticky-cta-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--rrg-line);padding:10px 16px;gap:10px;align-items:center;z-index:40;box-shadow:0 -6px 16px rgba(0,0,0,.08);}
-@media (max-width:640px){
+@media (max-width:900px){
   .sticky-cta-mobile.visible{display:flex;}
   body.has-sticky-cta{padding-bottom:74px;}
 }
@@ -1015,7 +1015,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .persistent-bar .price-now{font-size:20px;}
 .persistent-bar .price-was{font-size:12px;}
 .persistent-bar .btn{padding:12px 20px;font-size:13px;flex:0 0 auto;}
-@media (max-width:640px){.persistent-bar{display:none;}}
+@media (max-width:900px){.persistent-bar{display:none;}}
 
 /* Product thumbnail + truncated name (2026-09-11, backlog item 10) — gives the sticky
    bars back the "what am I looking at" context lost once the main gallery/title scroll
