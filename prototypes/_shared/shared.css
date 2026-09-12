@@ -395,7 +395,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    rows in the Click & Collect widget / store slide-out (a given store either has this
    product on display or it doesn't), not as a blanket pill beside the product's overall
    stock status. See .stock-chip.in/.order above and rrgStorePillsHTML() in shared.js. */
-.stock-chip.display{background:var(--rrg-display-bg);color:var(--rrg-display);border:1px solid var(--rrg-display);}
+.stock-chip.display{background:var(--rrg-display-bg);}
 
 /* Payment-plan badges — sits directly under Add to Cart, inside .cta-col, centered to
    match the button above. Real brand wordmarks (official SVGs), amount text computed
@@ -810,7 +810,9 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .exdemo-option{border:1px solid var(--rrg-line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
 .exdemo-option .eo-img{width:64px;height:64px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:6px;flex:0 0 auto;}
 .exdemo-option .eo-info{flex:1;min-width:0;}
-.exdemo-option .eo-tag{display:inline-block;white-space:nowrap;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:999px;background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);margin-bottom:6px;}
+/* Sizing kept identical to .stock-chip (padding/font-size/weight) — same status-pill family,
+   per Brenton's 2026-09-12 ask to unify every status pill on the page to one look. */
+.exdemo-option .eo-tag{display:inline-block;white-space:nowrap;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:6px;background:var(--rrg-unknown-bg);color:#333;margin-bottom:6px;}
 .exdemo-option .eo-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
 .exdemo-option .eo-was{font-size:12px;color:#8a8a8a;text-decoration:line-through;margin-left:6px;}
 .exdemo-option .eo-note{font-size:12px;color:#666;margin-top:2px;}
@@ -838,9 +840,34 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .dc-option,.dc-store{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--rrg-line);border-radius:8px;padding:12px 14px;font-size:13.5px;}
 .dc-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;}
 .muted{color:#767676;font-size:12.5px;}
-.stock-chip{display:inline-block;font-size:11px;font-weight:900;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-left:6px;}
-.stock-chip.in{background:var(--rrg-fits-bg);color:var(--rrg-fits);border:1px solid var(--rrg-fits);}
-.stock-chip.order{background:var(--rrg-unknown-bg);color:var(--rrg-unknown);border:1px solid var(--rrg-unknown);}
+.stock-chip{display:inline-block;white-space:nowrap;font-size:11px;font-weight:900;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-left:6px;color:#333;}
+.stock-chip.in{background:var(--rrg-fits-bg);}
+.stock-chip.order{background:var(--rrg-unknown-bg);}
+.stock-chip.none{background:var(--rrg-nofit-bg);}
+
+/* Delivery / Click & Collect widget v2 — Demo State Panel preview (backlog items 18/19,
+   2026-09-12, dcV2*() in shared.js). Explicit postcode "Check" instead of live-as-you-type:
+   .dc-shared (prompt + input row + error banner) sits above the two .dc-panel elements and
+   is hidden once a postcode is committed, replaced by that tab's own results-head + body. */
+.dc-prompt{padding:14px 18px 0;margin:0 0 8px;font-size:13.5px;color:#333;}
+.dc-shared .dc-postcode-row{padding-top:0;}
+.dc-error-banner{margin:10px 18px 0;padding:10px 14px;border-radius:8px;background:var(--rrg-nofit-bg);color:var(--rrg-nofit);font-size:13px;line-height:1.4;}
+.dc-input.error{border-color:var(--rrg-nofit);}
+.dc-results-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.dc-results-head h3{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;text-transform:none;}
+.dc-change-link{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--rrg-red);text-decoration:underline;white-space:nowrap;flex:0 0 auto;}
+.dc-select-list{display:flex;flex-direction:column;gap:10px;}
+.dc-select-option{display:flex;align-items:center;gap:12px;border:1.5px solid var(--rrg-line);border-radius:8px;padding:12px 14px;font-size:13.5px;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.dc-select-option:hover{border-color:#b8b8b8;}
+.dc-select-option:has(input:checked){border-color:var(--rrg-red);box-shadow:0 0 0 1px var(--rrg-red);}
+.dc-select-option input[type=radio]{accent-color:var(--rrg-red);width:18px;height:18px;flex:0 0 auto;}
+.dc-select-option .dc-select-body{flex:1 1 auto;min-width:0;}
+.dc-select-option .dc-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;flex:0 0 auto;}
+.dc-v2-copy{font-size:13.5px;color:#444;line-height:1.5;margin:0 0 14px;}
+.dc-v2-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.dc-quote-form{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.dc-quote-form .dc-input{flex:1 1 220px;}
+.dc-v2-confirm{font-size:13.5px;color:var(--rrg-fits);font-weight:700;margin:0 0 14px;}
 
 /* "View all stores" — opens the store slide-out drawer, see .store-slideout below and
    buildStoreSlideout() in shared.js. Click & Collect panel and, where present, the Showroom
@@ -945,7 +972,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .showroom-widget .dc-results{margin-top:18px;}
 .showroom-widget .dc-store{background:#1c1c1c;border-color:#3a3a3a;color:#fff;}
 .showroom-widget .muted{color:#aaa;}
-.showroom-widget .stock-chip.display{background:#FFCA48;color:#000;border-color:#FFCA48;}
+.showroom-widget .stock-chip.display{background:#FFCA48;color:#000;}
 .showroom-widget .dc-viewall-row{color:#ccc;margin-top:14px;}
 .showroom-widget .dc-viewall{color:#fff;}
 .showroom-widget .dc-viewall:hover{color:#e6e6e6;}
