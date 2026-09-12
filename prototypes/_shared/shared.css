@@ -44,6 +44,9 @@ h1,h2,h3,h4{
   margin:0 0 .4em;
   color:var(--rrg-black);
 }
+/* Product title — was locally overridden per template (23-26px, drifted over time); unified
+   2026-09-13 per client request so every template renders the same size. */
+.decision-panel h1{font-size:32px;line-height:1.1;margin-bottom:6px;}
 p{margin:0 0 1em;}
 img{max-width:100%;display:block;}
 a{color:inherit;}
