@@ -972,7 +972,9 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 **States:**
 - Location (full page, red arrow): ![Delivery/Click & Collect — location](dev-brief-assets/dc-widget-location.png)
 - Default, no postcode entered yet: ![DC widget — default](dev-brief-assets/dc-widget-default.png)
-- Postcode entered (AU) — summary line + "View all stores": ![DC widget — postcode entered](dev-brief-assets/dc-widget-results.png)
+- Postcode entered (AU), Delivery tab — Standard/Express Freight rates shown: ![DC widget — Delivery tab populated](dev-brief-assets/dc-widget-results-delivery.png)
+- Postcode entered (AU), Click & Collect tab — store results + "View all stores": ![DC widget — Click & Collect tab populated](dev-brief-assets/dc-widget-results-collect.png)
+- NZ/UK (single-store region) — fixed store line, no postcode search UI: ![DC widget — single-store region](dev-brief-assets/dc-widget-single-store.png)
 
 ---
 
@@ -990,7 +992,7 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 
 **States:**
 - Postcode entered (NSW, 2170) — NSW promoted to a "Within 100km" group at the top, open by default, On Display pill visible on Moorebank: ![Store Slide-out — open, promoted group](dev-brief-assets/store-slideout-open.png)
-- No postcode: every state renders as its own closed `<details>` group (native accordion, no JS) — not separately screenshotted here, same visual pattern as the FAQ accordion (7.18).
+- No postcode — every state renders as its own open `<details>` group (native accordion, no JS), same visual pattern as the FAQ accordion (7.18): ![Store Slide-out — no postcode, all groups open](dev-brief-assets/store-slideout-closed.png)
 
 ---
 
@@ -1092,8 +1094,10 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 **Links:** real external link (opens in a new tab, `target="_blank" rel="noopener noreferrer"`) — except on Vehicle-Specific, where the CTA copy/link is fitment-count-aware (see `#fitGallerySection`'s data-driven copy in `PAGE-GLOSSARY.md`): 5+ fitments links in-page to the Fitted Photos Gallery (7.16), 1–4 does the same with different copy, 0 or "no gallery" falls back to the same external fitting-costs link as the other 4 templates.
 
 **States:**
-- Paired with video (16:9, matches the video's height exactly): ![Get It Installed — paired](dev-brief-assets/install-cta-paired.png)
-- No video (full-width, larger text/icons): ![Get It Installed — no video](dev-brief-assets/install-cta-no-video.png)
+- Paired with video, Fitment Gallery on (16:9, matches the video's height exactly; CTA reads the fitment-count-aware copy, e.g. "We've fitted this 283 times — view the gallery"): ![Get It Installed — paired, gallery on](dev-brief-assets/install-cta-paired-gallery.png)
+- Paired with video, Fitment Gallery off (same size; CTA falls back to "See Fitting Options"): ![Get It Installed — paired, gallery off](dev-brief-assets/install-cta-paired-no-gallery.png)
+- No video, Fitment Gallery on (full-width, larger text/icons; same fitment-count-aware copy): ![Get It Installed — full-width, gallery on](dev-brief-assets/install-cta-fullwidth-gallery.png)
+- No video, Fitment Gallery off (full-width; "See Fitting Options" fallback): ![Get It Installed — full-width, gallery off](dev-brief-assets/install-cta-fullwidth-no-gallery.png)
 
 ---
 
@@ -1280,7 +1284,9 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 **Links:** not a navigation link — opens the slide-in drawer in place.
 
-**States:** ![Ex-Demo/B-Stock slide-in drawer](dev-brief-assets/exdemo-slideout.png) — 3 discount options (Ex-Demo/Sellable Return/Factory Second), computed live off whatever price is currently showing.
+**States:** 3 discount options (Ex-Demo/Sellable Return/Factory Second), computed live off whatever price is currently showing — the 3 tags are identical in every region, only the drawer heading and inline stock-line text change:
+- AU/NZ wording ("Ex-Demo & Factory Seconds"): ![Ex-Demo/B-Stock slide-in drawer — AU/NZ wording](dev-brief-assets/exdemo-slideout-au.png)
+- UK wording ("Graded Stock"): ![Ex-Demo/B-Stock slide-in drawer — UK "Graded" wording](dev-brief-assets/exdemo-slideout-uk.png)
 
 ---
 
