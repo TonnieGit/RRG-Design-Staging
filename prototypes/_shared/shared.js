@@ -1482,6 +1482,16 @@ function openFitGallerySlideout() {
   backdrop.classList.add('open');
 }
 
+// Opens the slide-out straight to one fitment's detail view (2026-09-12) — used by the
+// in-page carousel (renderFitGalleryTrack() in vehicle-specific/index.html), so clicking a
+// photo there jumps directly to its detail rather than requiring "View All" first.
+function openFitGallerySlideoutAt(index) {
+  const backdrop = document.getElementById('fitGallerySlideoutBackdrop');
+  if (!backdrop) return;
+  renderFitGallerySlideoutDetail(index);
+  backdrop.classList.add('open');
+}
+
 function renderFitGallerySlideoutGrid() {
   const { realCount, tileCount } = fitGalleryTileCount();
   document.getElementById('fitGallerySlideoutTitle').hidden = false;

@@ -845,12 +845,19 @@ const FIT_GALLERY_PHOTOS = [
   { thumb: "https://www.roofracksgalore.com.au/marcwatts/theme/cache/media/product/142x106/r/a/rackit-fitment-1-9994-1_1.jpg", id: 164886 }
 ];
 
+// Clicking a carousel photo opens that same fitment's detail view directly in the "View All"
+// slide-out (openFitGallerySlideoutAt() in shared.js) rather than requiring "View All" first.
+// Index matches 1:1 with FIT_GALLERY_PHOTOS since the carousel shows all 16 real photos in
+// the same order the grid does before it starts cycling past them.
 function renderFitGalleryTrack() {
   const track = document.getElementById('fitGalleryTrack');
   if (!track) return;
-  track.innerHTML = FIT_GALLERY_PHOTOS.map(p =>
-    `<img src="${p.thumb}" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80">`
+  track.innerHTML = FIT_GALLERY_PHOTOS.map((p, i) =>
+    `<img src="${p.thumb}" data-fgs-open-index="${i}" role="button" tabindex="0" alt="Rhino Rack Pioneer Platform fitted to a customer's Hilux N80 — view fitment detail">`
   ).join('');
+  track.querySelectorAll('img').forEach(img => {
+    img.addEventListener('click', () => openFitGallerySlideoutAt(Number(img.dataset.fgsOpenIndex)));
+  });
 }
 // Runs synchronously (not on DOMContentLoaded) — #fitGalleryTrack already exists above this
 // script tag, and shared.js's own DOMContentLoaded listener calls initFitGalleryCarousel()

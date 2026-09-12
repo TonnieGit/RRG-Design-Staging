@@ -637,7 +637,8 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .fit-gallery-carousel{position:relative;}
 .fit-gallery-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .fit-gallery-track::-webkit-scrollbar{display:none;}
-.fit-gallery-track img{flex:0 0 calc((100% - 60px)/7);aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#eee;scroll-snap-align:start;}
+.fit-gallery-track img{flex:0 0 calc((100% - 60px)/7);aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#eee;scroll-snap-align:start;cursor:pointer;transition:opacity .15s ease;}
+.fit-gallery-track img:hover{opacity:.8;}
 .fit-gallery-nav{display:none;position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--fg-nav-bg);color:var(--fg-nav-fg);border:1px solid var(--fg-nav-border);align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;z-index:2;}
 .fit-gallery-nav:disabled{opacity:.3;cursor:default;}
 .fit-gallery-nav.prev{left:-4px;}
