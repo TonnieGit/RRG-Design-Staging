@@ -1344,4 +1344,22 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 ---
 
+## 8. SEO & Structured Data
+
+**Location:** the page `<head>` and inline `<script type="application/ld+json">` blocks — not a visible widget, so it doesn't follow the Name/Location/Purpose/screenshot template used elsewhere in this document. Applies to all 5 templates.
+
+**Purpose:** technical elements that search engines and AI shopping agents (AEO — "answer engine optimization") read directly from the page, separate from anything a shopper sees. Logged via a scoping pass on 2026-09-12 (`spec.md` Section 12 item 31), after heading-hierarchy semantics and baseline `Product`/`Offer`/`FAQPage` schema were already built (see §7 audit and the JSON-LD blocks already in every template). **Nothing below is built in the prototype** — this section is scope notes for the real Magento build, written up directly rather than prototyped first, per Brenton's call on this item.
+
+1. **Meta description.** None of the 5 prototype templates carry a `<meta name="description">` tag. Needs real, keyword-targeted copy per product in the Magento build — this is on-page-copy/SEO-strategy work, not something to template-generate generically from other fields.
+2. **Canonical URL.** None of the 5 prototype templates carry a `<link rel="canonical">` tag. Add one per product page pointing at that product's real, single canonical URL.
+3. **`BreadcrumbList` structured data.** The visual breadcrumb trail (`.rrg-crumbs`) already exists and is correct on all 5 templates (fixed in `spec.md` Section 10 item 1), but nothing mirrors it as JSON-LD. Add a `BreadcrumbList` block matching whatever trail renders for that page.
+4. **`<title>` tag.** The prototype's `<title>` tags are dev-facing labels for this project (e.g. `"Simple Product PDP — Front Runner Pro Water Tank 42L"`), not real production titles. Build to whatever title format the wider Magento site already uses for product pages.
+5. **Alt text.** A handful of images ship with empty `alt=""` in the prototype — the payment-plan badge logos (`.pb-logo`) and the Persistent Bar thumbnail (`.persistent-thumb`). Give these real, descriptive alt text in the Magento build.
+6. **`Product` schema's `priceCurrency` — region-specific, flag to whoever builds the Region Selector (Section 4).** Every prototype template hardcodes `"priceCurrency": "AUD"` inline in its own `Product`/`Offer` JSON-LD block. The Region Selector's `applyRegionCurrency()` function (`shared.js`) only swaps the visible `$`/`£` symbol in on-page text — it doesn't touch these `<script>` blocks, so a UK/NZ page would still assert AUD pricing to search engines and AI shopping agents. In the real build, `priceCurrency` needs to follow the actual region/currency the page is served in.
+7. **`AggregateRating`/`Review` schema — not blocked on missing data.** No `aggregateRating` or `Review` schema exists yet in the `Product` block on any template, but the real data to populate it already exists: the Decision Panel star-rating badge (§2.2) already calls `api.reviews.io/timeline/data` live per SKU and gets back `average_rating`/`review_count`. Once a SKU has real reviews, that same response can drive `aggregateRating` — this is a straightforward addition once building in Magento, not something waiting on new data the way the FAQ content behind the `FAQPage` schema is (§7.18).
+
+**Before this leaves prototype stage:** none of the above is built in `prototypes/` — this section is scope/documentation only as of 2026-09-12, written up for the Magento build rather than prototyped first.
+
+---
+
 *Sections are added here as more of the prototype gets finalized and handed over — this is not the full site brief yet. Check `spec.md`'s own "Developer Brief" note for the date of the last addition.*
