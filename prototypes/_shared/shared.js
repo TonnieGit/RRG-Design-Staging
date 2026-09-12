@@ -104,7 +104,12 @@ function applyFitmentState(state, vehicle) {
     // actually confirmed to fit — hide it for "confirm your vehicle"/"doesn't fit".
     const badge = el.nextElementSibling;
     if (badge && (badge.classList.contains('rack-fit-badge') || badge.classList.contains('rack-fit-badge-icon'))) {
-      badge.hidden = state !== 'fits';
+      // toggleAttribute, not `badge.hidden = ...`: badge is an <svg>, and SVGElement doesn't
+      // reflect the boolean `hidden` IDL property to the content attribute in every browser —
+      // setting `.hidden` silently no-ops, leaving [hidden]{display:none} never applied and
+      // the badge visible in every fitment state (found 2026-09-12 while recapturing §7.2/7.3
+      // screenshots — this had never actually hidden in "doesn't fit"/"confirm your vehicle").
+      badge.toggleAttribute('hidden', state !== 'fits');
     }
   });
   // Add to Cart stays plain "Add To Cart" / primary style in every fitment state

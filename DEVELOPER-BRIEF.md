@@ -871,7 +871,7 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 
 **Purpose:** tells the shopper immediately whether this exact product fits their saved vehicle — the single most important piece of information on a fitment-driven product page, so it sits as high as possible.
 
-**Typography:** heading uses the page's `h1`-adjacent styling within the card (bold, black); body text is standard Lato body copy. Card background/accent colour comes from the state tokens in Section 5 (`--rrg-fits`/`--rrg-unknown`/`--rrg-nofit`).
+**Typography:** heading is a bold black `<strong>` within the card, not a real heading tag; body text is standard Lato body copy. Card background/accent colour comes from the state tokens in Section 5 (`--rrg-fits`/`--rrg-unknown`/`--rrg-nofit`).
 
 **Region differences:** none — this is driven by the shopper's saved vehicle, not their region.
 
@@ -893,9 +893,9 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 
 **Purpose:** reassures the shopper their fitment purchase is backed by a real guarantee, right at the point of the fitment decision.
 
-**Typography:** icon only, no visible text — the caption ("Peace of mind with our FREE Nationwide Rack Guarantee") lives in a `title` tooltip, not on-page text (client's explicit call — visible text read as too much).
+**Typography:** icon only, no visible text — the caption ("Peace of mind with our FREE Nationwide Rack Guarantee") lives in a `title` tooltip, not on-page text (client's explicit call — visible text read as too much). Hand-drawn placeholder vector icon (shield + checkmark), swappable for real client-approved artwork later; colour is tied to the `--rrg-fits` green token, the same token the Fitment Status card itself uses for a confirmed match.
 
-**Region differences:** none confirmed yet — not part of the Region Selector cascade.
+**Region differences:** none — the badge's colour is tied to the fitment-state token (`--rrg-fits`), not the region skin, so it doesn't vary by region.
 
 **Links:** clicking the badge (all 3 instances) jumps to and opens the Gold Guarantee tab, same tab-jump pattern as the star-rating badge (`data-jump-tab`/`initTabJumpLinks()`, see 7.17). The `title` tooltip is unchanged.
 
@@ -1127,13 +1127,15 @@ Every widget named in `PAGE-GLOSSARY.md`, one entry each, covering what it does,
 
 **Region differences:** none — not part of the Region Selector cascade.
 
-**Links:** "View All In-store Fitments (N)" is a real in-page link (jumps to/expands the full set); the CTA copy itself is fitment-count-aware, driven by Get It Installed (7.14).
+**Links:** "View All In-store Fitments (N)" opens a real two-view slide-out drawer (not an in-page expand) — a photo grid, then a per-fitment detail view when a photo is clicked. The CTA copy itself is fitment-count-aware, driven by Get It Installed (7.14).
 
 **States:**
 - Location (full page, red arrow): ![Fitted Photos Gallery — location](dev-brief-assets/fit-gallery-location.png)
 - Detail, full-width/non-red default (7 photos visible; nested placement shows 4): ![Fitted Photos Gallery — detail](dev-brief-assets/fit-gallery-detail.png)
+- Slide-out drawer, grid view (all 283 photos, opened via "View All In-store Fitments"): ![Fitted Photos Gallery — slide-out grid view](dev-brief-assets/fit-gallery-slideout-grid.png)
+- Slide-out drawer, detail view (clicking any grid photo opens this: "Browse Fitment N of 283 / Fit #" bar, Prev/Next, main photo + 4 thumbnails, the page's own real product title + vehicle line, and a live Rack Components list read from the page's own Package Contents rows): ![Fitted Photos Gallery — slide-out detail view](dev-brief-assets/fit-gallery-slideout-detail.png)
 
-**Notes:** a "Red background (live-site style)" toggle exists for stakeholder conversations expecting the old red-background treatment — default is non-red, per client direction.
+**Notes:** a "Red background (live-site style)" toggle exists for stakeholder conversations expecting the old red-background treatment — default is non-red, per client direction. Every fitment in the detail view shows the *same* real vehicle/components (no fabricated variety across vehicles) — the components list is read live from the page's own What's Included rows so the two can't drift apart; the detail view's "other angle" thumbnails reuse other real photos from the same 16-photo set rather than inventing new ones.
 
 ---
 
@@ -1218,7 +1220,7 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 **States:**
 - Vehicle-Specific (placeholder ×1 quantities — no real per-component quantity data exists yet): ![Package Contents — Vehicle-Specific](dev-brief-assets/package-contents-vehicle.png)
-- Grouped-Bundle (**real quantities**, taken verbatim from the live site's own "Bundle Includes" list): ![Package Contents — Grouped-Bundle](dev-brief-assets/screenshot-pending.svg) *(previous capture showed the Demo State Panel visible in frame — held pending the final mass-capture pass, see 0.1 rule 2)*
+- Grouped-Bundle (**real quantities**, taken verbatim from the live site's own "Bundle Includes" list): ![Package Contents — Grouped-Bundle](dev-brief-assets/package-contents-bundle.png)
 
 ---
 
@@ -1308,7 +1310,9 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 **Links:** none beyond the Add to Cart action itself.
 
-**States:** ![Sticky Mobile Bar](dev-brief-assets/sticky-mobile-bar.png) — on Vehicle-Specific this bar's fitment box drops to icon-only (no room once sharing space with the product thumbnail/name block added 2026-09-11).
+**States:**
+- Vehicle-Specific (thumbnail + name sharing space with a condensed, icon-only fitment box — no room for the full fitment label once both are present): ![Sticky Mobile Bar — Vehicle-Specific](dev-brief-assets/sticky-mobile-bar.png)
+- Other 4 templates (truncated name + price + Add to Cart, no fitment box): ![Sticky Mobile Bar — no fitment box](dev-brief-assets/sticky-mobile-bar-name.png)
 
 ---
 
@@ -1324,7 +1328,9 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 **Links:** Add to Cart action on every template; Vehicle-Specific's instance also carries the Rack Fit Guarantee badge's click-to-jump-to-Gold-Guarantee-tab action (see 7.3).
 
-**States:** ![Persistent Bar](dev-brief-assets/persistent-bar-detail.png) — Vehicle-Specific: product thumbnail + truncated name sharing space with a condensed fitment box (icon + short label, roughly half its full-detail width) + Rack Fit Guarantee badge. The other 4 templates: thumbnail + truncated name + price + Add to Cart only, no fitment box or badge.
+**States:**
+- Vehicle-Specific: product thumbnail + truncated name sharing space with a condensed fitment box (icon + short label, roughly half its full-detail width) + Rack Fit Guarantee badge: ![Persistent Bar — Vehicle-Specific](dev-brief-assets/persistent-bar-detail.png)
+- Other 4 templates: thumbnail + truncated name + price + Add to Cart only, no fitment box or badge: ![Persistent Bar — no fitment box](dev-brief-assets/persistent-bar-no-fitment.png)
 
 ---
 
@@ -1338,15 +1344,37 @@ Each template also carries a `FAQPage` JSON-LD structured-data block (in `<head>
 
 **Region differences:** none.
 
-**Links:** "Read more" is a real, working in-page jump — it checks the Details tab's own radio input directly and switches to it (`initTabJumpLinks()`), then scrolls there. A plain anchor jump wouldn't work here since the Tabs widget's accordion (7.17) has no JS of its own.
+**Links:** "Read more"/"See less" is an animated in-place expand/collapse (`toggleShortDesc()`), not a jump to the Details tab — clicking "Read more" reveals the full text in place with a "See less" link to re-collapse it back to the 2-line clamp.
 
-**States:** ![Short description — clamp + Read more](dev-brief-assets/short-desc-detail.png)
+**States:**
+- Collapsed (2-line clamp + "Read more"): ![Short description — collapsed](dev-brief-assets/short-desc-detail.png)
+- Expanded (full text + "See less"): ![Short description — expanded](dev-brief-assets/short-desc-expanded.png)
 
 ---
 
 ### 7.29 Demo State Panel
 
 **Not part of the shipped design — reviewer/QA tooling only, do not build this in Magento.** A floating "Demo State" button (bottom-right, hidden on mobile) expanding into a panel that lets a reviewer preview every simulated product state (video/sale/stock/shipping/collect/special order/ex-demo/showroom/fitted-option/gallery-placement/session-vehicle/cart-contents) without needing real data for each. Every screenshot in this document was captured with this panel closed — see Section "Screenshot capture process" convention. Mentioned here only so a developer who notices it in the prototype's source knows to leave it out of the production build.
+
+---
+
+### 7.30 Price Block
+
+**Location:** Decision Panel, directly below the title/short description — all 5 templates.
+
+**Purpose:** the price + stock-status area (`.price-block`) — redesigned 2026-09-12 off a client-supplied Figma reference to a stacked two-line layout that reads clearly at a glance: "Now" price on top, struck-through "RRP" + a Save-percent badge below.
+
+**Typography:** `.price-line-now` ("Now" label + `.price-now`, both red when on sale, `line-height:1`) above `.price-line-was` ("RRP" label + struck-through `.price-was` + `.badge-save`, both the label and price sharing identical dark-grey `#434343`/Lato-400 styling so the whole "RRP $X" reads as one continuous struck-through phrase — the RRP price is sized to match `.badge-save`'s own rendered height, and the two are centre-aligned). Off-sale, both labels and the whole RRP line disappear entirely, leaving a plain black price (red is reserved for the sale contrast, not every regular price).
+
+**Region differences:** none beyond the standard currency/price-token inheritance already covered in Section 4 — the redesign is purely a layout change, region cascade untouched.
+
+**Links:** none.
+
+**States:**
+- On-sale (desktop): ![Price Block — on-sale, desktop](dev-brief-assets/price-block-desktop-onsale.png)
+- Off-sale (desktop, plain black price, no labels): ![Price Block — off-sale, desktop](dev-brief-assets/price-block-desktop-offsale.png)
+- Mobile, on-sale — price centred as a unit; the Sale Tag moves off the price block entirely onto the top-right corner of the main gallery image (a corner ribbon reads better once price content no longer runs the block's full width): ![Price Block — mobile, on-sale, gallery Sale Tag](dev-brief-assets/price-block-mobile-onsale.png)
+- The condensed Sticky Mobile Bar (7.26) / Persistent Bar (7.27) price is adapted, not the full stacked treatment — same red/dark-grey colour language on the existing single-line price, no labels/badge (no room).
 
 ---
 
