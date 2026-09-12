@@ -310,7 +310,10 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 
 /* badges */
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:5px 12px;border-radius:999px;}
-.badge-save{background:var(--rrg-red);color:#fff;}
+/* border-radius override only (spec.md Section 12 item 23, Figma reference) — rectangular,
+   not the shared .badge pill shape. Scoped to -save specifically since .badge is never
+   reused for anything else in this project (confirmed via repo-wide search). */
+.badge-save{background:var(--rrg-red);color:#fff;border-radius:8px;text-transform:none;letter-spacing:normal;}
 
 /* fitment states — softened 2026-09-10 per client feedback: was a full solid-tinted
    box (heavy fill + full-strength border all round); now a near-white card with a
@@ -375,10 +378,62 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 .stars .stars-empty{opacity:.35;}
 .reviews-strip a{font-weight:700;text-decoration:underline;color:var(--rrg-black);}
 
-/* price block */
+/* price block — restyled 2026-09-12 (spec.md Section 12 item 23) to a stacked Now/Was
+   layout matching Brenton's Figma reference ("Price Layout Design.png"). .price-row is
+   kept as-is (still used by the condensed Persistent Bar's single-line price, which stays
+   a plain row — see the Persistent Bar/Sticky Mobile Bar rules further down). .price-now/
+   .price-was/.badge-save keep their exact class names/semantics so every existing JS hook
+   (reapplySaleFlag()/setSaleFlag()/detectInitialSaleState()/syncSaleTag(), plus each
+   template's own renderPrice()-equivalent) keeps working unchanged against the new
+   surrounding markup — see syncPriceLabels() in shared.js for the new label/line toggling. */
 .price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
-.price-now{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;color:var(--rrg-black);}
-.price-was{font-size:16px;color:#8a8a8a;text-decoration:line-through;}
+.price-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+/* line-height:1 on both children (2026-09-12 follow-up) — the inherited body line-height
+   of 1.45 was adding a lot of invisible space below .price-now's glyphs specifically (its
+   42px font-size makes that space large in absolute terms: a 60.9px line box around text
+   that's really only ~29px tall), which is what actually read as "a large gap" between the
+   Now/RRP lines even though the explicit margin between them was already only 2px. Scoped
+   to the Now line only — the RRP line's own line-height is deliberately left at the
+   inherited 1.45 since .price-was's font-size was tuned against that line-height to match
+   .badge-save's real rendered height (see below). */
+.price-line-now{margin-bottom:2px;}
+.price-line-now .price-now,.price-line-now .price-label{line-height:1;}
+/* Sale/RRP read as one "widget" (2026-09-12 follow-up), not two loosely-related lines —
+   align-items:center (was the .price-line default of baseline, which put the Save badge's
+   own centred padding out of true vertical alignment with the RRP text's baseline) plus a
+   tight explicit line-height on the RRP text itself (see .price-was/.price-label below —
+   the inherited body line-height of 1.45 was adding real invisible space above/below the
+   glyphs on both lines, which read as a large gap even though the margin between the two
+   line boxes was already only 2px). .badge-save is deliberately left off this line-height
+   change since its real rendered height (matched to the RRP price's font-size in the
+   previous follow-up) depends on the inherited 1.45 line-height. */
+.price-line-was{gap:6px;align-items:center;}
+.price-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
+/* "Now"/the price share one red once on sale (.price-block.on-sale, see below) — plain
+   (non-sale) state keeps the label neutral black, matching the plain price beside it. */
+.price-line-now .price-label{color:var(--rrg-black);}
+/* "RRP" (2026-09-12 follow-up, renamed from "Was") deliberately does NOT use the shared
+   .price-label treatment above — Brenton's feedback was that the bold Barlow Condensed
+   label read as heavier/a different colour than the grey RRP price next to it, even though
+   the hex was already identical (bold ink coverage reads visually darker/more saturated
+   at the same colour). Fixed by making the label match .price-was's actual font exactly
+   (family/weight/size/colour) rather than just its colour — the whole "RRP $319.00" then
+   reads as one consistent phrase, which also makes the shared text-decoration:line-through
+   on both spans look like one continuous strike rather than two different-weight pieces. */
+.price-line-was .price-label{font-family:inherit;font-weight:400;font-size:19px;color:#434343;text-decoration:line-through;}
+/* "Now" only reads red in contrast against a real "RRP" price (.price-block.on-sale,
+   toggled by syncPriceLabels() off the same .price-was.hidden state that already drove
+   the old single-row layout) — a plain full price stays neutral black, same as before
+   this redesign. Brenton's Figma reference is explicitly an on-sale example; reserving red
+   for the sale contrast itself (not every regular price) matches standard practice and
+   was flagged as a judgement call at plan review. */
+.price-block.on-sale .price-now,.price-block.on-sale .price-line-now .price-label{color:var(--rrg-red);}
+.price-now{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:700;color:var(--rrg-black);}
+/* font-size 19px (2026-09-12 follow-up) — sized to match .badge-save's real rendered
+   height (measured via Playwright: badge ~27.4px tall at 12px/1.45 line-height; 19px at
+   the same inherited line-height renders ~27.6px), per Brenton's ask that the RRP price
+   visually match the Save-badge pill's height rather than sitting noticeably smaller. */
+.price-was{font-size:19px;color:#434343;text-decoration:line-through;}
 
 /* Stock status line — replaces the old generic "estimate shipping" copy with the
    product's actual stock state (mirrors the fitment-state colour language: green/amber/
@@ -394,7 +449,7 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Discontinued state (backlog item 23) keeps the last real selling price on screen
    ("the price it was sold at") rather than hiding it — struck through, same visual
    language as .price-was's original-price crossout when on sale. */
-.price-block.discontinued .price-now{text-decoration:line-through;color:#8a8a8a;}
+.price-block.discontinued .price-now{text-decoration:line-through;color:#434343;}
 
 /* "On Display" pill — corrected 2026-09-10 (client feedback): belongs on individual store
    rows in the Click & Collect widget / store slide-out (a given store either has this
@@ -536,6 +591,17 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* gallery */
 .gallery-main{position:relative;border-radius:var(--radius);overflow:hidden;background:#f0f0f0;aspect-ratio:3/2;}
 .gallery-main img{width:100%;height:100%;object-fit:cover;}
+/* Mobile-only Sale Tag (2026-09-12, second follow-up — see the Sale Tag comment near
+   .price-block) — sits over the main product image's top-right corner instead of the
+   price block on mobile. Hidden entirely on desktop, where the original .price-block
+   instance is still the one that shows. `.gallery-main .gallery-sale-tag` (two classes)
+   is needed to out-specificity `.gallery-main img` above, which would otherwise stretch
+   this to fill the whole image box like the real product photo. `.gallery-main`'s own
+   overflow:hidden conveniently clips it flush to the image's rounded corner for free. */
+.gallery-sale-tag{display:none;}
+@media (max-width:900px){
+  .gallery-main .gallery-sale-tag{display:block;position:absolute;top:8px;right:8px;width:72px;height:auto;object-fit:contain;pointer-events:none;}
+}
 
 /* Thumbnails scroll as a single-row carousel instead of wrapping to a second row — keeps
    the gallery column's height from ballooning past the decision panel beside it once the
@@ -735,12 +801,27 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
 /* Sale tag — absolutely positioned against .price-block (not just .price-row), vertically
    centered against the whole block (price row + stock-status line beneath it), not just
    the price row's own line — matches the same corner-badge pattern as .rack-fit-badge.
-   Shown/hidden by the same "on sale" admin flag as the price (syncSaleTag() in shared.js
-   finds it via the price-row's containing .decision-panel, so it works regardless of
-   where inside the row it sits). */
+   Shown/hidden by the same "on sale" admin flag as the price — syncSaleTag() in shared.js
+   toggles every .sale-tag on the page together (this one plus .gallery-sale-tag below),
+   not scoped to a single .decision-panel, since a page only ever has one product/one sale
+   state to reflect regardless of how many tag instances currently show. */
 .price-block{position:relative;}
 .price-block .sale-tag{position:absolute;top:50%;right:0;transform:translateY(-50%);width:86px;height:auto;pointer-events:none;}
-@media (max-width:640px){.price-block .sale-tag{width:64px;}}
+/* Mobile (2026-09-12 follow-up, Brenton's ask): the pricing widget (both price lines +
+   the stock-status line) centers as a unit instead of staying left-aligned. Each is a flex
+   row that already shrink-wraps to its own content width, so align-items:center on the
+   now-flex-column .price-block centers each one as a whole block with no per-line change
+   needed. **Second follow-up, same day:** repositioning the Sale Tag to the price block's
+   own top-right corner (the first mobile fix) still read as "weird" per Brenton's review —
+   pinning a corner ribbon to a box that's centering its own content already looked
+   mismatched, and a wide price could still crowd it. Simpler fix: don't show it near the
+   price at all on mobile — hide it here entirely and show a second instance over the main
+   product image instead (.gallery-sale-tag below), which is where a "Sale" ribbon
+   conventionally belongs anyway. */
+@media (max-width:900px){
+  .price-block{display:flex;flex-direction:column;align-items:center;}
+  .price-block .sale-tag{display:none;}
+}
 
 /* Package contents (vehicle-specific kits) — each included item with its own SKU + copy
    button, so instore staff can copy individual part numbers without hunting through specs */
@@ -1044,8 +1125,18 @@ body.region-uk .rrg-sticky-header .rrg-logo img{position:absolute;top:-20px;left
    since there's no detail paragraph underneath to align against anymore. */
 .persistent-bar .fitment,.sticky-cta-mobile .info.fitment{align-items:center;}
 .persistent-bar .fitment strong,.sticky-cta-mobile .info.fitment strong{margin-bottom:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.persistent-bar .price-now{font-size:20px;}
-.persistent-bar .price-was{font-size:12px;}
+/* Condensed price (spec.md Section 12 item 23) — adapted, not the full stacked layout:
+   no room for Now/Was labels or the Save badge here, so it's just the same red/dark-grey
+   colour language as the Decision Panel applied to the existing single-line price. Applies
+   generically to every .price-now/.price-was still using these real classes (Persistent Bar
+   on all 5 templates, plus config-variant/sibling-color's #persistentPriceNow/Was) — the
+   Sticky Mobile Bar's inline-styled #mobilePrice/static equivalents on config-variant,
+   sibling-color, simple and grouped-bundle need their own direct colour edit since inline
+   styles don't inherit a class-level change. */
+.persistent-bar .price-now{font-size:20px;color:var(--rrg-red);}
+.persistent-bar .price-was{font-size:12px;color:#434343;}
+.sticky-cta-mobile .price-now{color:var(--rrg-red);}
+.sticky-cta-mobile .price-was{color:#434343;}
 .persistent-bar .btn{padding:12px 20px;font-size:13px;flex:0 0 auto;}
 @media (max-width:900px){.persistent-bar{display:none;}}
 

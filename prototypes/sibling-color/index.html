@@ -140,6 +140,7 @@
     <div class="gallery-col">
       <div class="gallery-main">
         <img id="mainImg" alt="MAXTRAX MKII recovery boards">
+        <img class="sale-tag gallery-sale-tag" src="../_shared/sale-tag.png" alt="On Sale">
       </div>
       <div class="gallery-thumbs" id="galleryThumbs"></div>
       <div class="install-media-row">
@@ -178,12 +179,16 @@
       <div class="swatch-note">Orange dot = limited stock</div>
 
       <div class="price-block">
-        <div class="price-row">
+        <div class="price-line price-line-now">
+          <span class="price-label">Now</span>
           <span class="price-now" id="priceNow"></span>
+        </div>
+        <div class="price-line price-line-was">
+          <span class="price-label">RRP</span>
           <span class="price-was" id="priceWas"></span>
           <span class="badge badge-save" id="saveBadge"></span>
-          <img class="sale-tag" src="../_shared/sale-tag.png" alt="On Sale">
         </div>
+        <img class="sale-tag" src="../_shared/sale-tag.png" alt="On Sale">
         <div class="stock-status-line in-stock" id="stockLine">✓ In Stock</div>
       </div>
 
@@ -713,7 +718,7 @@ function renderPrice(color) {
     priceWas.hidden = true;
     saveBadge.hidden = true;
   }
-  document.getElementById('mobilePrice').innerHTML = `${fmtMoney(color.price_now)}` + (color.price_now < color.price_was ? ` <span style="color:#8a8a8a;font-weight:400;text-decoration:line-through;font-size:11px;">${fmtMoney(color.price_was)}</span>` : '');
+  document.getElementById('mobilePrice').innerHTML = (color.price_now < color.price_was ? `<span style="color:var(--rrg-red);">${fmtMoney(color.price_now)}</span>` : fmtMoney(color.price_now)) + (color.price_now < color.price_was ? ` <span style="color:#434343;font-weight:400;text-decoration:line-through;font-size:11px;">${fmtMoney(color.price_was)}</span>` : '');
   const persistentPriceNow = document.getElementById('persistentPriceNow');
   const persistentPriceWas = document.getElementById('persistentPriceWas');
   if (persistentPriceNow) persistentPriceNow.textContent = fmtMoney(color.price_now);

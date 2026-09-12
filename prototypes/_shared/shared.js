@@ -734,14 +734,17 @@ function applyVideoFlag(on) {
   document.querySelectorAll('[data-admin-video]').forEach(el => { el.hidden = !on; });
 }
 
-// Mirrors the .sale-tag corner graphic (if this page has one) to the price block's real
-// discount-visible state — kept separate from the admin-flag override below so it stays
-// correct even when a variant/colour with no real discount (e.g. Titanium Grey) is showing.
+// Mirrors every .sale-tag corner graphic on the page (the price-block instance, desktop;
+// the .gallery-sale-tag instance over the main image, mobile — spec.md Section 12 item 23
+// follow-up) to the price block's real discount-visible state — kept separate from the
+// admin-flag override below so it stays correct even when a variant/colour with no real
+// discount (e.g. Titanium Grey) is showing. Not scoped to a single .decision-panel: a page
+// only ever has one product/one sale state, regardless of how many tag instances currently
+// show, so every .sale-tag on the page should always agree.
 function syncSaleTag(block) {
   const wasEl = block.querySelector('.price-was');
-  const panel = block.closest('.decision-panel');
-  const tag = panel && panel.querySelector('.sale-tag');
-  if (tag && wasEl) tag.hidden = wasEl.hidden;
+  if (!wasEl) return;
+  document.querySelectorAll('.sale-tag').forEach(tag => { tag.hidden = wasEl.hidden; });
 }
 
 // Payment-plan badge provider set, per region (backlog items 31/31a, 2026-09-11): AU keeps
@@ -807,6 +810,21 @@ function syncPaymentBadges(block) {
 // own renderAll()/renderPrice() loop should call this at the end of it, since that's the
 // only state a re-render can clobber (video/stock/availability use class or attribute
 // toggles that a re-render never touches).
+// "Now"/"Was" labels + the stacked price-line layout (spec.md Section 12 item 23) only
+// make sense when there's a real was-price to contrast against — this mirrors .price-was's
+// own hidden state rather than tracking the demo sale toggle directly, so it stays correct
+// for a per-variant/colour discount too (e.g. sibling-color's Titanium Grey, which has no
+// real discount even while the page's overall "sale" flag is on), not just the admin panel.
+function syncPriceLabels(block) {
+  const wasEl = block.querySelector('.price-was');
+  const lineWas = block.querySelector('.price-line-was');
+  const labelNow = block.querySelector('.price-line-now .price-label');
+  const onSale = !!wasEl && !wasEl.hidden;
+  block.classList.toggle('on-sale', onSale);
+  if (lineWas) lineWas.hidden = !onSale;
+  if (labelNow) labelNow.hidden = !onSale;
+}
+
 function reapplySaleFlag() {
   document.querySelectorAll('.price-block').forEach(block => {
     const nowEl = block.querySelector('.price-now');
@@ -818,6 +836,7 @@ function reapplySaleFlag() {
       wasEl.hidden = true;
       if (badgeEl) badgeEl.hidden = true;
     }
+    syncPriceLabels(block);
     syncSaleTag(block);
     syncPaymentBadges(block);
   });
@@ -833,6 +852,12 @@ function setSaleFlag(on) {
       el.textContent = el.dataset.saleText;
       delete el.dataset.saleText;
     });
+    // Real bug found 2026-09-12 (spec.md Section 12 item 23 build): this restore path never
+    // called reapplySaleFlag(), so the Sale Tag graphic (and, now, the new price labels)
+    // stayed hidden from the "off" toggle even after the price itself was restored. Safe to
+    // call unconditionally here — reapplySaleFlag()'s own price-swap branch is a no-op once
+    // adminState.sale is true again, so this only runs the sync-the-rest-of-the-UI half.
+    reapplySaleFlag();
     return;
   }
   reapplySaleFlag();
